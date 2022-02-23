@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Purchase RFQ number",
+    "name": "Purchase number",
     "summary": "Différencie les demande de prix (achat) et les bon de commande (achat)",
     "version": "0.1",
     "category": "Purchase",

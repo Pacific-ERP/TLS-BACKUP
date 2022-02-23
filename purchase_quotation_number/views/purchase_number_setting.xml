@@ -8,12 +8,12 @@
             <xpath expr="//field[@name='module_purchase_requisition']/../.." position="after">
                 <div class="col-12 col-lg-6 o_setting_box">
                     <div class="o_setting_left_pane">
-                        <field name="purchase_name_rfq" />
+                        <field name="purchase_rfq" />
                     </div>
                     <div class="o_setting_right_pane">
-                        <label for="purchase_name_rfq" />
+                        <label for="purchase_rfq" />
                         <div class="text-muted">
-                            Si décoché les demande de prix d'achat utiliseront un nom différent (QO) des bon de commande (PO)
+                            Si c'est décoché les demande de prix achat (QO*****) seront nommé différément des bon de commande (PO*****)
                         </div>
                     </div>
                 </div>

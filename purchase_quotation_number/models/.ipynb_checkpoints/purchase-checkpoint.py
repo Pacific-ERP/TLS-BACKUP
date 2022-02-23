@@ -1,9 +1,3 @@
-# © 2010-2012 Andy Lu <andy.lu@elico-corp.com> (Elico Corp)
-# © 2013 Agile Business Group sagl (<http://www.agilebg.com>)
-# © 2017 valentin vinagre  <valentin.vinagre@qubiq.es> (QubiQ)
-# © 2020 Manuel Regidor  <manuel.regidor@sygel.es>
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-
 from odoo import api, models
 
 
@@ -13,7 +7,7 @@ class PurchaseOrder(models.Model):
     @api.model
     def create(self, vals):
         if self.is_using_quotation_number(vals):
-            sequence = self.env["ir.sequence"].next_by_code("purchase.rfq")
+            sequence = self.env["ir.sequence"].next_by_code("purchase.order")
             vals["name"] = sequence or "/"
         return super(PurchaseOrder, self).create(vals)
 
@@ -24,8 +18,9 @@ class PurchaseOrder(models.Model):
             company = self.env["res.company"].browse(vals.get("company_id"))
         else:
             company = self.env.company
-        return not company.purchase_name_rfq
-
+        return not company.purchase_rfq
+    
+    #extend de l'action dupliquer
     def copy(self, default=None):
         self.ensure_one()
         if default is None:
@@ -35,17 +30,21 @@ class PurchaseOrder(models.Model):
         else:
             default["origin"] = self.name
         return super(PurchaseOrder, self).copy(default)
-
-    def action_confirm(self):
+    
+    #extend de l'action confirmation du rfq en bdc
+    def button_confirm(self):
         for purchase in self:
+            #Si name = P -> Continue
             if self.name[:2] != "QO":
                 continue
-            if purchase.state not in ("draft", "sent") or purchase.company_id.purchase_name_rfq:
+            #Si état n'est pas draft ou sent ou que l'option différenciation est activé -> Continue
+            if purchase.state not in ("draft", "sent") or purchase.company_id.purchase_rfq:
                 continue
+            #si origin existe et qu'il n'est pas vide -> quo = origin , name
             if purchase.origin and purchase.origin != "":
                 quo = purchase.origin + ", " + purchase.name
             else:
                 quo = purchase.name
-            sequence = self.env["ir.sequence"].next_by_code("purchase.rfq")
+            sequence = self.env["ir.sequence"].next_by_code("purchase.po")
             purchase.write({"origin": quo, "name": sequence})
-        return super().action_confirm()
+        return super().button_confirm()
