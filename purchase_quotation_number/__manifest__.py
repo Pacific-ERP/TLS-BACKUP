@@ -9,7 +9,7 @@
     "license": "LGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["purchase"],
+    "depends": ["purchase","base"],
     "data": [
         #Création de la séquence dans le modèle ir.sequence
         "data/purchase_rfq_sequence.xml",
