@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models
+import logging
+from odoo import api, models, fields
 
+_logger = logging.getLogger(__name__)
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
-
+    
     @api.model
     def create(self, vals):
         if self.is_using_quotation_number(vals):
