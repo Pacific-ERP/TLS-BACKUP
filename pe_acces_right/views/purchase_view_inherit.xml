@@ -1,0 +1,27 @@
+<odoo>
+    <data>
+        <!-- attribution des groups au button -->
+        <record id="purchase_order_form_restricted" model="ir.ui.view">
+            <field name="name">purchase.order.form.restricted</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_create_invoice'][2]" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user,purchase.group_purchase_manager</attribute>
+                </xpath>
+            </field>
+        </record>
+        <record id="purchase_order_form_mods_restrict" model="ir.ui.view">
+            <field name="name">purchase.order.form.mods.restrict</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form" />
+            <field name="groups_id" eval="[(6, 0, [ref('pe_acces_right.purchase_create_facture_restricted') ])]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_create_invoice'][2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
+        

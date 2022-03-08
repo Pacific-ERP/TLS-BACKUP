@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="purchase_order_view_inherit_print" model="ir.ui.view">
+        <field name="name">purchase.order.view.inherit.print</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form" />
+        <field name="arch" type="xml">
+            <!-- modification avec xpath  // recherche sur tout le documents -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Var Test">
+                    <group>
+                        <group string="PDF Files name">
+                            <field name="check_text"/>
+                            <field name="pdf_name_po"/>
+                            <field name="pdf_name_qo"/>
+                            <field name="field_reload_compute"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
