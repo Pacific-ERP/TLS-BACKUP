@@ -33,8 +33,10 @@ class PurchaseOrder(models.Model):
                         # récupération du nom de la société au lieu de passer par 
                         if societe.company_type == 'company':
                             societe_demandeuse = societe_demandeuse + '-' + societe.name
-                        else:
+                        elif societe.parent_id.name:
                             societe_demandeuse = societe_demandeuse + '-' + societe.parent_id.name
+                        else:
+                            societe_demandeuse = societe_demandeuse + '-' + societe.name
                             # String formating python
                 if purchase.state in ('draft','sent'):
                     state = 'Demande de prix'
@@ -54,7 +56,7 @@ class PurchaseOrder(models.Model):
 # à mettre sur les rapport nom du fichier action>rapport ne pas oublier les traduction éviter tout problème:
 
 # Bon de commande (purchase.order)
-#(object.pdf_name_po) and '%s' % (object.pdf_name_po) or '%s - Bon de comamnde' % (object.name))
+#(object.pdf_name_po) and '%s' % (object.pdf_name_po) or '%s - Bon de comamnde' % (object.name)
 
 # Demande de prix (purchase.order)
 #(object.pdf_name_qo) and '%s' % (object.pdf_name_qo) or '%s - Demande de prix' % (object.name)

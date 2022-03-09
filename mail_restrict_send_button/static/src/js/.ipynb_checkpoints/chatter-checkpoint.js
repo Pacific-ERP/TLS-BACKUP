@@ -1,11 +1,12 @@
 odoo.define("mail_restrict_send_button/static/src/js/chatter.js", function (require) {
     "use strict";
 
-    const {registry} = require("mail/static/src/model/model_core.js");
-    const container = require("mail/static/src/components/chatter_container/chatter_container.js");
+    const {registry} = require("@mail/model/model_core");
+    const container = require("@mail/components/chatter_container/chatter_containerrrrrrrrr");
+    console.log(container);
     const rpc = require("web.rpc");
-    const {attr, many2one, one2one} = require("mail/static/src/model/model_field.js");
-    const {clear} = require("mail/static/src/model/model_field_command.js");
+    const {attr, many2one, one2one} = require("@mail/model/model_field");
+    const {clear} = require("@mail/model/model_field_command");
 
     registry["mail.chatter"].factory = function (dependencies) {
         const getThreadNextTemporaryId = (function () {
@@ -354,7 +355,7 @@ odoo.define("mail_restrict_send_button/static/src/js/chatter.js", function (requ
 
         return Chatter;
     };
-    container.prototype._insertFromProps = function (props) {
+    container._insertFromProps = function (props) {
         const values = Object.assign({}, props);
         rpc.query({
             model: "mail.followers",
