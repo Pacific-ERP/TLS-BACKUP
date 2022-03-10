@@ -2,7 +2,7 @@ odoo.define("mail_restrict_send_button/static/src/js/chatter.js", function (requ
     "use strict";
 
     const {registry} = require("@mail/model/model_core");
-    const container = require("@mail/components/chatter_container/chatter_containerrrrrrrrr");
+    const container = require("@mail/components/chatter_container/chatter_containerrrrr");
     console.log(container);
     const rpc = require("web.rpc");
     const {attr, many2one, one2one} = require("@mail/model/model_field");
@@ -355,6 +355,7 @@ odoo.define("mail_restrict_send_button/static/src/js/chatter.js", function (requ
 
         return Chatter;
     };
+    /*
     container._insertFromProps = function (props) {
         const values = Object.assign({}, props);
         rpc.query({
@@ -375,5 +376,5 @@ odoo.define("mail_restrict_send_button/static/src/js/chatter.js", function (requ
                 this.chatter.update(values);
             }
         });
-    };
+    };*/
 });
