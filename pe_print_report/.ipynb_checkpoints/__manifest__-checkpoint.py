@@ -11,6 +11,7 @@
     "installable": True,
     "depends": ["purchase"],
     "data": [
-        "views/purchase_order_view_inherit.xml"
+        "views/purchase_order_view_inherit.xml",
+        "report/print_report_custom.xml",
         ],
 }
