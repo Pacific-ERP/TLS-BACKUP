@@ -11,6 +11,6 @@
     "installable": True,
     "depends": ["purchase"],
     "data": [
-        "views/purchase_order_view_inherit.xml",
+        #test only "views/purchase_order_view_inherit.xml",
         ],
 }
