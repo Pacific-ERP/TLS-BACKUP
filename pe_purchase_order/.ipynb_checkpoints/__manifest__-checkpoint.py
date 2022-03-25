@@ -9,8 +9,8 @@
     "license": "LGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["purchase"],
+    "depends": ['account','stock','purchase'],
     "data": [
-        #"views/example_inherit_view.xml"
+        "views/purchase_form.xml"
         ],
 }
