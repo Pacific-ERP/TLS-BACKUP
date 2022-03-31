@@ -15,7 +15,8 @@
     ##########################Ajout MT Pacific-ERP""##########################
     'assets': {
         'web.assets_backend': [
-            'mail_restrict_send_button/static/src/js/chatter.js',
+            #'mail_restrict_send_button/static/src/js/chatter.js',
+            'mail_restrict_send_button/static/src/js/test_chatter.js',
             #'mail/static/src/model/model_core.js',
         ],
         'web.assets_qweb': [

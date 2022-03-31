@@ -3,7 +3,6 @@ odoo.define("mail_restrict_send_button/static/src/js/chatter.js", function (requ
 
     const {registry} = require("@mail/model/model_core");
     const container = require("@mail/components/chatter_container/chatter_containerrrrr");
-    console.log(container);
     const rpc = require("web.rpc");
     const {attr, many2one, one2one} = require("@mail/model/model_field");
     const {clear} = require("@mail/model/model_field_command");
