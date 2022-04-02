@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+        <!-- rend visible champs pour groups donner -->
+        <record id="sale_order_form_aremiti_only" model="ir.ui.view">
+            <field name="name">sale.order.form.aremiti.only</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="groups_id" eval="[(6, 0, [ref('pe_aremiti_custom.group_aremiti_users') ])]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Aremiti">
+                        <group>
+
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
+        
