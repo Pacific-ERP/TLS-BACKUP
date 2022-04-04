@@ -5,7 +5,7 @@
             <field name="name">sale.order.form.revatua.user.only</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form" />
-            <field name="groups_id" eval="[(6, 0, [ref('pe_aremiti_custom.group_aremiti_users') ])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
                     <page string="Aremiti">

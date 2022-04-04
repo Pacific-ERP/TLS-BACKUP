@@ -12,7 +12,7 @@
             </field>
         </record>
     <!-- Ajout de notre menu au sous menu des configuration dans le modules inventaires -->
-        <menuitem name="Étiquette d'articles" id="pe_revatua_etiquette" parent="stock.menu_stock_config_settings" action="product_etiquette_list_action" sequence="10"/>
+        <menuitem name="Étiquette d'articles" id="pe_revatua_etiquette" parent="stock.menu_product_in_config_stock" action="product_etiquette_list_action" sequence="10"/>
     </data>
 </odoo>
         

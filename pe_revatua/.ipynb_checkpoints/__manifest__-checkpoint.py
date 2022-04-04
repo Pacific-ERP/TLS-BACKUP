@@ -15,6 +15,6 @@
         "security/ir.model.access.csv",
         "views/sale_order_inherit.xml",
         "views/menuitems_inherit.xml",
-        #"views/product_template_inherit.xml"        
+        "views/product_template_inherit.xml"        
         ],
 }
