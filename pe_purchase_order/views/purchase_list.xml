@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="pe_purchase_list_inherit" model="ir.ui.view">
+        <field name="name">pe.purchase.list.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-bf">delivery_status == 'all_delivered' and invoice_status == 'invoiced'</attribute>
+                <attribute name="decoration-success">delivery_status == 'all_delivered' and invoice_status == 'invoiced'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="delivery_status" optional="show" widget="badge" decoration-danger="delivery_status == 'no'" decoration-warning="delivery_status == 'in_delivery'" decoration-success="delivery_status == 'all_delivered'" />
+            </xpath>
+            <xpath expr="//field[@name='invoice_status']" position="attributes">
+                <attribute name="optional">show</attribute>
+                <attribute name="widget">badge</attribute>
+                <attribute name="decoration-danger">invoice_status == 'no'</attribute>
+                <attribute name="decoration-warning">invoice_status == 'to invoice'</attribute>
+                <attribute name="decoration-success">invoice_status == 'invoiced'</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
