@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "PDF report name",
-    "summary": "Custom de report PDF file name",
+    "name": "Custom module Comptabilité (PE)",
+    "summary": "Modif non studio (PE)",
     "version": "0.1",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",
+    "depends": ['account'],
     "license": "LGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["purchase"],
     "data": [
-        #testviews "views/purchase_order_view_inherit.xml",
+        
         ],
 }

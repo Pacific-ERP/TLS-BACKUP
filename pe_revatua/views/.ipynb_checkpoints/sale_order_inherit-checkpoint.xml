@@ -1,0 +1,25 @@
+<odoo>
+    <data>
+        <!-- rend visible champs pour groups donner -->
+        <record id="sale_order_form_revatua_user_only" model="ir.ui.view">
+            <field name="name">sale.order.form.revatua.user.only</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Aremiti">
+                        <group>
+                            <field name="mt_txt1"/>
+                            <field name="mt_txt2" required="1"/>
+                            <field name="mt_numb"/>
+                            <field name="mt_boolean"/>
+                            <field name="mt_date"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
+        
