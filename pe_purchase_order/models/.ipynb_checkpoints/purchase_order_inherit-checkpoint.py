@@ -7,14 +7,7 @@ _logger = logging.getLogger(__name__)
 class PurchaseOrderInherit(models.Model):
     _inherit = "purchase.order"
     
-    ################################ Override State purchase.py ################################
-    #state = fields.Selection( selection_add =[
-    #    ('delivered', 'Commande à facturé'),   # Etat ajoutée
-    #    ('invoicing', 'Facture en attentes'),   # Etat ajoutée
-    #    ('all_done', 'Commande cloturée'),     # Etat ajoutée
-    #], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
-    ################################ Override State purchase.py ################################ picking_ids invoice_status(to invoice, invoiced)
-    
+    #ajouter le module purchase_stock dans les dépendances du manifest pour avoir le champs purchase_id sinon erreur d'existence
     delivery_line = fields.One2many(comodel_name='stock.picking', inverse_name='purchase_id', string='delivery line', copy=True)
 
     delivery_status = fields.Selection([
@@ -45,3 +38,5 @@ class PurchaseOrderInherit(models.Model):
                 purchase.delivery_status = 'all_delivered'
             else:
                 purchase.delivery_status = 'no'
+
+        # Si trop de soucis avec le champs de base de facturation(invoice_status) refaire la méthode manuellement 
