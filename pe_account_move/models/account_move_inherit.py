@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 class AccountMoveIhnerit(models.Model):
     _inherit = "account.move"
     
-    def _check_month_lock_date(self):
+    def _check_month_lock_date(self):# 644 302
         for move in self:
             invoice_date = move.date # date du document
             today = date.today() # date d'aujourd'hui
@@ -19,7 +19,7 @@ class AccountMoveIhnerit(models.Model):
             last_day_of_prev_month = date.today().replace(day=1) - timedelta(days=1) # dernier jours M-1
             # Pour récupérer le group de l'utilisateur : self.user_has_groups() ici group_account_manager c'est le [Comptabilité / Paramétrage facturation]
             if invoice_date <= last_day_of_prev_month and lock_date <= today and not self.user_has_groups('account.group_account_manager'):
-                message = _("You cannot add/modify entries prior to and inclusive of the lock date %s.", format_date(self.env, lock_date))
+                message = _("You cannot add/modify entries prior to and inclusive of the lock date %s, refer to your invoice manager.", format_date(self.env, lock_date))
                 raise UserError(message)
         return True
         
@@ -62,6 +62,8 @@ class AccountMoveLineIhnerit(models.Model):
     
     def write(self, vals):
         # OVERRIDE Write method account.move.line
+        PROTECTED_FIELDS_TAX_LOCK_DATE = ['debit', 'credit', 'tax_line_id', 'tax_ids', 'tax_tag_ids']
+        PROTECTED_FIELDS_LOCK_DATE = PROTECTED_FIELDS_TAX_LOCK_DATE + ['account_id', 'journal_id', 'amount_currency', 'currency_id', 'partner_id']
         res = super(AccountMoveLineIhnerit, self).write(vals)
         for line in self:
             if line.parent_state == 'posted' and any(self.env['account.move']._field_will_change(line, vals, field_name) for field_name in PROTECTED_FIELDS_LOCK_DATE):
