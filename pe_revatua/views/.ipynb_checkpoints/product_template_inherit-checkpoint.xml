@@ -13,9 +13,9 @@
                             <field name="tarif_normal" class="oe_inline" widget='monetary'/>
                             <field name="tarif_minimum" class="oe_inline" widget='monetary'/>
                         </group>
-                        <group string="Fret">
-                            <field name="tarif_fret" class="oe_inline" widget='monetary'/>
-                            <field name="tarif_minimum_fret" class="oe_inline" widget='monetary'/>
+                        <group string="Maritime">
+                            <field name="tarif_maritime" class="oe_inline" widget='monetary'/>
+                            <field name="tarif_minimum_maritime" class="oe_inline" widget='monetary'/>
                         </group>
                         <group string="Terrestre">
                             <field name="tarif_terrestre" class="oe_inline" widget='monetary'/>
@@ -31,17 +31,6 @@
                             <field name="check_adm"/>
                         </group>
                     </group>
-                </xpath>
-            </field>
-        </record>
-        <record id="product_template_form_tls_only" model="ir.ui.view">
-            <field name="name">product.template.form.tls.only</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_form_view" />
-            <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_tls_users') ])]"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='uom_po_id']" position="after">
-                    <field name="check_barre_roue"/>
                 </xpath>
             </field>
         </record>
