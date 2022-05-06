@@ -12,9 +12,9 @@ class PurchaseOrderInherit(models.Model):
 
     delivery_status = fields.Selection([
         ('no','Pas de livraison'),
-        ('in_delivery','Livraison en cour'),
+        ('in_delivery','Livraison en cours'),
         ('all_delivered','Livraison complète')
-    ], string='Status reception', compute='_get_deliveries_state', store=True, readonly=True, copy=False, default='no')
+    ], string='Statut reception', compute='_get_deliveries_state', store=True, readonly=True, copy=False, default='no')
           
     # Vérification de l'avancement des livraison     
     @api.depends('delivery_line.state')
