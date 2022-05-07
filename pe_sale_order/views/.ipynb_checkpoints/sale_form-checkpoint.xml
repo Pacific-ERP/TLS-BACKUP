@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="pe_sale_form_inherit" model="ir.ui.view">
+        <field name="name">pe.sale.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='other_information']/group[1]/group[@name='sale_info']/field[@name='invoice_status']" position="after">
+                <field name="delivery_status"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
