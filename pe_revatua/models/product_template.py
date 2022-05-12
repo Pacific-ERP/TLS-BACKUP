@@ -41,29 +41,26 @@ class ProductTemplateInherit(models.Model):
     tarif_minimum_rpa = fields.Monetary(string='Tarif minimum RPA',
                                         default=0)
         
-    
-    
     #Terrestre 60% du prix normal & maritime 40% du prix normal
-    @api.depends('tarif_normal')
+    @api.onchange('tarif_normal')
     def _get_default_value_m_t(self):
         for record in self:
-            if record.tarif_normal and record.tarif_normal != 0:
-                record.tarif_terrestre = (record.tarif_normal * 0.6)
-                record.tarif_maritime = (record.tarif_normal * 0.4)
+            t_normal = record.tarif_normal
+            # si tarif normal existe et qu'il n'est pas = à 0 et si les tarifs terrestre 
+            if t_normal and t_normal != 0:
+                record.tarif_terrestre = (t_normal * 0.6)
+                record.tarif_maritime = (t_normal * 0.4)
                 
     #Fields maritime
     tarif_maritime = fields.Monetary(string='Tarif maritime',
-                                     compute=_get_default_value_m_t,
                                      default=0,
                                      readonly=False)
     tarif_minimum_maritime = fields.Monetary(string='Tarif minimum maritime',
                                              default=0)
     #Fields Terrestre
     tarif_terrestre = fields.Monetary(string='Tarif terrestre',
-                                      compute=_get_default_value_m_t,
                                       default=0,
                                       readonly=False)
-    
     tarif_minimum_terrestre = fields.Monetary(string='Tarif minimum terrestre',
                                               default=0)
 
