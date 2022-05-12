@@ -12,7 +12,7 @@
                     <field name="tarif_terrestre" optional="show"/>
                     <field name="tarif_maritime" optional="show"/>
                     <field name="tarif_rpa" optional="show"/>
-                    <field name="total_ttc" optional="show"/>
+                    <field name="price_total" optional="show" string="Total TTC"/>
                 </xpath>
                 <!-- Précision sur le sous total que c'est du HT -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="attributes">

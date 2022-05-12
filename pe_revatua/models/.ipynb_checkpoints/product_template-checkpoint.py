@@ -37,7 +37,7 @@ class ProductTemplateInherit(models.Model):
                                     default=0)
     #Fields RPA
     tarif_rpa = fields.Monetary(string='Tarif RPA',
-                                default=100)
+                                default=0)
     tarif_minimum_rpa = fields.Monetary(string='Tarif minimum RPA',
                                         default=0)
         
@@ -48,8 +48,11 @@ class ProductTemplateInherit(models.Model):
             t_normal = record.tarif_normal
             # si tarif normal existe et qu'il n'est pas = à 0 et si les tarifs terrestre 
             if t_normal and t_normal != 0:
+                record.list_price = t_normal
                 record.tarif_terrestre = (t_normal * 0.6)
                 record.tarif_maritime = (t_normal * 0.4)
+                if record.tarif_rpa == 0:
+                    record.tarif_rpa = 100
                 
     #Fields maritime
     tarif_maritime = fields.Monetary(string='Tarif maritime',

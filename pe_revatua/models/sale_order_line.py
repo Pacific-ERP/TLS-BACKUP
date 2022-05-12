@@ -10,16 +10,6 @@ class SaleOrderLineInherit(models.Model):
     tarif_rpa = fields.Float(string='RPA', default=0, required=True)
     tarif_maritime = fields.Float(string='Maritime', default=0, required=True)
     tarif_terrestre = fields.Float(string='Terrestre', default=0, required=True)
-    total_ttc = fields.Monetary(string='Total TTC', default=0 ,compute='_total_ttc_revatua')
-    #volume_m3 = fields.Float(string='Vol(m3)', default=1, required=True)
-    
-    @api.depends('tarif_terrestre','tarif_maritime','tarif_rpa')
-    def _total_ttc_revatua(self):
-        # Check if revatua is activate
-        revatua_state = self.env.company.revatua_ck
-        if revatua_state:
-            for line in self:
-                line.total_ttc = line.price_subtotal + line.price_tax + line.tarif_rpa
             
     @api.onchange('product_id')
     def product_id_change(self):
@@ -43,9 +33,10 @@ class SaleOrderLineInherit(models.Model):
         res = super(SaleOrderLineInherit, self)._onchange_update_product_packaging_qty()
         # Check if revatua is activate
         revatua_state = self.env.company.revatua_ck
-        if revatua_state:
+        if revatua_state and self.tarif_terrestre != 0 or self.tarif_maritime != 0:
             self.tarif_terrestre = self.price_subtotal * 0.6
             self.tarif_maritime = self.price_subtotal * 0.4
-            self.tarif_rpa = self.product_uom_qty * 100
+            if self.tarif_rpa != 0:
+                self.tarif_rpa = self.product_uom_qty * 100
         return res
     
