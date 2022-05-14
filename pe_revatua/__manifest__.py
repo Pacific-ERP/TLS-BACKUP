@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Revatua",
-    "summary": "Ajout du module Revatua uniquement pour le groupe d'utilisateur Revatua / Users",
-    "version": "0.1",
+    "summary": "Ajout des fonctionnalité en liens à Revatua (création de connaissement, visualisation des planing bateau, etc...)",
+    "version": "15.0.0.1.5",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",
@@ -13,8 +13,9 @@
     "data": [
         "security/res_groups.xml",
         "security/ir.model.access.csv",
-        "views/sale_order_inherit.xml",
+        "views/setting_inherits.xml",
         "views/menuitems_inherit.xml",
-        "views/product_template_inherit.xml"        
+        "views/product_template_inherit.xml",
+        "views/sale_order_inherit.xml",
         ],
 }
