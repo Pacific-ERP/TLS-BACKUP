@@ -7,8 +7,7 @@ _logger = logging.getLogger(__name__)
 class SaleOrderInherit(models.Model):
     _inherit = "stock.picking"
     
-    reliquat_refuser = fields.Char(string="Reliquat cancel")
-    reliquat_accepter = fields.Char(string="Reliquat process")
+    reliquat_state = fields.Char(string="Reliquat")
 
 class StockBackorderConfirmation(models.TransientModel):
     _inherit = 'stock.backorder.confirmation'
@@ -18,7 +17,7 @@ class StockBackorderConfirmation(models.TransientModel):
         picking_ids = self.pick_ids
         if picking_ids:
             for picking in picking_ids:
-                picking.reliquat_accepter = 'Reliquat Créer'
+                picking.reliquat_state = 'Reliquat Créer'
         return res
 
     def process_cancel_backorder(self):
@@ -26,5 +25,5 @@ class StockBackorderConfirmation(models.TransientModel):
         picking_ids = self.pick_ids
         if picking_ids:
             for picking in picking_ids:
-                picking.reliquat_accepter = 'Reliquat refuser'
+                picking.reliquat_state = 'Reliquat refuser'
         return res
