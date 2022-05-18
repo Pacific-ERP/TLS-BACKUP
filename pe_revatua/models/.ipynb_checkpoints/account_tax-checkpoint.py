@@ -37,8 +37,7 @@ class AccountTaxInherit(models.Model):
             #### OVERRIDE ####
             ##################
             if product.tarif_terrestre and product.tarif_terrestre > 0:
-                base_amount = (base_amount * quantity) * 0.6
-                base_amount = round(base_amount, precision_digits=0)
+                base_amount = base_amount * 0.6
                 return base_amount * self.amount / 100
             else:
             ##################

@@ -11,6 +11,9 @@ class SaleOrderLineInherit(models.Model):
     tarif_maritime = fields.Float(string='Maritime', default=0, required=True)
     tarif_terrestre = fields.Float(string='Terrestre', default=0, required=True)
     
+    #ratio_maritime = fields.Float(string='Maritime', default=0, required=True)
+    #ratio_terrestre = fields.Float(string='Terrestre', default=0, required=True)
+    
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
     def _compute_amount(self):
         ##################
@@ -36,7 +39,6 @@ class SaleOrderLineInherit(models.Model):
         # Check if revatua is activate
         revatua_state = self.env.company.revatua_ck
         if revatua_state:
-            company_name = self.env.company.name
             product = self.product_id
             self.tarif_terrestre = product.tarif_terrestre
             self.tarif_maritime = product.tarif_maritime
