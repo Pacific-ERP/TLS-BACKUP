@@ -1,5 +1,6 @@
-<odoo>
-    <data>
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
         <!-- rend visible champs pour groups donner -->
         <record id="revatua_sale_order_form" model="ir.ui.view">
             <field name="name">revatua.sale.order.form</field>
@@ -7,11 +8,36 @@
             <field name="inherit_id" ref="sale.view_order_form" />
             <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
             <field name="arch" type="xml">
-                <!-- ajout des champs custom -->
+            <!-- Formulaire -->
+                <!-- déplacer condition de livraison -->
+                <xpath expr="//field[@name='validity_date']" position="before">
+                    <xpath expr="//field[@name='picking_policy']" position="move"/>
+                </xpath>
+                <!-- champs custom revatua -->
+                <xpath expr="//group[@name='sale_header']" position="after">
+                    <group name="detail_livraison">
+                        <group name="lieu_recuperation" string="Lieu de récupération">
+                            <field name="commune_recup"/>
+                            <field name="ile_recup"/>
+                            <field name="contact_expediteur"/>
+                            <field name="tel_expediteur" attrs='{"invisible": ["&amp;",["tel_expediteur","=",False],["mobil_expediteur","!=",False]]}'/>
+                            <field name="mobil_expediteur" attrs='{"invisible": ["|",["tel_expediteur","!=",False],["mobil_expediteur","=",False]]}'/>
+                        </group>
+                        <group name="lieu_destinataire" string="Destinataire">
+                            <field name="commune_dest"/>
+                            <field name="ile_dest"/>
+                            <field name="contact_dest"/>
+                            <field name="tel_dest" attrs='{"invisible": ["&amp;",["tel_dest","=",False],["mobil_dest","!=",False]]}'/>
+                            <field name="mobil_dest" attrs='{"invisible": ["|",["tel_dest","!=",False],["mobil_dest","=",False]]}'/>
+                        </group>
+                    </group>
+                </xpath>
+            <!-- Ligne d'articles -->
+                <!-- champs custom revatua -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="after">
                     <field name="tarif_terrestre" optional="show"/>
                     <field name="tarif_maritime" optional="show"/>
-                    <field name="tarif_rpa" optional="show"/>
+                    <field name="tarif_rpa" optional="show" />
                     <field name="price_total" optional="show" string="Total TTC"/>
                 </xpath>
                 <!-- Précision sur le sous total que c'est du HT -->
@@ -20,6 +46,6 @@
                 </xpath>
             </field>
         </record>
-    </data>
-</odoo>
+    
+</data></odoo>
         

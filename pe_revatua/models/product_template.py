@@ -73,12 +73,19 @@ class ProductTemplateInherit(models.Model):
     #Ajout automatique de la taxes RPA si le champs RPA est remplis
     @api.onchange('tarif_rpa')
     def _add_rpa_taxe(self):
-        for record in self:
-            if record.tarif_rpa and self.env.company.revatua_ck:
-                #self.env['account.tax'].sudo([('name','=','')])
-                _logger.error('Hello')
-    
-    
+        if self.env.company.revatua_ck:
+            rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=',2)])
+            for record in self:
+                if record.tarif_rpa:
+                    record.taxes_id = [(4, rpa.id)]
+                    _logger.error(record.taxes_id)
+                else:
+                    if rpa in record.taxes_id:
+                        for taxe in record.taxes_id:
+                            if taxe.id == rpa.id:
+                                _logger.error('RPA detecté')
+                                record.taxes_id = [(2, rpa.id)]
+
     #Fields Maritime
     tarif_maritime = fields.Monetary(string='Tarif maritime',
                                      default=0,

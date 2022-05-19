@@ -1,6 +1,7 @@
-<odoo>
-    <data>
-        <!-- rend visible champs pour groups donner -->
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+        <!-- rend visible les champs pour le groups revatua / users -->
         <record id="product_template_form_aremiti_only" model="ir.ui.view">
             <field name="name">product.template.form.aremiti.only</field>
             <field name="model">product.template</field>
@@ -34,6 +35,5 @@
                 </xpath>
             </field>
         </record>
-    </data>
-</odoo>
-        
+
+</data></odoo>        

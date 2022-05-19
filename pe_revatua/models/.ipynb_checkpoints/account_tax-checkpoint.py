@@ -20,7 +20,7 @@ class AccountTaxInherit(models.Model):
                 ##################
                 #### OVERRIDE ####
                 ##################
-                if self.name == 'RPA_mt' and product.tarif_rpa > 0:
+                if self.name == 'RPA' and product.tarif_rpa > 0:
                     return math.copysign(quantity, base_amount) * product.tarif_rpa
                 else:
                 ##################
