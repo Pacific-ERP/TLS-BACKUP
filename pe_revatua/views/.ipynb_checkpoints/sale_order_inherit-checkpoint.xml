@@ -33,7 +33,12 @@
                     </group>
                 </xpath>
             <!-- Ligne d'articles -->
-                <!-- champs custom revatua -->
+                <!-- Champs volume/weight -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="replace">
+                    <field name="r_volume" optional="show"/>
+                    <field name="r_weight" optional="show"/>
+                </xpath>
+                <!-- Champs tarif(terrestre/maritime/rpa) et total -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="after">
                     <field name="tarif_terrestre" optional="show"/>
                     <field name="tarif_maritime" optional="show"/>
@@ -44,8 +49,29 @@
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="attributes">
                   <attribute name="string">Total HT</attribute>
                 </xpath>
-            </field>
-        </record>
-    
+            <!-- Total maritime & terrestre -->
+                <xpath expr="//field[@name='note']/../.." position="before">
+                    <div class="oe_left">
+                        <table style="border:1px #dcdddf solid;width:200px">
+                            <tbody>
+                                <tr>
+                                    <td><b>Maritime :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><field name="sum_maritime" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Terrestre :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><field name="sum_terrestre" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td style="width:100px"><b>Total :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><b><field name="sum_mar_ter" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </xpath>
+            </field></record>
 </data></odoo>
         

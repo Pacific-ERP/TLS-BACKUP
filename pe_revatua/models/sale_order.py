@@ -20,3 +20,31 @@ class SaleOrderInherit(models.Model):
     contact_dest = fields.Many2one(string='Contact de destination',comodel_name='res.partner')
     tel_dest = fields.Char(string='Téléphone destinataire', related='contact_dest.phone', store=True)
     mobil_dest = fields.Char(string='Mobile destinataire', related='contact_dest.mobile', store=True)
+                
+    # Maritime
+    sum_maritime = fields.Monetary(string="Maritime", store=True)
+    sum_terrestre = fields.Monetary(string="Terrestre", store=True)
+    sum_mar_ter = fields.Monetary(string="Total Maritime & Terrestre", store=True)
+    
+    # total_tarif
+    @api.onchange('order_line')
+    def _total_tarif(self):
+        if self.env.company.revatua_ck:
+            sum_mar = 0
+            sum_ter = 0
+            for record in self:
+                # Sum tarif_terrestre and maritime
+                for line in record.order_line:
+                    if line.tarif_maritime:
+                        sum_mar += round(line.tarif_maritime)
+                    if line.tarif_terrestre:
+                        sum_ter += round(line.tarif_terrestre)
+                # Write fields values car les champs sont en readonly
+                record.write({
+                    'sum_maritime' : sum_mar,
+                    'sum_terrestre' : sum_ter,
+                    'sum_mar_ter' : sum_mar + sum_ter
+                })
+    
+                
+                        

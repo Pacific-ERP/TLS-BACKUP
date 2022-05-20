@@ -10,6 +10,8 @@ class SaleOrderLineInherit(models.Model):
     tarif_rpa = fields.Float(string='RPA', default=0, required=True)
     tarif_maritime = fields.Float(string='Maritime', default=0, required=True)
     tarif_terrestre = fields.Float(string='Terrestre', default=0, required=True)
+    r_volume = fields.Float(string='Volume Revatua (m³)', default=0)
+    r_weight = fields.Float(string='Volume weight (T)', default=0)
     
     #ratio_maritime = fields.Float(string='Maritime', default=0, required=True)
     #ratio_terrestre = fields.Float(string='Terrestre', default=0, required=True)
@@ -29,6 +31,16 @@ class SaleOrderLineInherit(models.Model):
             self.tarif_rpa = product.tarif_rpa
         return res
     
+    @api.onchange('r_volume','r_weight')
+    def _onchange_update_qty(self):
+        # Calcul volume si poids + volume alors product_qty = (poids+volume)/2, sinon soit l'un soit l'autre
+            if self.r_volume and self.r_weight:
+                self.product_uom_qty = (self.r_volume + self.r_weight) / 2
+            elif self.r_volume and not self.r_weight:
+                self.product_uom_qty = self.r_volume
+            else:
+                self.product_uom_qty = self.r_weight
+    
     @api.onchange('product_packaging_id', 'product_uom', 'product_uom_qty')
     def _onchange_update_product_packaging_qty(self):
         ##################
@@ -38,10 +50,13 @@ class SaleOrderLineInherit(models.Model):
         res = super(SaleOrderLineInherit, self)._onchange_update_product_packaging_qty()
         # Check if revatua is activate
         revatua_state = self.env.company.revatua_ck
-        if revatua_state and self.tarif_terrestre != 0 or self.tarif_maritime != 0:
-            self.tarif_terrestre = self.price_subtotal * 0.6
-            self.tarif_maritime = self.price_subtotal * 0.4
-            if self.tarif_rpa != 0:
-                self.tarif_rpa = self.product_uom_qty * 100
+        
+        if revatua_state:
+            # Calcul des part maritime et part terrestre    
+            if self.tarif_terrestre or self.tarif_maritime:   
+                self.tarif_terrestre = self.price_subtotal * 0.6
+                self.tarif_maritime = self.price_subtotal * 0.4
+                if self.tarif_rpa != 0:
+                    self.tarif_rpa = self.product_uom_qty * 100
         return res
     
