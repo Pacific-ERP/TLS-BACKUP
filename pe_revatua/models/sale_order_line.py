@@ -60,3 +60,17 @@ class SaleOrderLineInherit(models.Model):
                     self.tarif_rpa = self.product_uom_qty * 100
         return res
     
+    def _prepare_procurement_values(self, group_id=False):
+        values = super(SaleOrderLineInherit, self)._prepare_procurement_values(group_id)
+        self.ensure_one()
+        _logger.error('Avant : %s' % values)
+        values.update({
+            'tarif_rpa': self.tarif_rpa,
+            'tarif_maritime': self.tarif_maritime,
+            'tarif_terrestre': self.tarif_terrestre,
+            'r_volume': self.r_volume,
+            'r_weight': self.r_weight,
+        })
+        _logger.error('Après : %s' % values)
+        return values
+    

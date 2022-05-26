@@ -72,6 +72,17 @@
                         </table>
                     </div>
                 </xpath>
+                <!-- cache l'unité de base pour réduire la taille du tableau -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                
+                <!-- cache l'unité de measure de base pour réduire la taille du tableau -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="attributes">
+                    <attribute name="attrs">{"readonly": [["product_uom_readonly","=",True]], "required": [["display_type","=",False]]}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
             </field></record>
 </data></odoo>
         
