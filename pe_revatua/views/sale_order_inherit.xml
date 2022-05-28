@@ -33,19 +33,32 @@
                     </group>
                 </xpath>
             <!-- Ligne d'articles -->
+                <!-- Renommer Quantité -->
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="string">Qté</attribute>
+                </xpath>
+                <!-- Renommer Prix unitaire -->
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_unit']" position="attributes">
+                    <attribute name="string">Prix unit.</attribute>
+                </xpath>
                 <!-- Champs volume/weight -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="replace">
-                    <field name="r_volume" optional="show"/>
-                    <field name="r_weight" optional="show"/>
+                    <field name="r_volume" string="Vol(m³)" optional="show"/>
+                    <field name="r_weight" string="Poids(T)" optional="show"/>
                 </xpath>
                 <!-- Champs tarif(terrestre/maritime/rpa) et total -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="after">
-                    <field name="tarif_terrestre" optional="show"/>
-                    <field name="tarif_maritime" optional="show"/>
-                    <field name="tarif_rpa" optional="show" />
+                    <field name="tarif_terrestre" digits="[42,0]" optional="show"/>
+                    <field name="tarif_maritime" digits="[42,0]" optional="show"/>
+                    <field name="tarif_rpa" digits="[42,0]" optional="show"/>
                     <field name="price_total" optional="show" string="Total TTC"/>
                 </xpath>
                 <!-- Précision sur le sous total que c'est du HT -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="replace">
+                  <field name="revatua_uom"/>
+                </xpath>
+                
+                <!-- remplacer l'uom de base par un fictif pour information -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="attributes">
                   <attribute name="string">Total HT</attribute>
                 </xpath>
@@ -64,25 +77,25 @@
                                 </tr>
                             </tbody>
                             <tfoot>
+                                <!-- pas important
                                 <tr>
-                                    <td style="width:100px"><b>Total :</b></td>
+                                    <td style="width:100px"><b>Total (M-T) :</b></td>
                                     <td style="width:100px;text-align:right !important;"><b><field name="sum_mar_ter" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
+                                </tr>
+                                -->
+                                <tr>
+                                    <td style="width:200px"><b>Montant ADM :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><b><field name="sum_adm" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
+                                </tr>
+                                <tr>
+                                    <td style="width:200px"><b>Montant Client :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><b><field name="sum_customer" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 </xpath>
-                <!-- cache l'unité de base pour réduire la taille du tableau -->
-                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="attributes">
-                    <attribute name="attrs">{}</attribute>
-                    <attribute name="invisible">1</attribute>
-                </xpath>
                 
-                <!-- cache l'unité de measure de base pour réduire la taille du tableau -->
-                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="attributes">
-                    <attribute name="attrs">{"readonly": [["product_uom_readonly","=",True]], "required": [["display_type","=",False]]}</attribute>
-                    <attribute name="invisible">1</attribute>
-                </xpath>
             </field></record>
 </data></odoo>
         

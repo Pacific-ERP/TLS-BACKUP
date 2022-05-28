@@ -12,9 +12,8 @@ class SaleOrderLineInherit(models.Model):
     tarif_terrestre = fields.Float(string='Terrestre', default=0, required=True)
     r_volume = fields.Float(string='Volume Revatua (m³)', default=0)
     r_weight = fields.Float(string='Volume weight (T)', default=0)
-    
-    #ratio_maritime = fields.Float(string='Maritime', default=0, required=True)
-    #ratio_terrestre = fields.Float(string='Terrestre', default=0, required=True)
+    check_adm = fields.Boolean(string='Payé par ADM', related="product_id.check_adm")
+    revatua_uom = fields.Many2one(string='Udm', comodel_name='uom.uom')
     
     @api.onchange('product_id')
     def product_id_change(self):
@@ -36,10 +35,15 @@ class SaleOrderLineInherit(models.Model):
         # Calcul volume si poids + volume alors product_qty = (poids+volume)/2, sinon soit l'un soit l'autre
             if self.r_volume and self.r_weight:
                 self.product_uom_qty = (self.r_volume + self.r_weight) / 2
+                self.revatua_uom = 29
+            elif self.r_weight and not self.r_volume:
+                self.product_uom_qty = self.r_weight
+                self.revatua_uom = 7
             elif self.r_volume and not self.r_weight:
                 self.product_uom_qty = self.r_volume
+                self.revatua_uom = 12
             else:
-                self.product_uom_qty = self.r_weight
+                self.product_uom_qty = 1
     
     @api.onchange('product_packaging_id', 'product_uom', 'product_uom_qty')
     def _onchange_update_product_packaging_qty(self):

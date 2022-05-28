@@ -1,0 +1,14 @@
+<odoo><data noupdate="1">
+    <!-- Les fichiers data permettent de créer des records -->
+        <!-- Catégorie d'unité de measure -->
+        <record id="revatua_poid_volumetrique" model="uom.category">
+            <field name="name">Poid Volumétrique</field>
+        </record>
+        
+        <!-- Unité de measure (uom)-->
+        <record id="revatua_tonne_mcube" model="uom.uom">
+            <field name="name">t/m³</field>
+            <field name="category_id" eval="revatua_poid_volumetrique"/>
+        </record> 
+    
+</data></odoo>

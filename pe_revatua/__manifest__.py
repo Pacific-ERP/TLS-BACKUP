@@ -14,6 +14,7 @@
         "security/res_groups.xml",
         "security/ir.model.access.csv",
         "data/account_tax_data.xml",
+        "data/uom_uom_category_data.xml",
         "views/connaissement_template.xml",
         "data/ir_actions_report.xml",
         "views/setting_inherits.xml",
