@@ -1,6 +1,6 @@
 /* Style des colonnes tree view  */
 [data-name="product_uom_qty"] {
-    width: 58px !important;
+    width: 48px !important;
 }
 [data-name="r_volume"] {
     width: 65px !important;
@@ -24,6 +24,6 @@
     width: 70px !important;
 }
 [data-name="tarif_rpa"] {
-    width: 60px !important;
+    width: 56px !important;
 }
 

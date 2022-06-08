@@ -7,8 +7,6 @@ _logger = logging.getLogger(__name__)
 class StockPickingInherit(models.Model):
     _inherit = "stock.picking"
     
-    
-    
     #Lieu Livraison
     commune_recup = fields.Many2one(string='Commune de récupération',comodel_name='res.commune', related='sale_id.commune_recup')
     ile_recup = fields.Char(string='Île de récupération', related='commune_recup.ile_id.name', store=True)

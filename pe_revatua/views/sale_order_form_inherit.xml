@@ -20,15 +20,15 @@
                             <field name="commune_recup"/>
                             <field name="ile_recup"/>
                             <field name="contact_expediteur"/>
-                            <field name="tel_expediteur" attrs='{"invisible": ["&amp;",["tel_expediteur","=",False],["mobil_expediteur","!=",False]]}'/>
-                            <field name="mobil_expediteur" attrs='{"invisible": ["|",["tel_expediteur","!=",False],["mobil_expediteur","=",False]]}'/>
+                            <field name="tel_expediteur" attrs="{&quot;invisible&quot;: [&quot;&amp;&quot;,[&quot;tel_expediteur&quot;,&quot;=&quot;,False],[&quot;mobil_expediteur&quot;,&quot;!=&quot;,False]]}"/>
+                            <field name="mobil_expediteur" attrs="{&quot;invisible&quot;: [&quot;|&quot;,[&quot;tel_expediteur&quot;,&quot;!=&quot;,False],[&quot;mobil_expediteur&quot;,&quot;=&quot;,False]]}"/>
                         </group>
                         <group name="lieu_destinataire" string="Destinataire">
                             <field name="commune_dest"/>
                             <field name="ile_dest"/>
                             <field name="contact_dest"/>
-                            <field name="tel_dest" attrs='{"invisible": ["&amp;",["tel_dest","=",False],["mobil_dest","!=",False]]}'/>
-                            <field name="mobil_dest" attrs='{"invisible": ["|",["tel_dest","!=",False],["mobil_dest","=",False]]}'/>
+                            <field name="tel_dest" attrs="{&quot;invisible&quot;: [&quot;&amp;&quot;,[&quot;tel_dest&quot;,&quot;=&quot;,False],[&quot;mobil_dest&quot;,&quot;!=&quot;,False]]}"/>
+                            <field name="mobil_dest" attrs="{&quot;invisible&quot;: [&quot;|&quot;,[&quot;tel_dest&quot;,&quot;!=&quot;,False],[&quot;mobil_dest&quot;,&quot;=&quot;,False]]}"/>
                         </group>
                     </group>
                 </xpath>
@@ -43,6 +43,7 @@
                 </xpath>
                 <!-- Champs volume/weight -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="replace">
+                    <field name="product_uom_qty" decoration-info="(not display_type and invoice_status == 'to invoice')" decoration-bf="(not display_type and invoice_status == 'to invoice')" context="{'partner_id':parent.partner_id,'quantity': product_uom_qty,'pricelist': parent.pricelist_id,'uom': product_uom,'company_id': parent.company_id}"/>
                     <field name="r_volume" string="Vol(m³)" optional="show"/>
                     <field name="r_weight" string="Poids(T)" optional="show"/>
                 </xpath>
@@ -53,15 +54,23 @@
                     <field name="tarif_rpa" digits="[42,0]" optional="show"/>
                     <field name="price_total" optional="show" string="Total TTC"/>
                 </xpath>
-                <!-- Précision sur le sous total que c'est du HT -->
+                
+                <!-- Remplacer l'uom de base par un fictif pour information -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="replace">
+                  <field name="product_uom" invisible="1"/>
                   <field name="revatua_uom"/>
                 </xpath>
                 
-                <!-- remplacer l'uom de base par un fictif pour information -->
+                <!-- Modification de prix unitaire en prix U -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_unit']" position="attributes">
+                  <attribute name="string">Prix U</attribute>
+                </xpath>
+                
+                <!-- Précision sur le sous total que c'est du HT -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="attributes">
                   <attribute name="string">Total HT</attribute>
                 </xpath>
+                
             <!-- Total maritime & terrestre -->
                 <xpath expr="//field[@name='note']/../.." position="before">
                     <div class="oe_left">
@@ -77,12 +86,6 @@
                                 </tr>
                             </tbody>
                             <tfoot>
-                                <!-- pas important
-                                <tr>
-                                    <td style="width:100px"><b>Total (M-T) :</b></td>
-                                    <td style="width:100px;text-align:right !important;"><b><field name="sum_mar_ter" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
-                                </tr>
-                                -->
                                 <tr>
                                     <td style="width:200px"><b>Montant ADM :</b></td>
                                     <td style="width:100px;text-align:right !important;"><b><field name="sum_adm" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
