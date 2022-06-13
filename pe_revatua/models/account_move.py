@@ -30,4 +30,3 @@ class AccountMoveInherit(models.Model):
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
     
-    

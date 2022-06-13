@@ -10,16 +10,18 @@ _logger = logging.getLogger(__name__)
 class AccountTaxInherit(models.Model):
     _inherit = "account.tax"
     
-    def _compute_amount(self, base_amount, price_unit, quantity=1.0, product=None, partner=None):
+    def _compute_amount(self, base_amount, price_unit, quantity=1.0, product=None, partner=None, invoice=None):
         #########################
         #### OVERRIDE METHOD ####
         #########################
         self.ensure_one()
         if self.amount_type == 'fixed':
             if base_amount:
-                ##################
-                #### OVERRIDE ####
-                ##################
+                
+                #############################################################################################################################
+                #==================================#
+                #=============OVERRIDE=============#
+                #========================================================================#
                 # --- Check if revatua is activate ---#
                 if self.env.company.revatua_ck:
                     if self.name == 'RPA' and product.tarif_rpa > 0:
@@ -28,9 +30,11 @@ class AccountTaxInherit(models.Model):
                         return math.copysign(quantity, base_amount) * self.amount
                 else:
                     _logger.error('Revatua not activate : account_tax.py -> _compute_amount 1')
-                ##################
-                #### OVERRIDE ####
-                ##################
+                #========================================================================#
+                #=============OVERRIDE=============#
+                #==================================#
+                #############################################################################################################################
+                
                 return math.copysign(quantity, base_amount) * self.amount
             else:
                 return quantity * self.amount
@@ -38,9 +42,11 @@ class AccountTaxInherit(models.Model):
         price_include = self._context.get('force_price_include', self.price_include)
         # base * (1 + tax_amount) = new_base
         if self.amount_type == 'percent' and not price_include:
-            ##################
-            #### OVERRIDE ####
-            ##################
+            
+            #############################################################################################################################
+            #==================================#
+            #=============OVERRIDE=============#
+            #========================================================================#
             # --- Check if revatua is activate ---#
             if self.env.company.revatua_ck:
                 if product.tarif_terrestre and product.tarif_terrestre > 0:
@@ -50,11 +56,12 @@ class AccountTaxInherit(models.Model):
                     return base_amount * self.amount / 100
             else:
                 _logger.error('Revatua not activate : account_tax.py -> _compute_amount 2')
-            ##################
-            #### OVERRIDE ####
-            ##################
+            #========================================================================#
+            #=============OVERRIDE=============#
+            #==================================#
+            #############################################################################################################################
             return base_amount * self.amount / 100
-            
+
         # <=> new_base = base / (1 + tax_amount)
         if self.amount_type == 'percent' and price_include:
             return base_amount - (base_amount / (1 + self.amount / 100))

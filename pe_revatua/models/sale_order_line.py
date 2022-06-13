@@ -7,6 +7,7 @@ _logger = logging.getLogger(__name__)
 class SaleOrderLineInherit(models.Model):
     _inherit = "sale.order.line"
     
+    base_rpa = fields.Float(string='Base RPA', default=100, required=True, store=True)
     tarif_rpa = fields.Float(string='RPA', default=0, required=True, store=True)
     tarif_maritime = fields.Float(string='Maritime', default=0, required=True, store=True)
     tarif_terrestre = fields.Float(string='Terrestre', default=0, required=True, store=True)
@@ -29,7 +30,7 @@ class SaleOrderLineInherit(models.Model):
             self.tarif_rpa = product.tarif_rpa
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> product_id_change')
-        return res
+        return res        
     
     @api.onchange('r_volume','r_weight')
     def _onchange_update_qty(self):
@@ -68,7 +69,7 @@ class SaleOrderLineInherit(models.Model):
                 else:
                     self.tarif_maritime = 0
                 if self.tarif_rpa != 0 and self.product_id.tarif_rpa:
-                    self.tarif_rpa = self.product_uom_qty * 100
+                    self.tarif_rpa = self.product_uom_qty * self.base_rpa
                 else:
                     self.tarif_rpa = 0
         else:
@@ -83,7 +84,6 @@ class SaleOrderLineInherit(models.Model):
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
             self.ensure_one()
-            _logger.error('Avant : %s' % values)
             values.update({
                 'tarif_rpa': self.tarif_rpa,
                 'tarif_maritime': self.tarif_maritime,
@@ -92,17 +92,20 @@ class SaleOrderLineInherit(models.Model):
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
             })
-            _logger.error('Après : %s' % values)
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_procurement_values')
         return values
     
+# === Invoice === #
+
     # Ligne d'articles de la(les) facture(s)
     def _prepare_invoice_line(self, **optional_values):
+        ##################
+        #### OVERRIDE ####
+        ##################
         values = super(SaleOrderLineInherit, self)._prepare_invoice_line(**optional_values)
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
-            _logger.error('Avant IL: %s' % values)
             values.update({
                 'tarif_rpa': self.tarif_rpa,
                 'tarif_maritime': self.tarif_maritime,
@@ -110,9 +113,55 @@ class SaleOrderLineInherit(models.Model):
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
+                'base_qty' : self.product_uom_qty,
             })
-            _logger.error('Après IL: %s' % values)
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line')
+        return values
+    
+    # Ligne d'articles pour les factures ADM
+    def _prepare_invoice_line_adm_part(self, **optional_values):
+        values = super(SaleOrderLineInherit, self)._prepare_invoice_line(**optional_values)
+        # --- Check if revatua is activate ---#
+        if self.env.company.revatua_ck:
+            values.update({
+                'tarif_rpa': self.tarif_rpa,
+                'tarif_maritime': self.tarif_maritime,
+                'tarif_terrestre': 0,
+                'check_adm': self.check_adm,
+                'r_volume': self.r_volume,
+                'r_weight': self.r_weight,
+                'old_subtotal' : self.price_subtotal,
+            })
+            for tax in self.tax_id:
+                if tax.name == 'RPA':
+                    values.update({'tax_ids' : [(6,0,[tax.id])]})
+            _logger.error('ADM part : %s' % values)
+        else:
+            _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line_adm_part')
+        return values
+    
+    # Ligne d'articles pour les factures Client
+    def _prepare_invoice_line_non_adm(self, **optional_values):
+        values = super(SaleOrderLineInherit, self)._prepare_invoice_line(**optional_values)
+        # --- Check if revatua is activate ---#
+        if self.env.company.revatua_ck:
+            values.update({
+                'tarif_rpa': 0,
+                'tarif_maritime': 0,
+                'tarif_terrestre': self.tarif_terrestre,
+                'check_adm': self.check_adm,
+                'r_volume': self.r_volume,
+                'r_weight': self.r_weight,
+                'old_subtotal' : self.price_subtotal,
+            })
+            tax_list=[]
+            for tax in self.tax_id:
+                if not tax.name == 'RPA':
+                    tax_list.append(tax.id)
+            values.update({'tax_ids' : [(6,0,tax_list)]})
+            _logger.error('Custo part : %s' % values)
+        else:
+            _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line_non_adm')
         return values
     

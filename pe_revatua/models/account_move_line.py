@@ -14,3 +14,28 @@ class AccountMoveLineInherit(models.Model):
     r_weight = fields.Float(string='Volume weight (T)', default=0, store=True)
     revatua_uom = fields.Char(string='Udm', store=True)
     check_adm = fields.Boolean(string='Payé par ADM', related="product_id.check_adm")
+    
+    old_subtotal = fields.Float(string='Base Total HT', default=0, store=True)
+    base_qty = fields.Float(string='Base Quantity', default=0, store=True)
+    
+    def _get_price_total_and_subtotal_model(self, price_unit, quantity, discount, currency, product, partner, taxes, move_type):
+        #########################
+        #### OVERRIDE METHOD ####
+        #########################
+        res = super(AccountMoveLineInherit, self)._get_price_total_and_subtotal_model(price_unit, quantity, discount, currency, product, partner, taxes, move_type)
+        # --- Check if revatua is activate ---#
+        if self.env.company.revatua_ck:
+            if self.check_adm:
+                if not self.move_id.is_adm_invoice:
+                    old_subtotal = res['price_subtotal']
+                    self.old_subtotal = old_subtotal
+                    new_subtotal = (res['price_subtotal'] - old_subtotal) + self.tarif_terrestre
+                    res['price_subtotal'] = new_subtotal
+                else:
+                    old_subtotal = res['price_subtotal']
+                    self.old_subtotal = old_subtotal
+                    new_subtotal = (res['price_subtotal'] - old_subtotal) + self.tarif_maritime
+                    res['price_subtotal'] = new_subtotal
+        else:
+            _logger.error('Revatua not activate : account_move_line.py -> _get_price_total_and_subtotal_model')
+        return res

@@ -8,6 +8,12 @@
             <field name="inherit_id" ref="product.product_template_form_view" />
             <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='purchase_ok']/.." position="after">
+                    <span class="d-inline-block">
+                        <field name="check_adm"/>
+                        <label for="check_adm"/>
+                    </span>
+                </xpath>
                 <xpath expr="//notebook/page[1]/group[1]" position="after">
                     <group>
                         <group string="Normal">
@@ -29,7 +35,6 @@
                         <group string="Autres">
                             <field name="famille_produit"/>
                             <field name="etiquette_produit" widget="many2many_tags"/>
-                            <field name="check_adm"/>
                         </group>
                     </group>
                 </xpath>
