@@ -136,7 +136,6 @@ class SaleOrderLineInherit(models.Model):
             for tax in self.tax_id:
                 if tax.name == 'RPA':
                     values.update({'tax_ids' : [(6,0,[tax.id])]})
-            _logger.error('ADM part : %s' % values)
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line_adm_part')
         return values
@@ -160,7 +159,6 @@ class SaleOrderLineInherit(models.Model):
                 if not tax.name == 'RPA':
                     tax_list.append(tax.id)
             values.update({'tax_ids' : [(6,0,tax_list)]})
-            _logger.error('Custo part : %s' % values)
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line_non_adm')
         return values
