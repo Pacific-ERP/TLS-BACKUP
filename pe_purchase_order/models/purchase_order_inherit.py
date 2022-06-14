@@ -11,11 +11,17 @@ class PurchaseOrderInherit(models.Model):
     delivery_line = fields.One2many(comodel_name='stock.picking', inverse_name='purchase_id', string='delivery line', copy=True)
 
     delivery_status = fields.Selection([
-        ('no','Pas de livraison'),
-        ('in_delivery','Livraison en cours'),
-        ('all_delivered','Livraison complète')
-    ], string='Statut reception', compute='_get_deliveries_state', store=True, readonly=True, copy=False, default='no')
-          
+        ('no','Pas de réception'),
+        ('in_delivery','Réception en cours'),
+        ('all_delivered','Réception complète')
+    ], string='État de reception', compute='_get_deliveries_state', store=True, readonly=True, copy=False, default='no')
+    
+    invoices_status = fields.Selection([
+        ('no','Rien à facturé'),
+        ('to_invoice','Factures en attente'),
+        ('invoiced','Complètement Facturé')
+    ], string='État de facturations', compute='_get_invoices_state', store=True, readonly=True, copy=False, default='no')
+    
     # Vérification de l'avancement des livraison     
     @api.depends('delivery_line.state')
     def _get_deliveries_state(self):
@@ -23,20 +29,23 @@ class PurchaseOrderInherit(models.Model):
             if purchase.state not in ('purchase', 'done'):
                 purchase.delivery_status = 'no'
                 continue
-            if any(
-                line.state != 'done'
-                for line in purchase.delivery_line
-            ):
+            if any(line.state != 'done' for line in purchase.delivery_line):
                 purchase.delivery_status = 'in_delivery'
-            elif (
-                all(
-                    line.state == 'done'
-                    for line in purchase.delivery_line
-                )
-                and purchase.delivery_line
-            ):
+            elif (all(line.state == 'done' for line in purchase.delivery_line) and purchase.delivery_line):
                 purchase.delivery_status = 'all_delivered'
             else:
                 purchase.delivery_status = 'no'
 
-        # Si trop de soucis avec le champs de base de facturation(invoice_status) refaire la méthode manuellement 
+    # Vérification de l'avancement des factures     
+    @api.depends('order_line.qty_to_invoice')
+    def _get_invoices_state(self):
+        for sale in self:
+            if sale.state not in ('sale', 'done'):
+                sale.invoices_status = 'no'
+                continue
+            if any(invoice.state != 'posted' for invoice in sale.invoice_ids):
+                sale.invoices_status = 'to_invoice'
+            elif all(invoice.state == 'posted' for invoice in sale.invoice_ids):
+                sale.invoices_status = 'invoiced'
+            else:
+                sale.invoices_status = 'no'
