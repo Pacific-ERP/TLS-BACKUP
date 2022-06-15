@@ -8,6 +8,7 @@ class AccountMoveInherit(models.Model):
     _inherit = "account.move"
     
     is_adm_invoice = fields.Boolean(string='Est pour ADM', store=True, default=False)
+    adm_group_id = fields.Many2one(string='Facture globale ADM', store=True, comodel_name='account.move.adm')
     
     #Lieu Livraison
     commune_recup = fields.Many2one(string='Commune de récupération',comodel_name='res.commune')
@@ -29,3 +30,8 @@ class AccountMoveInherit(models.Model):
     sum_mar_ter = fields.Monetary(string="Total Maritime & Terrestre", store=True)
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
+    
+    def action_group_adm_invoice(self):
+        for record in self:
+            name = record.name
+            _logger.error(name)
