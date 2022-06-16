@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+        <!-- rend visible champs pour groups donner -->
+        <record id="revatua_sale_order_form" model="ir.ui.view">
+            <field name="name">revatua.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
+            <field name="arch" type="xml">
+            <!-- Formulaire -->
+                <!-- déplacer condition de livraison -->
+                <xpath expr="//field[@name='validity_date']" position="before">
+                    <xpath expr="//field[@name='picking_policy']" position="move"/>
+                </xpath>
+                <!-- champs custom revatua -->
+                <xpath expr="//group[@name='sale_header']" position="after">
+                    <group name="detail_livraison">
+                        <group name="lieu_recuperation" string="Lieu de récupération">
+                            <field name="commune_recup"/>
+                            <field name="ile_recup"/>
+                            <field name="contact_expediteur"/>
+                            <field name="tel_expediteur" attrs="{&quot;invisible&quot;: [&quot;&amp;&quot;,[&quot;tel_expediteur&quot;,&quot;=&quot;,False],[&quot;mobil_expediteur&quot;,&quot;!=&quot;,False]]}"/>
+                            <field name="mobil_expediteur" attrs="{&quot;invisible&quot;: [&quot;|&quot;,[&quot;tel_expediteur&quot;,&quot;!=&quot;,False],[&quot;mobil_expediteur&quot;,&quot;=&quot;,False]]}"/>
+                        </group>
+                        <group name="lieu_destinataire" string="Destinataire">
+                            <field name="commune_dest"/>
+                            <field name="ile_dest"/>
+                            <field name="contact_dest"/>
+                            <field name="tel_dest" attrs="{&quot;invisible&quot;: [&quot;&amp;&quot;,[&quot;tel_dest&quot;,&quot;=&quot;,False],[&quot;mobil_dest&quot;,&quot;!=&quot;,False]]}"/>
+                            <field name="mobil_dest" attrs="{&quot;invisible&quot;: [&quot;|&quot;,[&quot;tel_dest&quot;,&quot;!=&quot;,False],[&quot;mobil_dest&quot;,&quot;=&quot;,False]]}"/>
+                        </group>
+                    </group>
+                </xpath>
+            <!-- Ligne d'articles -->
+                <!-- Renommer Quantité -->
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="string">Qté</attribute>
+                </xpath>
+                <!-- Renommer Prix unitaire -->
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_unit']" position="attributes">
+                    <attribute name="string">Prix unit.</attribute>
+                </xpath>
+                <!-- Champs volume/weight -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="replace">
+                    <field name="product_uom_qty" decoration-info="(not display_type and invoice_status == 'to invoice')" decoration-bf="(not display_type and invoice_status == 'to invoice')" context="{'partner_id':parent.partner_id,'quantity': product_uom_qty,'pricelist': parent.pricelist_id,'uom': product_uom,'company_id': parent.company_id}"/>
+                    <field name="r_volume" string="Vol(m³)" optional="show"/>
+                    <field name="r_weight" string="Poids(T)" optional="show"/>
+                </xpath>
+                <!-- Champs tarif(terrestre/maritime/rpa) et total -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="after">
+                    <field name="tarif_terrestre" digits="[42,0]" optional="show"/>
+                    <field name="tarif_maritime" digits="[42,0]" optional="show"/>
+                    <field name="tarif_rpa" digits="[42,0]" optional="show"/>
+                    <field name="price_total" optional="show" string="Total TTC"/>
+                </xpath>
+                
+                <!-- Remplacer l'uom de base par un fictif pour information -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="replace">
+                  <field name="product_uom" invisible="1"/>
+                  <field name="revatua_uom"/>
+                </xpath>
+                
+                <!-- Modification de prix unitaire en prix U -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_unit']" position="attributes">
+                  <attribute name="string">Prix U</attribute>
+                </xpath>
+                
+                <!-- Précision sur le sous total que c'est du HT -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="attributes">
+                  <attribute name="string">Total HT</attribute>
+                </xpath>
+                
+            <!-- Total maritime & terrestre -->
+                <xpath expr="//field[@name='note']/../.." position="before">
+                    <div class="oe_left">
+                        <table style="border:1px #dcdddf solid;width:200px">
+                            <tbody>
+                                <tr>
+                                    <td><b>Maritime :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><field name="sum_maritime" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Terrestre :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><field name="sum_terrestre" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td style="width:200px"><b>Montant ADM :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><b><field name="sum_adm" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
+                                </tr>
+                                <tr>
+                                    <td style="width:200px"><b>Montant Client :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><b><field name="sum_customer" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </xpath>
+                
+            </field></record>
+</data></odoo>
+        
