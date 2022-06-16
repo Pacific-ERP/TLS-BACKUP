@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 class SaleOrderInherit(models.Model):
     _inherit = "stock.picking"
     
-    reliquat_state = fields.Char(string="Reliquat")
+    reliquat_state = fields.Char(string="Reliquats")
 
 class StockBackorderConfirmation(models.TransientModel):
     _inherit = 'stock.backorder.confirmation'
