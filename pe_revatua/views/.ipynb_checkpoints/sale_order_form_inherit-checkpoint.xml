@@ -49,9 +49,9 @@
                 </xpath>
                 <!-- Champs tarif(terrestre/maritime/rpa) et total -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="after">
-                    <field name="tarif_terrestre" digits="[42,0]" optional="show"/>
-                    <field name="tarif_maritime" digits="[42,0]" optional="show"/>
-                    <field name="tarif_rpa" digits="[42,0]" optional="show"/>
+                    <field name="tarif_terrestre" sum="Terrestre" digits="[42,0]" optional="show"/>
+                    <field name="tarif_maritime" sum="Maritime" digits="[42,0]" optional="show"/>
+                    <field name="tarif_rpa" sum="RPA" digits="[42,0]" optional="show"/>
                     <field name="price_total" optional="show" string="Total TTC"/>
                 </xpath>
                 
@@ -74,18 +74,8 @@
             <!-- Total maritime & terrestre -->
                 <xpath expr="//field[@name='note']/../.." position="before">
                     <div class="oe_left">
-                        <table style="border:1px #dcdddf solid;width:200px">
+                        <table style="width:200px">
                             <tbody>
-                                <tr>
-                                    <td><b>Maritime :</b></td>
-                                    <td style="width:100px;text-align:right !important;"><field name="sum_maritime" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></td>
-                                </tr>
-                                <tr>
-                                    <td><b>Terrestre :</b></td>
-                                    <td style="width:100px;text-align:right !important;"><field name="sum_terrestre" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
                                 <tr>
                                     <td style="width:200px"><b>Montant ADM :</b></td>
                                     <td style="width:100px;text-align:right !important;"><b><field name="sum_adm" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
@@ -94,7 +84,7 @@
                                     <td style="width:200px"><b>Montant Client :</b></td>
                                     <td style="width:100px;text-align:right !important;"><b><field name="sum_customer" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
                                 </tr>
-                            </tfoot>
+                            </tbody>
                         </table>
                     </div>
                 </xpath>

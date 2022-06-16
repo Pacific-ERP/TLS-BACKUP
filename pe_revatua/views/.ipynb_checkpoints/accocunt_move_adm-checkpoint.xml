@@ -39,13 +39,46 @@
                         </group>
                         <notebook>
                             <page string="Détails">
-                                <field name="product_line_ids"/>
+                                <field name="product_line_ids">
+                                    <tree create="false" delete="false">
+                                        <field name="display_type" optional="hide"/>
+                                        <field name="currency_id" optional="hide"/>
+                                        <field name="product_id" optional="show" string='Articles'/>
+                                        <field name="r_volume" optional="show" string='Vol(m³)'/>
+                                        <field name="r_weight" optional="show" string='Poid(T)'/>
+                                        <field name="quantity" optional="show" string='Qté'/>
+                                        <field name="revatua_uom" optional="show" string='Udm'/>
+                                        <field name="price_subtotal" optional="show" string='Total HT'/>
+                                        <field name="tax_id" optional="show" string='Taxes'/>
+                                        <field name="tarif_terrestre" optional="hide" string='Terrestre' sum='Terrestre'/>
+                                        <field name="tarif_maritime" optional="show" string='Maritime' sum='Maritime'/>
+                                        <field name="tarif_rpa" optional="show" string='RPA' sum='RPA'/>
+                                    </tree>
+                                </field>
                             </page>
                             <page string="Factures">
-                                <field name="invoice_line_ids"/>
+                                <field name="invoice_line_ids">
+                                    <tree default_order='invoice_date asc'>
+                                        <field name="name" decoration-bf="1" optional="show"/>
+                                        <field name="invoice_partner_display_name" string='Administration' optional="show"/>
+                                        <field name="invoice_date" optional="show"/>
+                                        <field name="amount_untaxed_signed" string="Total HT" sum="Total HT" optional="show"/>
+                                        <field name="amount_tax_signed" string="Tax" sum="Total" optional="hide"/>
+                                        <field name="amount_total_signed" string="Total TTC" sum="Total TTC" decoration-bf="1" optional="show"/>
+                                        <field name="amount_total_in_currency_signed" string="Total en devise" groups="base.group_multi_currency" optional="hide"/>
+                                        <field name="currency_id" groups="base.group_multi_currency" optional="hide"/>
+                                        <field name="payment_state" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')" optional="show"/>
+                                        <field name="state" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'" optional="show"/>
+                                    </tree>
+                                </field>
                             </page>
                         </notebook>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
                 </form>
             </field>
         </record>
