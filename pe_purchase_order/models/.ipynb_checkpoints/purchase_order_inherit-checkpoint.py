@@ -39,13 +39,13 @@ class PurchaseOrderInherit(models.Model):
     # Vérification de l'avancement des factures     
     @api.depends('order_line.qty_to_invoice')
     def _get_invoices_state(self):
-        for sale in self:
-            if sale.state not in ('sale', 'done'):
-                sale.invoices_status = 'no'
+        for purchase in self:
+            if purchase.state not in ('sale', 'done'):
+                purchase.invoices_status = 'no'
                 continue
-            if any(invoice.state != 'posted' for invoice in sale.invoice_ids):
-                sale.invoices_status = 'to_invoice'
-            elif all(invoice.state == 'posted' for invoice in sale.invoice_ids):
-                sale.invoices_status = 'invoiced'
+            if any(invoice.state != 'posted' for invoice in purchase.invoice_ids):
+                purchase.invoices_status = 'to_invoice'
+            elif (all(invoice.state == 'posted' for invoice in purchase.invoice_ids) and purchase.invoice_ids):
+                purchase.invoices_status = 'invoiced'
             else:
-                sale.invoices_status = 'no'
+                purchase.invoices_status = 'no'

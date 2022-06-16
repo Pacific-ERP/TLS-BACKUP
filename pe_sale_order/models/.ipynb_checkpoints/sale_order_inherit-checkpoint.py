@@ -45,7 +45,7 @@ class SaleOrderInherit(models.Model):
                 continue
             if any(invoice.state != 'posted' for invoice in sale.invoice_ids):
                 sale.invoices_status = 'to_invoice'
-            elif all(invoice.state == 'posted' for invoice in sale.invoice_ids):
+            elif (all(invoice.state == 'posted' for invoice in sale.invoice_ids) and sale.invoice_ids):
                 sale.invoices_status = 'invoiced'
             else:
                 sale.invoices_status = 'no'
