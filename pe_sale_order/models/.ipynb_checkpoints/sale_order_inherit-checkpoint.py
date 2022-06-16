@@ -18,10 +18,11 @@ class SaleOrderInherit(models.Model):
     
     invoices_status = fields.Selection([
         ('no','Rien à facturé'),
-        ('to_invoice','Factures en attente'),
+        ('to_invoice','À facturé'),
+        ('partial_invoiced','Factures en attente'),
         ('invoiced','Complètement Facturé')
     ], string='État de facturations', compute='_get_invoices_state', store=True, readonly=True, copy=False, default='no')
-          
+    
     # Vérification de l'avancement des livraisons     
     @api.depends('delivery_line.state')
     def _get_deliveries_state(self):
@@ -43,8 +44,10 @@ class SaleOrderInherit(models.Model):
             if sale.state not in ('sale', 'done'):
                 sale.invoices_status = 'no'
                 continue
-            if any(invoice.state != 'posted' for invoice in sale.invoice_ids):
+            if sale.delivery_status == 'all_delivered' and not sale.invoice_ids:
                 sale.invoices_status = 'to_invoice'
+            elif any(invoice.state != 'posted' for invoice in sale.invoice_ids):
+                sale.invoices_status = 'partial_invoiced'
             elif (all(invoice.state == 'posted' for invoice in sale.invoice_ids) and sale.invoice_ids):
                 sale.invoices_status = 'invoiced'
             else:
