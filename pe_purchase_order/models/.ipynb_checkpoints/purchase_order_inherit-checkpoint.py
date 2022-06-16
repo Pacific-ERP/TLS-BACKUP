@@ -18,7 +18,8 @@ class PurchaseOrderInherit(models.Model):
     
     invoices_status = fields.Selection([
         ('no','Rien à facturé'),
-        ('to_invoice','Factures en attente'),
+        ('to_invoice','À facturé'),
+        ('partial_invoiced','Factures en attente'),
         ('invoiced','Complètement Facturé')
     ], string='État de facturations', compute='_get_invoices_state', store=True, readonly=True, copy=False, default='no')
     
@@ -43,8 +44,10 @@ class PurchaseOrderInherit(models.Model):
             if purchase.state not in ('sale', 'done'):
                 purchase.invoices_status = 'no'
                 continue
-            if any(invoice.state != 'posted' for invoice in purchase.invoice_ids):
+            if purchase.delivery_status == 'all_delivered' and not purchase.invoice_ids:
                 purchase.invoices_status = 'to_invoice'
+            elif any(invoice.state != 'posted' for invoice in purchase.invoice_ids):
+                purchase.invoices_status = 'partial_invoiced'
             elif (all(invoice.state == 'posted' for invoice in purchase.invoice_ids) and purchase.invoice_ids):
                 purchase.invoices_status = 'invoiced'
             else:
