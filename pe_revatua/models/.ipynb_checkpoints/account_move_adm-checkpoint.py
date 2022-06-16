@@ -15,6 +15,10 @@ class AccountMoveAdm(models.Model):
     partner_id = fields.Many2one(string='Client', store=True, comodel_name='res.partner')
     company_id = fields.Many2one('res.company', string='Company', readonly=True, states={'draft': [('readonly', False)], 'refused': [('readonly', False)]}, default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Currency')
+    state = fields.Selection(string='État de facturation', selection=[('no','Aucun paiement'),
+                                                                      ('in_payment','Paiement partiel'),
+                                                                      ('invoiced','Paiement complet')]
+                             ,store=True, default='no', copy=False)
     
     invoice_line_ids = fields.One2many(string='Factures ADM', store=True, comodel_name='account.move', inverse_name='adm_group_id')
     product_line_ids = fields.One2many(string='Articles', store=True, comodel_name='account.move.adm.line', inverse_name='invoice_id')

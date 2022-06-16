@@ -2,6 +2,7 @@
 
 from . import res_company
 from . import res_commune
+from . import account_move_adm
 from . import etiquette_article
 from . import product_template
 from . import sale_order
@@ -11,4 +12,4 @@ from . import stock_move_line
 from . import account_tax
 from . import account_move_line
 from . import account_move
-from . import account_move_adm
+

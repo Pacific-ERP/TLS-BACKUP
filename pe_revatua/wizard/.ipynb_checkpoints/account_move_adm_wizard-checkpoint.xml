@@ -16,8 +16,8 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Note">
-                                <field name="adm_target"/>
+                            <page string="Détails">
+                                <field name="adm_invoice_ids"/>
                             </page>
                         </notebook>
                     </sheet>

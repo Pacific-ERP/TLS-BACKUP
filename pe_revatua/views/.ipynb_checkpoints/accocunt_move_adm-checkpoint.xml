@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    <!-- list -->
+        <record model="ir.ui.view" id="revatua_account_move_adm_list">
+            <field name="name">revatua.account.move.adm.list</field>
+            <field name="model">account.move.adm</field>
+            <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
+            <field name="arch" type="xml">
+                <tree decoration-success="state == 'invoiced'" string="Facture ADM">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+    <!-- form -->
+        <record model="ir.ui.view" id="revatua_account_move_adm_form">
+            <field name="name">revatua.account.move.adm.form</field>
+            <field name="model">account.move.adm</field>
+            <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
+            <field name="arch" type="xml">
+                <form string="Facture ADM">
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <h1 style="width:30%%"><field name="name"/></h1>
+                        <group>
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="currency_id"/>
+                            </group>
+                            <group>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Détails">
+                                <field name="product_line_ids"/>
+                            </page>
+                            <page string="Factures">
+                                <field name="invoice_line_ids"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    
+</data></odoo>
