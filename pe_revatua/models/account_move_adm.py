@@ -50,10 +50,25 @@ class AccountMoveAdm(models.Model):
                         else:
                             if move.invoice_date >= record.start_date:
                                adms.append(move.id)
-            record.adm_invoice_ids = [(6,0,adms)]
+            record.invoice_line_ids = [(6,0,adms)]
     
-    
-    
+    @api.onchange('invoice_line_ids')
+    def _onchange_invoice_list_update_detail(self):
+        for record in self:
+            record.product_line_ids = [(5,0,0)]
+            moves = record.invoice_line_ids
+            adm_line = []
+            sequence = 1
+            for move in moves:
+                _logger.error(move.name)
+                adm_line.append((0,0,move._add_move_line(sequence=sequence)),)
+                sequence += 1
+                if move.invoice_line_ids:
+                    for line in move.invoice_line_ids:
+                        adm_line.append((0,0,line._prepare_line_admg(sequence=sequence)),)
+                        sequence += 1
+            record.product_line_ids = adm_line
+            #record.write({'product_line_ids' : adm_line,})
 #--------- LINE ---------#   
 class AccountMoveAdmLine(models.Model):
     _name = 'account.move.adm.line'
@@ -63,6 +78,7 @@ class AccountMoveAdmLine(models.Model):
     currency_id = fields.Many2one('res.currency', related='invoice_id.currency_id', string='Devise')
     # Article
     sequence = fields.Integer(string='Sequence', default=1)
+    name = fields.Char(string='Description')
     display_type = fields.Selection([
         ('line_section', "Section"),
         ('line_note', "Note")], default=False, help="Technical field for UX purpose.")

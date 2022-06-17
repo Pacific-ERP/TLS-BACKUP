@@ -23,7 +23,7 @@
             <field name="arch" type="xml">
                 <form string="Facture ADM">
                     <header>
-                        <field name="state" widget="statusbar"/>
+                        <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
                     </header>
                     <sheet>
                         <h1 style="width:30%%"><field name="name"/></h1>
@@ -39,20 +39,23 @@
                         </group>
                         <notebook>
                             <page string="Détails">
-                                <field name="product_line_ids">
+                                <field name="product_line_ids" widget="section_and_note_one2many">
                                     <tree create="false" delete="false">
-                                        <field name="display_type" optional="hide"/>
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="display_type" invisible="1"/>
                                         <field name="currency_id" optional="hide"/>
-                                        <field name="product_id" optional="show" string='Articles'/>
-                                        <field name="r_volume" optional="show" string='Vol(m³)'/>
-                                        <field name="r_weight" optional="show" string='Poid(T)'/>
-                                        <field name="quantity" optional="show" string='Qté'/>
-                                        <field name="revatua_uom" optional="show" string='Udm'/>
-                                        <field name="price_subtotal" optional="show" string='Total HT'/>
-                                        <field name="tax_id" optional="show" string='Taxes'/>
-                                        <field name="tarif_terrestre" optional="hide" string='Terrestre' sum='Terrestre'/>
-                                        <field name="tarif_maritime" optional="show" string='Maritime' sum='Maritime'/>
-                                        <field name="tarif_rpa" optional="show" string='RPA' sum='RPA'/>
+                                        <field name="product_id" optional="show" string="Article"/>
+                                        <field name="name" widget="section_and_note_text" optional="show" string="Description"/>
+                                        <field name="r_volume" optional="show" string="Vol(m³)"/>
+                                        <field name="r_weight" optional="show" string="Poid(T)"/>
+                                        <field name="quantity" optional="show" string="Qté"/>
+                                        <field name="revatua_uom" optional="show" string="Udm"/>
+                                        <field name="price_subtotal" optional="show" string="Total HT"/>
+                                        <field name="tax_id" widget="many2many_tags" readonly="1" optional="show" string="Taxes"/>
+                                        <field name="tarif_terrestre" optional="hide" string="Terrestre" sum="Terrestre"/>
+                                        <field name="tarif_maritime" optional="show" string="Maritime" sum="Maritime"/>
+                                        <field name="tarif_rpa" optional="show" string="RPA" sum="RPA"/>
+                                        <field name="price_total" optional="show" string="Total TTC"/>
                                     </tree>
                                 </field>
                             </page>

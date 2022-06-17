@@ -39,3 +39,23 @@ class AccountMoveLineInherit(models.Model):
         else:
             _logger.error('Revatua not activate : account_move_line.py -> _get_price_total_and_subtotal_model')
         return res
+    
+    def _prepare_line_admg(self, sequence=1):
+        self.ensure_one()
+        vals = {
+            'sequence': sequence,
+            'display_type': self.display_type,
+            'product_id': self.product_id,
+            'r_volume': self.r_volume,
+            'r_weight': self.r_weight,
+            'quantity': self.quantity,
+            'revatua_uom': self.revatua_uom,
+            'price_subtotal': self.price_subtotal,
+            'tax_id': [(6,0,[137])], #RPA id
+            'tarif_terrestre': self.tarif_terrestre,
+            'tarif_maritime': self.tarif_maritime,
+            'tarif_rpa': self.tarif_rpa,
+            'price_total': self.price_total,
+        }
+        _logger.error('Seq : %s | Ligne: %s' % (sequence,vals))
+        return vals
