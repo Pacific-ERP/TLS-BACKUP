@@ -11,12 +11,6 @@ class ProductTemplateInherit(models.Model):
     check_adm = fields.Boolean(string='Payé par ADM',
                                default=False)
     
-    etiquette_produit = fields.Many2many(string="Etiquette d'article",
-                                         comodel_name="product.etiquette",
-                                         relation='product_etiquette_aremiti',
-                                         column1='product_id',
-                                         column2='etiquette_id')
-    
     famille_produit = fields.Selection(selection=[('livraison_moorea','Livraison Moorea'),
                                                   ('livraison_tahiti','Livraison Tahiti'),
                                                   ('location','Locations'),

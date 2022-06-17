@@ -14,6 +14,7 @@
         "security/res_groups.xml",
         "security/ir.model.access.csv",
         #"wizard/account_move_adm_wizard.xml",
+        "data/account_journal.xml",
         "data/account_tax_data.xml",
         "data/ir_actions_report.xml",
         "data/account_move_adm_sequence.xml",
