@@ -57,5 +57,5 @@ class AccountMoveLineInherit(models.Model):
             'tarif_rpa': self.tarif_rpa,
             'price_total': self.price_total,
         }
-        _logger.error('Seq : %s | Ligne: %s' % (sequence,vals))
+        #_logger.error('Seq : %s | Ligne: %s' % (sequence,vals))
         return vals

@@ -44,6 +44,20 @@ class ProductTemplateInherit(models.Model):
                                    help='La part du prix normal qui est pris pour la partie maritime en pourcentage (1-Terrestre)',
                                    default=0.4,
                                    readonly=False)
+
+    #Fields Maritime
+    tarif_maritime = fields.Monetary(string='Tarif maritime',
+                                     default=0,
+                                     readonly=False)
+    tarif_minimum_maritime = fields.Monetary(string='Tarif minimum maritime',
+                                             default=0)
+    #Fields Terrestre
+    tarif_terrestre = fields.Monetary(string='Tarif terrestre',
+                                      default=0,
+                                      readonly=False)
+    tarif_minimum_terrestre = fields.Monetary(string='Tarif minimum terrestre',
+                                              default=0)
+
     #Terrestre 60% du prix normal & maritime 40% du prix normal
     @api.onchange('tarif_normal','ratio_terrestre')
     def _get_default_revatua(self):
@@ -60,6 +74,7 @@ class ProductTemplateInherit(models.Model):
                     record.tarif_terrestre = record.tarif_normal * r_t
                     record.tarif_maritime = record.tarif_normal * r_m
                     record.tarif_rpa = 100
+                    record.list_price = record.tarif_normal
                 # Si le prix normal est remis à 0 on retirer les valeurs des champs pour éviter des soucis de calcul par la suite
                 else:
                     record.list_price = 1
@@ -84,20 +99,6 @@ class ProductTemplateInherit(models.Model):
                             record.taxes_id = [(3,taxe.id)]
         else:
             _logger.error('Revatua not activate : product_template.py -> _add_rpa_taxe')
-
-    #Fields Maritime
-    tarif_maritime = fields.Monetary(string='Tarif maritime',
-                                     default=0,
-                                     readonly=False)
-    tarif_minimum_maritime = fields.Monetary(string='Tarif minimum maritime',
-                                             default=0)
-    #Fields Terrestre
-    tarif_terrestre = fields.Monetary(string='Tarif terrestre',
-                                      default=0,
-                                      readonly=False)
-    tarif_minimum_terrestre = fields.Monetary(string='Tarif minimum terrestre',
-                                              default=0)
-
     
     
     

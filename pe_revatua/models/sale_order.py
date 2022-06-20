@@ -120,7 +120,8 @@ class SaleOrderInherit(models.Model):
             #========================================================================#
             # --- Check if revatua is activate ---#
             if self.env.company.revatua_ck:
-                journal = self.env['account.journal'].sudo().search(['name','=','Facture ADM'])
+                journal = self.env['account.journal'].sudo().search([('name','=','Facture ADM')])
+                _logger.error(journal)
                 invoice_vals_adm = order._prepare_invoice()
                 invoice_vals_adm.update({
                     'is_adm_invoice':True,

@@ -23,23 +23,28 @@
             <field name="arch" type="xml">
                 <form string="Facture ADM">
                     <header>
+                        <button name="action_confirm_adm" id="action_confirm" string="Confirmé" class="btn-primary" type="object" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                         <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
                     </header>
                     <sheet>
-                        <h1 style="width:30%%"><field name="name"/></h1>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
                         <group>
                             <group>
-                                <field name="partner_id"/>
-                                <field name="currency_id"/>
+                                <field name="partner_id" attrs="{'readonly':[('state','=','done')]}"/>
+                                <field name="currency_id" attrs="{'readonly':[('state','=','done')]}"/>
                             </group>
                             <group>
-                                <field name="start_date"/>
-                                <field name="end_date"/>
+                                <field name="start_date" attrs="{'readonly':[('state','=','done')]}"/>
+                                <field name="end_date" attrs="{'readonly':[('state','=','done')]}"/>
                             </group>
                         </group>
                         <notebook>
                             <page string="Détails">
-                                <field name="product_line_ids" widget="section_and_note_one2many">
+                                <field name="product_line_ids" widget="section_and_note_one2many" attrs="{'readonly':[('state','=','done')]}">
                                     <tree create="false" delete="false">
                                         <field name="sequence" widget="handle"/>
                                         <field name="display_type" invisible="1"/>
@@ -51,16 +56,27 @@
                                         <field name="quantity" optional="show" string="Qté"/>
                                         <field name="revatua_uom" optional="show" string="Udm"/>
                                         <field name="price_subtotal" optional="show" string="Total HT"/>
-                                        <field name="tax_id" widget="many2many_tags" readonly="1" optional="show" string="Taxes"/>
+                                        <field name="tax_id" widget="many2many_tags" readonly="1" optional="hide" string="Taxes"/>
                                         <field name="tarif_terrestre" optional="hide" string="Terrestre" sum="Terrestre"/>
                                         <field name="tarif_maritime" optional="show" string="Maritime" sum="Maritime"/>
                                         <field name="tarif_rpa" optional="show" string="RPA" sum="RPA"/>
                                         <field name="price_total" optional="show" string="Total TTC"/>
                                     </tree>
                                 </field>
+                                <group name="note_group" col="6" class="mt-2 mt-md-0" style="padding-top:10px">
+                                    <group colspan="4">
+                                        <field name="note_adm" class="oe-bordered-editor" nolabel="1" placeholder="Notes..."/>
+                                    </group>
+                                    <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                                        <field name='total_ht' />
+                                        <field name='total_rpa' />
+                                        <field name='total_ttc' style="font-weight: bold;"/>
+                                    </group>
+                                    <div class="oe_clear"/>
+                                </group>
                             </page>
                             <page string="Factures">
-                                <field name="invoice_line_ids">
+                                <field name="invoice_line_ids" context="{'search_default_no_cargo':1}" attrs="{'readonly':[('state','=','done')]}">
                                     <tree default_order='invoice_date asc'>
                                         <field name="name" decoration-bf="1" optional="show"/>
                                         <field name="invoice_partner_display_name" string='Administration' optional="show"/>
@@ -74,6 +90,9 @@
                                         <field name="state" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'" optional="show"/>
                                     </tree>
                                 </field>
+                            </page>
+                            <page string='MT' groups="base.group_no_one">
+                                <field name="invoice_ids"/>
                             </page>
                         </notebook>
                     </sheet>

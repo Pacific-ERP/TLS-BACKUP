@@ -8,21 +8,29 @@ _logger = logging.getLogger(__name__)
 class AccountMoveAdm(models.Model):
     _name = 'account.move.adm'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _description = 'Historique des facture grouper pour les administrations'
+    _description = 'Facture global ADM'
     
     name = fields.Char(string='Numéro', store=True, readonly=True, copy=False)
-    start_date = fields.Date(string='Du', store=True, copy=False)
-    end_date = fields.Date(string='Au', store=True, copy=False)
-    partner_id = fields.Many2one(string='Client', store=True, comodel_name='res.partner')
+    start_date = fields.Date(string='Du', store=True, copy=False, tracking=True)
+    end_date = fields.Date(string='Au', store=True, copy=False, tracking=True)
+    partner_id = fields.Many2one(string='Client', store=True, comodel_name='res.partner', tracking=True)
     company_id = fields.Many2one('res.company', string='Company', readonly=True, states={'draft': [('readonly', False)], 'refused': [('readonly', False)]}, default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Currency')
-    state = fields.Selection(string='État de facturation', selection=[('no','Aucun paiement'),
-                                                                      ('in_payment','Paiement partiel'),
-                                                                      ('invoiced','Paiement complet')]
-                             ,store=True, default='no', copy=False)
-    
-    invoice_line_ids = fields.Many2many(string='Factures ADM', store=True, comodel_name='account.move')#, inverse_name='adm_group_id'
+    note_adm = fields.Html(string='Note')
+    state = fields.Selection(string='État de facturation', selection=[('draft','Brouillons'),
+                                                                      ('done','Confirmé'),
+                                                                      ('in_payment','Paiement Partiel'),
+                                                                      ('payed','Paiement complet')]
+                             ,store=True, default='draft', copy=False, tracking=True)
+    # M2m/O2m
+    invoice_line_ids = fields.Many2many(string='Factures ADM', store=True, comodel_name='account.move')
+    invoice_ids = fields.One2many(string='Factures lié ADM', store=True, comodel_name='account.move', inverse_name='adm_group_id')
     product_line_ids = fields.One2many(string='Articles', store=True, comodel_name='account.move.adm.line', inverse_name='invoice_id')
+    
+    # Total
+    total_ht = fields.Float(string='Total HT', store=True, copy=False)
+    total_rpa = fields.Float(string='Total RPA', store=True, copy=False)
+    total_ttc = fields.Float(string='Total TTC', store=True, copy=False, help='Total RPA + Total HT')
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -51,7 +59,7 @@ class AccountMoveAdm(models.Model):
                             if move.invoice_date >= record.start_date:
                                adms.append(move.id)
             record.invoice_line_ids = [(6,0,adms)]
-    
+                                
     @api.onchange('invoice_line_ids')
     def _onchange_invoice_list_update_detail(self):
         for record in self:
@@ -68,7 +76,44 @@ class AccountMoveAdm(models.Model):
                         adm_line.append((0,0,line._prepare_line_admg(sequence=sequence)),)
                         sequence += 1
             record.product_line_ids = adm_line
-            #record.write({'product_line_ids' : adm_line,})
+    
+    @api.onchange('product_line_ids')
+    def _compute_total(self):
+        for record in self:
+            total_ht = 0
+            total_rpa = 0
+            total_ttc = 0
+            for line in record.product_line_ids:
+                total_ht += line.price_subtotal
+                total_rpa += line.tarif_rpa
+                total_ttc += line.price_total
+        record.write({
+            'total_ht' : total_ht,
+            'total_rpa' : total_rpa,
+            'total_ttc' : total_ttc,
+        })
+    
+    def action_confirm_adm(self):
+        _logger.error('action_confirm_adm')
+        for record in self:
+            for line in record.invoice_line_ids:
+                adm = record.env['account.move'].sudo().search([('id','=',line.id)])
+                if adm and not adm.adm_group_id:
+                    adm.write({'adm_group_id': record.id})
+            record.write({'state':'done'})
+    
+    @api.onchange('invoice_ids.payment_state')
+    def _onchange_paiement_state(self):
+        for record in self:
+            if record.invoice_ids:
+                if all(line.payment_state == 'paid' for line in record.invoice_ids):
+                    record.write({'state':'payed'})
+                elif any(line.payment_state == 'paid' for line in record.invoice_ids):
+                    record.write({'state':'in_payment'})
+                else:
+                    continue
+                
+            
 #--------- LINE ---------#   
 class AccountMoveAdmLine(models.Model):
     _name = 'account.move.adm.line'
