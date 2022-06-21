@@ -44,7 +44,7 @@
                         </group>
                         <notebook>
                             <page string="Détails">
-                                <field name="product_line_ids" widget="section_and_note_one2many" attrs="{'readonly':[('state','=','done')]}">
+                                <field name="product_line_ids" widget="section_and_note_one2many" context="{'search_default_posted':1}" domain="[('is_adm_invoice','=',True),('adm_group_id','=',False)]" attrs="{'readonly':[('state','=','done')]}">
                                     <tree create="false" delete="false">
                                         <field name="sequence" widget="handle"/>
                                         <field name="display_type" invisible="1"/>

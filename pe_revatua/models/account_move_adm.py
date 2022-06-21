@@ -48,7 +48,7 @@ class AccountMoveAdm(models.Model):
             if record.start_date:
                 moves = record.env['account.move'].search([('is_adm_invoice','=',True)])
                 for move in moves:
-                    if move.invoice_date and move.state not in ('draft','cancel'):
+                    if move.invoice_date and move.state not in ('draft','cancel') and not move.adm_group_id:
                         if record.end_date:
                             if record.end_date <= record.start_date:
                                 raise ValidationError('La date de fin ne peut pas être inférieur à la date de départ')
