@@ -52,9 +52,7 @@ class SaleOrderInherit(models.Model):
                     if line.tarif_terrestre:
                         sum_ter += round(line.tarif_terrestre)
                 # Write fields values car les champs sont en readonly
-                _logger.error('custo: %s | adm: %s'% (sum_customer,sum_adm))
                 sum_total = sum_customer - sum_adm
-                _logger.error(sum_total)
                 order.write({
                     'sum_maritime' : sum_mar,
                     'sum_terrestre' : sum_ter,
@@ -62,7 +60,6 @@ class SaleOrderInherit(models.Model):
                     'sum_adm' : sum_adm,
                     'sum_customer' : sum_total,
                 })
-                _logger.error(order)
         else:
             _logger.error('Revatua not activate : sale_order.py -> _total_tarif')
                 
