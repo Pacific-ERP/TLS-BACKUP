@@ -44,7 +44,7 @@
                         </group>
                         <notebook>
                             <page string="Détails">
-                                <field name="product_line_ids" widget="section_and_note_one2many" context="{'search_default_posted':1}" domain="[('is_adm_invoice','=',True),('adm_group_id','=',False)]" attrs="{'readonly':[('state','=','done')]}">
+                                <field name="product_line_ids" widget="section_and_note_one2many" attrs="{'readonly':[('state','=','done')]}">
                                     <tree create="false" delete="false">
                                         <field name="sequence" widget="handle"/>
                                         <field name="display_type" invisible="1"/>
@@ -76,7 +76,7 @@
                                 </group>
                             </page>
                             <page string="Factures">
-                                <field name="invoice_line_ids" context="{'search_default_no_cargo':1}" attrs="{'readonly':[('state','=','done')]}">
+                                <field name="invoice_line_ids" context="{'search_default_posted':1}" domain="[('is_adm_invoice','=',True),('adm_group_id','=',False)]"  attrs="{'readonly':[('state','=','done')]}">
                                     <tree default_order='invoice_date asc'>
                                         <field name="name" decoration-bf="1" optional="show"/>
                                         <field name="invoice_partner_display_name" string='Administration' optional="show"/>
