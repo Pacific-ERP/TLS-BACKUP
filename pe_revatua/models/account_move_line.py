@@ -15,30 +15,68 @@ class AccountMoveLineInherit(models.Model):
     revatua_uom = fields.Char(string='Udm', store=True)
     check_adm = fields.Boolean(string='Payé par ADM', related="product_id.check_adm")
     
-    old_subtotal = fields.Float(string='Base Total HT', default=0, store=True)
+    # Field from Sale before changes
     base_qty = fields.Float(string='Base Quantity', default=0, store=True)
+    base_unit_price = fields.Float(string='Origin Unit Price', default=0, store=True)
+    base_subtotal = fields.Float(string='Base Total HT', default=0, store=True)
+    base_rpa = fields.Float(string='Base RPA', default=0, store=True)
+    base_maritime = fields.Float(string='Base maritime', default=0, store=True)
+    base_terrestre = fields.Float(string='Base Terrestre', default=0, store=True)
+    base_total = fields.Float(string='Base Total TTC', default=0, store=True)
     
-    def _get_price_total_and_subtotal_model(self, price_unit, quantity, discount, currency, product, partner, taxes, move_type):
-        #########################
-        #### OVERRIDE METHOD ####
-        #########################
-        res = super(AccountMoveLineInherit, self)._get_price_total_and_subtotal_model(price_unit, quantity, discount, currency, product, partner, taxes, move_type)
+    @api.onchange('quantity', 'discount', 'price_unit', 'tax_ids')
+    def _onchange_price_subtotal(self):
+        ### Override ###
+        for line in self:
+            if not line.move_id.is_invoice(include_receipts=True):
+                continue
+            # --- Check if revatua is activate ---#
+            if self.env.company.revatua_ck:
+                # Pour la facture Administration article ADM
+                if line.check_adm and line.move_id.is_adm_invoice:
+                    if line.base_unit_price:
+                        price_custo = line.base_unit_price - (line.base_unit_price * 0.6)
+                        line.update(line._get_price_total_and_subtotal(price_unit=price_custo) )
+                        line.update(line._get_fields_onchange_subtotal())
+                # Pour la facture client article ADM
+                elif line.check_adm and not line.move_id.is_adm_invoice:
+                    if line.base_unit_price:
+                        price_adm = line.base_unit_price - (line.base_unit_price * 0.4)
+                        line.update(line._get_price_total_and_subtotal(price_unit=price_adm) )
+                        line.update(line._get_fields_onchange_subtotal())
+                else:
+                    line.update(line._get_price_total_and_subtotal())
+                    line.update(line._get_fields_onchange_subtotal())
+                    line.update({'tarif_maritime': (line.quantity * line.price_unit) * 0.4, 
+                                 'tarif_terrestre': (line.quantity * line.price_unit) * 0.6,
+                                 'tarif_rpa': line.quantity * 100,})
+                    
+            # Autres
+            else:
+                 _logger.error('Revatua not activate : account_move_line.py -> _onchange_price_subtotal')
+                 line.update(line._get_price_total_and_subtotal())
+                 line.update(line._get_fields_onchange_subtotal())
+    
+    @api.onchange('r_volume','r_weight')
+    def _onchange_update_qty(self):
+        _logger.error('_onchange_update_qty')
+        # Calcul volume si poids + volume alors product_qty = (poids+volume)/2, sinon soit l'un soit l'autre
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
-            if self.check_adm:
-                if not self.move_id.is_adm_invoice:
-                    old_subtotal = res['price_subtotal']
-                    self.old_subtotal = old_subtotal
-                    new_subtotal = (res['price_subtotal'] - old_subtotal) + self.tarif_terrestre
-                    res['price_subtotal'] = new_subtotal
-                else:
-                    old_subtotal = res['price_subtotal']
-                    self.old_subtotal = old_subtotal
-                    new_subtotal = (res['price_subtotal'] - old_subtotal) + self.tarif_maritime
-                    res['price_subtotal'] = new_subtotal
+            if self.r_volume and self.r_weight:
+                self.quantity = (self.r_volume + self.r_weight) / 2
+                self.revatua_uom = 'T/m³'
+            elif self.r_weight and not self.r_volume:
+                self.quantity = self.r_weight
+                self.revatua_uom = 'T'
+            elif self.r_volume and not self.r_weight:
+                self.quantity = self.r_volume
+                self.revatua_uom = 'm³'
+            else:
+                self.quantity = 1
+                self.revatua_uom = ''
         else:
-            _logger.error('Revatua not activate : account_move_line.py -> _get_price_total_and_subtotal_model')
-        return res
+            _logger.error('Revatua not activate : account_move_line.py -> _onchange_update_qty')
     
     def _prepare_line_admg(self, sequence=1):
         self.ensure_one()

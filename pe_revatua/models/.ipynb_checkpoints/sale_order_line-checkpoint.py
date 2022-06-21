@@ -91,6 +91,7 @@ class SaleOrderLineInherit(models.Model):
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
+                'revatua_uom': self.revatua_uom,
             })
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_procurement_values')
@@ -113,7 +114,14 @@ class SaleOrderLineInherit(models.Model):
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
-                'base_qty' : self.product_uom_qty,
+                'revatua_uom': self.revatua_uom,
+                'base_qty': self.product_uom_qty,
+                'base_unit_price':self.price_unit,
+                'base_subtotal':self.price_subtotal,
+                'base_rpa':self.tarif_rpa,
+                'base_maritime':self.tarif_maritime,
+                'base_terrestre':self.tarif_terrestre,
+                'base_total':self.price_total,
             })
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line')
@@ -123,6 +131,7 @@ class SaleOrderLineInherit(models.Model):
     def _prepare_invoice_line_adm_part(self, **optional_values):
         values = super(SaleOrderLineInherit, self)._prepare_invoice_line(**optional_values)
         # --- Check if revatua is activate ---#
+        # L'administration paie la part maritime et RPA uniquement
         if self.env.company.revatua_ck:
             values.update({
                 'tarif_rpa': self.tarif_rpa,
@@ -131,7 +140,14 @@ class SaleOrderLineInherit(models.Model):
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
-                'old_subtotal' : self.price_subtotal,
+                'revatua_uom': self.revatua_uom,
+                'base_qty': self.product_uom_qty,
+                'base_unit_price':self.price_unit,
+                'base_subtotal':self.price_subtotal,
+                'base_rpa':self.tarif_rpa,
+                'base_maritime':self.tarif_maritime,
+                'base_terrestre':self.tarif_terrestre,
+                'base_total':self.price_total,
             })
             for tax in self.tax_id:
                 if tax.name == 'RPA':
@@ -145,6 +161,7 @@ class SaleOrderLineInherit(models.Model):
         values = super(SaleOrderLineInherit, self)._prepare_invoice_line(**optional_values)
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
+            # Le client ne paie pas la part Maritime et RPA si l'article est ADM
             values.update({
                 'tarif_rpa': 0,
                 'tarif_maritime': 0,
@@ -152,7 +169,14 @@ class SaleOrderLineInherit(models.Model):
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
-                'old_subtotal' : self.price_subtotal,
+                'revatua_uom': self.revatua_uom,
+                'base_qty': self.product_uom_qty,
+                'base_unit_price':self.price_unit,
+                'base_subtotal':self.price_subtotal,
+                'base_rpa':self.tarif_rpa,
+                'base_maritime':self.tarif_maritime,
+                'base_terrestre':self.tarif_terrestre,
+                'base_total':self.price_total,
             })
             tax_list=[]
             for tax in self.tax_id:
