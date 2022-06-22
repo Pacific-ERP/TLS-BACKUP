@@ -27,7 +27,7 @@
                                         <span t-field="o.commune_recup"/>
                                     </div>
                                 </div>
-                                <div class="col-6" name="div_incoming_address"><!--&quot;phone_icons&quot;: True-->
+                                <div class="col-6" name="div_incoming_address">
                                     <span><strong>Destinataire:</strong></span>
                                     <div t-field="o.contact_expediteur.name"/>
                                     <div>
@@ -45,7 +45,7 @@
                                         <span t-field="o.commune_dest"/>
                                     </div>
                                 </div>
-                                <div class="col-4" name="div_incoming_address"><!--&quot;phone_icons&quot;: True-->
+                                <div class="col-4" name="div_incoming_address">
                                     
                                 </div>
                             </div>
