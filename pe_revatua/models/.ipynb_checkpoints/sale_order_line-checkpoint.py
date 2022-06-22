@@ -185,5 +185,4 @@ class SaleOrderLineInherit(models.Model):
             values.update({'tax_ids' : [(6,0,tax_list)]})
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line_non_adm')
-        return values
-    
+        return values  

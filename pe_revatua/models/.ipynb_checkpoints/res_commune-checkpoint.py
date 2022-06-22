@@ -15,4 +15,3 @@ class ResCountryStateInherit(models.Model):
     _inherit = "res.country.state"
     
     commune_ids = fields.One2many(string='Communes', comodel_name='res.commune', inverse_name='ile_id')
-    

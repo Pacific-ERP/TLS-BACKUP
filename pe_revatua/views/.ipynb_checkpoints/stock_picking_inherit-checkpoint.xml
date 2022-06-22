@@ -32,6 +32,21 @@
                 <xpath expr="//field[@name='carrier_id']" position="after">
                     <field name="sale_id"/>
                 </xpath>
+            <!-- Opérations -->
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='operations']/field[@name='move_ids_without_package']/tree[1]/field[@name='product_uom_qty']" position="before">
+                    <field name="r_volume" optional="show" string='Vol(m³)'/>
+                    <field name="r_weight" optional="show" string='Poid(T)'/>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='operations']/field[@name='move_ids_without_package']/tree[1]/field[@name='product_uom_qty']" position="after">
+                    <field name="revatua_uom" optional="show"/>
+                    <field name="sale_line_id" optional="hide"/>
+                    <field name="tarif_maritime" optional="hide"/>
+                    <field name="tarif_terrestre" optional="hide"/>
+                    <field name="tarif_rpa" optional="hide"/>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='operations']/field[@name='move_ids_without_package']/tree[1]/field[@name='product_uom']" position="attributes">
+                    <attribute name="attrs">{"readonly": [["state","!=","draft"],["additional","=",False]]}</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
             </field></record>
 </data></odoo>
-        

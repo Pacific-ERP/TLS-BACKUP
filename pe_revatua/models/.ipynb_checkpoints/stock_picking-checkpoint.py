@@ -20,5 +20,3 @@ class StockPickingInherit(models.Model):
     contact_dest = fields.Many2one(string='Contact de destination',comodel_name='res.partner', related='sale_id.contact_dest')
     tel_dest = fields.Char(string='Téléphone destinataire', related='contact_dest.phone', store=True)
     mobil_dest = fields.Char(string='Mobile destinataire', related='contact_dest.mobile', store=True)
-    
-    

@@ -99,7 +99,3 @@ class ProductTemplateInherit(models.Model):
                             record.taxes_id = [(3,taxe.id)]
         else:
             _logger.error('Revatua not activate : product_template.py -> _add_rpa_taxe')
-    
-    
-    
-    
