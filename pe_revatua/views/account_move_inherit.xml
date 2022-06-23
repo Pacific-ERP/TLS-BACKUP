@@ -31,11 +31,9 @@
             </xpath>
             
             <!-- Remplacer l'uom de base par un fictif pour information -->
-            <xpath expr="//page[1]/field[@name='invoice_line_ids']/tree[1]/field[@name='product_uom_id']" position="replace">
-                <field name="product_uom_id" invisible="1"/>
+            <xpath expr="//page[1]/field[@name='invoice_line_ids']/tree[1]/field[@name='product_uom_id']" position="after">
                 <field name="r_volume" string="Vol(m³)" optional="show"/>
                 <field name="r_weight" string="Poids(T)" optional="show"/>
-                <field name="revatua_uom"/>
             </xpath>
             <!-- Ajout des champs sur le deuxieme onglet pour sauvegarde -->
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[2]/field[@name='line_ids']/tree[1]/field[@name='account_id']" position="after">

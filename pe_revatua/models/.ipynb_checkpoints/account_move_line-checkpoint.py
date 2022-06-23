@@ -12,7 +12,6 @@ class AccountMoveLineInherit(models.Model):
     tarif_terrestre = fields.Float(string='Terrestre', default=0, required=True, store=True)
     r_volume = fields.Float(string='Volume Revatua (m³)', default=0, store=True)
     r_weight = fields.Float(string='Volume weight (T)', default=0, store=True)
-    revatua_uom = fields.Char(string='Udm', store=True)
     check_adm = fields.Boolean(string='Payé par ADM', related="product_id.check_adm")
     
     # Field from Sale before changes
@@ -65,16 +64,16 @@ class AccountMoveLineInherit(models.Model):
         if self.env.company.revatua_ck:
             if self.r_volume and self.r_weight:
                 self.quantity = (self.r_volume + self.r_weight) / 2
-                self.revatua_uom = 'T/m³'
+                self.product_uom_id = 'T/m³'
             elif self.r_weight and not self.r_volume:
                 self.quantity = self.r_weight
-                self.revatua_uom = 'T'
+                self.product_uom_id = 'T'
             elif self.r_volume and not self.r_weight:
                 self.quantity = self.r_volume
-                self.revatua_uom = 'm³'
+                self.product_uom_id = 'm³'
             else:
                 self.quantity = 1
-                self.revatua_uom = 'm³'
+                self.product_uom_id = 'm³'
         else:
             _logger.error('Revatua not activate : account_move_line.py -> _onchange_update_qty')
     
@@ -87,7 +86,6 @@ class AccountMoveLineInherit(models.Model):
             'r_volume': self.r_volume,
             'r_weight': self.r_weight,
             'quantity': self.quantity,
-            'revatua_uom': self.revatua_uom,
             'price_subtotal': self.price_subtotal,
             'tax_id': [(6,0,[137])], #RPA id
             'tarif_terrestre': self.tarif_terrestre,

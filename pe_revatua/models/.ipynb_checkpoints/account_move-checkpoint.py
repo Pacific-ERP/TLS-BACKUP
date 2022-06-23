@@ -41,7 +41,6 @@ class AccountMoveInherit(models.Model):
             'r_volume': 0,
             'r_weight': 0,
             'quantity': 0,
-            'revatua_uom': '',
             'price_subtotal': 0,
             'tax_id': [], #RPA id
             'tarif_terrestre': 0,

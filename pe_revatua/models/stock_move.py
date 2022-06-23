@@ -12,4 +12,3 @@ class StockMoveInherit(models.Model):
     tarif_terrestre = fields.Float(string='Terrestre', related='sale_line_id.tarif_terrestre', required=True)
     r_volume = fields.Float(string='Volume Revatua (m³)', related='sale_line_id.r_volume')
     r_weight = fields.Float(string='Volume weight (T)', related='sale_line_id.r_weight')
-    revatua_uom = fields.Char(string='Udm', related='sale_line_id.revatua_uom', store=True)

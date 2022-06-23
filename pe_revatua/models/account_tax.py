@@ -53,7 +53,7 @@ class AccountTaxInherit(models.Model):
                 else:
                     base_amount = math.copysign(quantity, base_amount) * product.tarif_terrestre
                 ## Arrondis down pour la CPS uniquement
-                if 'CPS' in self.name and self.env.company.id == 2:
+                if 'CPS' in self.name:
                     return math.floor(base_amount * self.amount / 100)
                 else:
                     return base_amount * self.amount / 100

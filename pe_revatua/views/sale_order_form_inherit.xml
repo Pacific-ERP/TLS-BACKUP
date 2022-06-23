@@ -33,8 +33,17 @@
                     </group>
                 </xpath>
             <!-- Ligne d'articles -->
+                <!-- Ligne d'article -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_id']" position="replace">
+                    <!-- Aremiti -->
+                    <field name="product_id" 
+                        domain="[('sale_ok', '=', True),('company_id', '=', 2)]"
+                        context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
+                        attrs="{'readonly': [('product_updatable', '=', False)],'required': [('display_type', '=', False)],}"
+                        force_save="1"/>
+                </xpath>
                 <!-- Renommer Quantité -->
-                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="attributes">
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="attributes">
                     <attribute name="string">Qté</attribute>
                 </xpath>
                 <!-- Renommer Prix unitaire -->
@@ -75,16 +84,13 @@
                     <field name="tarif_terrestre" invisible="1"/>
                     <field name="tarif_maritime" invisible="1"/>
                     <field name="tarif_rpa" invisible="1"/>
-                    <field name="price_total" invisible="1"/>
                     <field name="check_adm" invisible="1"/>
                 </xpath>
                 
                 <!-- Remplacer l'uom de base par un fictif pour information -->
-                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="replace">
-                  <field name="product_uom" invisible="1"/>
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="after">
                   <field name="r_volume" string="Vol(m³)" optional="show"/>
                   <field name="r_weight" string="Poids(T)" optional="show"/>
-                  <field name="revatua_uom"/>
                 </xpath>
                 
                 <!-- Modification de prix unitaire en prix U -->

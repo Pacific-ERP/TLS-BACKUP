@@ -9,6 +9,10 @@
             <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
             <field name="arch" type="xml">
             <!-- Formulaire -->
+                <!-- Date de voyage -->
+                <xpath expr="//field[@name='location_id']" position="after">
+                    <field name="travel_date"/>
+                </xpath>
                 <!-- Champ recup/destinataire -->
                 <xpath expr="//field[@name='owner_id']/../.." position="after">
                     <group name="detail_livraison" attrs='{"invisible": [["commune_recup","=",False]]}'>
@@ -38,7 +42,6 @@
                     <field name="r_weight" optional="show" string='Poid(T)'/>
                 </xpath>
                 <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='operations']/field[@name='move_ids_without_package']/tree[1]/field[@name='product_uom_qty']" position="after">
-                    <field name="revatua_uom" optional="show"/>
                     <field name="sale_line_id" optional="hide"/>
                     <field name="tarif_maritime" optional="hide"/>
                     <field name="tarif_terrestre" optional="hide"/>

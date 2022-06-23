@@ -60,9 +60,6 @@ class SaleOrderInherit(models.Model):
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
             invoice_vals.update({
-                'sum_maritime' : self.sum_maritime,
-                'sum_terrestre' : self.sum_terrestre,
-                'sum_mar_ter' : self.sum_mar_ter,
                 'sum_adm': self.sum_adm,
                 'sum_customer': self.sum_customer,
             })
@@ -163,6 +160,7 @@ class SaleOrderInherit(models.Model):
                     if line.check_adm:
                         invoice_line_vals_no_adm.append((0, 0, line._prepare_invoice_line_non_adm(sequence=invoice_item_sequence,)),)
                         invoice_line_vals_adm.append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
+                        invoice_vals_adm.update({'partner_id':line.product_id.contact_adm})
                     else:
                         invoice_line_vals.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence,)),)
                 else:

@@ -54,7 +54,6 @@
                                         <field name="r_volume" optional="show" string="Vol(m³)"/>
                                         <field name="r_weight" optional="show" string="Poid(T)"/>
                                         <field name="quantity" optional="show" string="Qté"/>
-                                        <field name="revatua_uom" optional="show" string="Udm"/>
                                         <field name="price_subtotal" optional="show" string="Total HT"/>
                                         <field name="tax_id" widget="many2many_tags" readonly="1" optional="hide" string="Taxes"/>
                                         <field name="tarif_terrestre" optional="hide" string="Terrestre" sum="Terrestre"/>

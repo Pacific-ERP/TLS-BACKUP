@@ -29,7 +29,6 @@ class SaleOrderLineInherit(models.Model):
     r_volume = fields.Float(string='Volume Revatua (m³)', store=True)
     r_weight = fields.Float(string='Volume weight (T)', store=True)
     check_adm = fields.Boolean(string='Payé par ADM', store=True)
-    revatua_uom = fields.Char(string='Udm', store=True)
     
     @api.onchange('product_id')
     def product_id_change(self):
@@ -61,16 +60,16 @@ class SaleOrderLineInherit(models.Model):
         if self.env.company.revatua_ck:
             if self.r_volume and self.r_weight:
                 self.product_uom_qty = (self.r_volume + self.r_weight) / 2
-                self.revatua_uom = 'T/m³'
+                self.product_uom = self.env['uom.uom'].sudo().search([('name','=','T/m³')]) #'T/m³'
             elif self.r_weight and not self.r_volume:
                 self.product_uom_qty = self.r_weight
-                self.revatua_uom = 'T'
+                self.product_uom = self.env['uom.uom'].sudo().search([('name','=','T')]) #'T'
             elif self.r_volume and not self.r_weight:
                 self.product_uom_qty = self.r_volume
-                self.revatua_uom = 'm³'
+                self.product_uom = self.env['uom.uom'].sudo().search([('name','=','m3')]) #'m³'
             else:
                 self.product_uom_qty = 1
-                self.revatua_uom = 'm³'
+                self.product_uom = self.env['uom.uom'].sudo().search([('name','=','m3')]) #'m³'
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _onchange_update_qty')
     
@@ -118,7 +117,6 @@ class SaleOrderLineInherit(models.Model):
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
-                'revatua_uom': self.revatua_uom,
             })
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_procurement_values')
@@ -141,7 +139,6 @@ class SaleOrderLineInherit(models.Model):
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
-                'revatua_uom': self.revatua_uom,
                 'base_qty': self.product_uom_qty,
                 'base_unit_price':self.price_unit,
                 'base_subtotal':self.price_subtotal,
@@ -167,7 +164,6 @@ class SaleOrderLineInherit(models.Model):
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
-                'revatua_uom': self.revatua_uom,
                 'base_qty': self.product_uom_qty,
                 'base_unit_price':self.price_unit,
                 'base_subtotal':self.price_subtotal,
@@ -196,7 +192,6 @@ class SaleOrderLineInherit(models.Model):
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
                 'r_weight': self.r_weight,
-                'revatua_uom': self.revatua_uom,
                 'base_qty': self.product_uom_qty,
                 'base_unit_price':self.price_unit,
                 'base_subtotal':self.price_subtotal,
@@ -213,3 +208,29 @@ class SaleOrderLineInherit(models.Model):
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line_non_adm')
         return values  
+
+class SaleOrderOptionInherit(models.Model):
+    _inherit = "sale.order.option"
+    
+    # Tarif de ventes
+    tarif_minimum = fields.Float(string='Prix Minimum', default=0, required=True, store=True)
+    
+    # -- RPA --#
+    base_rpa = fields.Float(string='Base RPA', store=True)
+    tarif_rpa = fields.Float(string='RPA', default=0, store=True)
+    tarif_minimum_rpa = fields.Float(string='Minimum RPA', store=True)
+    
+    # -- Maritime --#
+    base_maritime = fields.Float(string='Base Maritime', store=True)
+    tarif_maritime = fields.Float(string='Maritime', default=0, store=True)
+    tarif_minimum_maritime = fields.Float(string='Minimum Maritime', store=True)
+    
+    # -- Terrestre --#
+    base_terrestre = fields.Float(string='Base Terrestre', store=True)
+    tarif_terrestre = fields.Float(string='Terrestre', default=0, store=True)
+    tarif_minimum_terrestre = fields.Float(string='Minimum Terrestre', store=True)
+    
+    # Calcul & check
+    r_volume = fields.Float(string='Volume Revatua (m³)', store=True)
+    r_weight = fields.Float(string='Volume weight (T)', store=True)
+    check_adm = fields.Boolean(string='Payé par ADM', store=True)
