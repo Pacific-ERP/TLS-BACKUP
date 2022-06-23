@@ -10,6 +10,7 @@ class ProductTemplateInherit(models.Model):
     #Fields Autres
     check_adm = fields.Boolean(string='Payé par ADM',
                                default=False)
+    contact_adm = fields.Many2one(string='Département(ADM)', comodel_name='res.partner')
     
     famille_produit = fields.Selection(selection=[('livraison_moorea','Livraison Moorea'),
                                                   ('livraison_tahiti','Livraison Tahiti'),

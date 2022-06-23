@@ -24,7 +24,10 @@ class AccountTaxInherit(models.Model):
                 #========================================================================#
                 # --- Check if revatua is activate ---#
                 if self.name == 'RPA' and product.tarif_rpa > 0:
-                    return math.copysign(quantity, base_amount) * product.tarif_rpa
+                    if product.tarif_minimum_rpa and (math.copysign(quantity, base_amount) * product.tarif_rpa) < product.tarif_minimum_rpa:
+                        return product.tarif_minimum_rpa
+                    else:
+                        return math.copysign(quantity, base_amount) * product.tarif_rpa
                 else:
                     return math.copysign(quantity, base_amount) * self.amount
                 #========================================================================#
@@ -45,7 +48,10 @@ class AccountTaxInherit(models.Model):
             # --- Check if revatua is activate ---#
             # La taxe s'applique que à la part Terrestre base_amount = montant HT multilier par 0.6 pour obtenir la part terrestre
             if product.tarif_terrestre and product.tarif_terrestre > 0:
-                base_amount = base_amount * 0.6
+                if product.tarif_minimum_terrestre and (math.copysign(quantity, base_amount) * product.tarif_terrestre) < product.tarif_minimum_terrestre:
+                    base_amount = product.tarif_minimum_terrestre
+                else:
+                    base_amount = math.copysign(quantity, base_amount) * product.tarif_terrestre
                 ## Arrondis down pour la CPS uniquement
                 if 'CPS' in self.name and self.env.company.id == 2:
                     return math.floor(base_amount * self.amount / 100)

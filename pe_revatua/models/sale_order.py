@@ -24,9 +24,6 @@ class SaleOrderInherit(models.Model):
     mobil_dest = fields.Char(string='Mobile destinataire', related='contact_dest.mobile', store=True)
                 
     # Maritime
-    sum_maritime = fields.Monetary(string="Maritime", store=True, help="La part maritime correspond à 40% du prix HT")
-    sum_terrestre = fields.Monetary(string="Terrestre", store=True, help="La part terrestre correspond à 60% du prix HT")
-    sum_mar_ter = fields.Monetary(string="Total Maritime & Terrestre", store=True)
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
     
@@ -35,30 +32,20 @@ class SaleOrderInherit(models.Model):
     def _total_tarif(self):
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
-            sum_mar = 0
-            sum_ter = 0
-            sum_adm = 0
             sum_customer = 0
+            sum_adm = 0
             for order in self:
                 # Sum tarif_terrestre and maritime
                 for line in order.order_line:
-                    sum_customer += line.price_total
-                    if line.tarif_maritime:
-                        if line.check_adm:
-                            sum_adm += round(line.tarif_maritime) + round(line.tarif_rpa)
-                            sum_mar += round(line.tarif_maritime)
-                        else:
-                            sum_mar += round(line.tarif_maritime)
-                    if line.tarif_terrestre:
-                        sum_ter += round(line.tarif_terrestre)
+                    if line.check_adm:
+                        sum_adm += round(line.tarif_maritime) + round(line.tarif_rpa)
+                        sum_customer += round(line.tarif_terrestre)
+                    else:
+                        sum_customer += line.price_total
                 # Write fields values car les champs sont en readonly
-                sum_total = sum_customer - sum_adm
                 order.write({
-                    'sum_maritime' : sum_mar,
-                    'sum_terrestre' : sum_ter,
-                    'sum_mar_ter' : sum_mar + sum_ter,
                     'sum_adm' : sum_adm,
-                    'sum_customer' : sum_total,
+                    'sum_customer' : sum_customer,
                 })
         else:
             _logger.error('Revatua not activate : sale_order.py -> _total_tarif')

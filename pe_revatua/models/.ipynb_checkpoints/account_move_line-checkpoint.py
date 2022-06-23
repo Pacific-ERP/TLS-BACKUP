@@ -74,7 +74,7 @@ class AccountMoveLineInherit(models.Model):
                 self.revatua_uom = 'm³'
             else:
                 self.quantity = 1
-                self.revatua_uom = ''
+                self.revatua_uom = 'm³'
         else:
             _logger.error('Revatua not activate : account_move_line.py -> _onchange_update_qty')
     

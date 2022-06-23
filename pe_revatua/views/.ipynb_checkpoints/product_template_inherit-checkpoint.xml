@@ -19,6 +19,9 @@
                 <xpath expr="//field[@name='company_id']" position="before">
                     <field name="famille_produit"/>
                 </xpath>
+                <xpath expr="//field[@name='uom_po_id']" position="after">
+                    <field name="contact_adm" attrs="{'invisible': [['check_adm','=',False]]}" string="Département (ADM)" domain="[['id_adm','=',True]]"/>
+                </xpath>
                 <!-- Champs tarif Revatua -->
                 <xpath expr="//notebook/page[1]/group[1]" position="after">
                     <group>
@@ -37,6 +40,7 @@
                         <group string="RPA">
                             <field name="tarif_rpa" class="oe_inline" widget='monetary'/>
                             <field name="tarif_minimum_rpa" class="oe_inline" widget='monetary'/>
+                            <field name="check_adm" invisible="1"/>
                         </group>
                     </group>
                 </xpath>

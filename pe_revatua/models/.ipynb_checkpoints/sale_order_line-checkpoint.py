@@ -7,13 +7,28 @@ _logger = logging.getLogger(__name__)
 class SaleOrderLineInherit(models.Model):
     _inherit = "sale.order.line"
     
-    base_rpa = fields.Float(string='Base RPA', default=100, required=True, store=True)
-    tarif_rpa = fields.Float(string='RPA', default=0, required=True, store=True)
-    tarif_maritime = fields.Float(string='Maritime', default=0, required=True, store=True)
-    tarif_terrestre = fields.Float(string='Terrestre', default=0, required=True, store=True)
-    r_volume = fields.Float(string='Volume Revatua (m³)', default=0, store=True)
-    r_weight = fields.Float(string='Volume weight (T)', default=0, store=True)
-    check_adm = fields.Boolean(string='Payé par ADM', related="product_id.check_adm")
+    # Tarif de ventes
+    tarif_minimum = fields.Float(string='Prix Minimum', default=0, required=True, store=True)
+    
+    # -- RPA --#
+    base_rpa = fields.Float(string='Base RPA', store=True)
+    tarif_rpa = fields.Float(string='RPA', default=0, store=True)
+    tarif_minimum_rpa = fields.Float(string='Minimum RPA', store=True)
+    
+    # -- Maritime --#
+    base_maritime = fields.Float(string='Base Maritime', store=True)
+    tarif_maritime = fields.Float(string='Maritime', default=0, store=True)
+    tarif_minimum_maritime = fields.Float(string='Minimum Maritime', store=True)
+    
+    # -- Terrestre --#
+    base_terrestre = fields.Float(string='Base Terrestre', store=True)
+    tarif_terrestre = fields.Float(string='Terrestre', default=0, store=True)
+    tarif_minimum_terrestre = fields.Float(string='Minimum Terrestre', store=True)
+    
+    # Calcul & check
+    r_volume = fields.Float(string='Volume Revatua (m³)', store=True)
+    r_weight = fields.Float(string='Volume weight (T)', store=True)
+    check_adm = fields.Boolean(string='Payé par ADM', store=True)
     revatua_uom = fields.Char(string='Udm', store=True)
     
     @api.onchange('product_id')
@@ -24,10 +39,17 @@ class SaleOrderLineInherit(models.Model):
         res = super(SaleOrderLineInherit, self).product_id_change()
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
-            product = self.product_id
-            self.tarif_terrestre = product.tarif_terrestre
-            self.tarif_maritime = product.tarif_maritime
-            self.tarif_rpa = product.tarif_rpa
+            self.tarif_minimum = self.product_id.tarif_minimum
+            self.check_adm = self.product_id.check_adm
+            # Terrestre
+            self.base_terrestre = self.product_id.tarif_terrestre
+            self.tarif_minimum_terrestre = self.product_id.tarif_minimum_terrestre
+            # Maritime
+            self.base_maritime = self.product_id.tarif_maritime
+            self.tarif_minimum_maritime = self.product_id.tarif_minimum_maritime
+            # RPA
+            self.base_rpa = self.product_id.tarif_rpa
+            self.tarif_minimum_rpa = self.product_id.tarif_minimum_rpa
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> product_id_change')
         return res        
@@ -48,7 +70,7 @@ class SaleOrderLineInherit(models.Model):
                 self.revatua_uom = 'm³'
             else:
                 self.product_uom_qty = 1
-                self.revatua_uom = ''
+                self.revatua_uom = 'm³'
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _onchange_update_qty')
     
@@ -61,21 +83,26 @@ class SaleOrderLineInherit(models.Model):
         res = super(SaleOrderLineInherit, self)._onchange_update_product_packaging_qty()
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
-            # Calcul des part maritime et part terrestre    
-            if self.tarif_terrestre or self.tarif_maritime:
-                self.tarif_terrestre = self.price_subtotal * 0.6
-                if self.product_id.tarif_maritime:
-                    self.tarif_maritime = self.price_subtotal * 0.4
+            # Calcul des part maritime et part terrestre
+            if self.base_terrestre:
+                if self.tarif_minimum_terrestre and (self.product_uom_qty * self.base_terrestre) < self.tarif_minimum_terrestre:
+                    self.tarif_terrestre = self.tarif_minimum_terrestre
                 else:
-                    self.tarif_maritime = 0
-                if self.tarif_rpa != 0 and self.product_id.tarif_rpa:
+                    self.tarif_terrestre = self.product_uom_qty * self.base_terrestre
+            if self.base_maritime:
+                if self.tarif_minimum_maritime and (self.product_uom_qty * self.base_maritime) < self.tarif_minimum_maritime:
+                    self.tarif_maritime = self.tarif_minimum_maritime
+                else:
+                    self.tarif_maritime = self.product_uom_qty * self.base_maritime
+            if self.base_rpa:
+                if self.tarif_minimum_rpa and (self.product_uom_qty * self.base_rpa) < self.tarif_minimum_rpa:
+                    self.tarif_rpa = self.tarif_minimum_rpa
+                else:
                     self.tarif_rpa = self.product_uom_qty * self.base_rpa
-                else:
-                    self.tarif_rpa = 0
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _onchange_update_product_packaging_qty')
         return res
-    
+# === Stock Move === #
     def _prepare_procurement_values(self, group_id=False):
         ##################
         #### OVERRIDE ####
