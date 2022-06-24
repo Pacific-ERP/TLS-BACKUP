@@ -322,8 +322,9 @@ class SaleOrderInherit(models.Model):
         if self.env.company.revatua_ck:
             #=============# Create an ADM invoices #=============#
             _logger.error(invoice_vals_list_adm)
-            moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list_adm)
-            if invoice_vals_list_adm:
+            if invoice_line_vals_adm:
+                moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list_adm)
+            if invoice_line_vals_adm:
                 for order in self:
                     order.invoice_status = 'invoiced'
         else:

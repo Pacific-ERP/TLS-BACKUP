@@ -101,6 +101,7 @@ class AccountMoveLineInherit(models.Model):
             'quantity': self.quantity,
             'price_subtotal': self.price_subtotal,
             'tax_id': [(6,0,[137])], #RPA id
+            'price_unit': self.price_unit,
             'tarif_terrestre': self.tarif_terrestre,
             'tarif_maritime': self.tarif_maritime,
             'tarif_rpa': self.tarif_rpa,

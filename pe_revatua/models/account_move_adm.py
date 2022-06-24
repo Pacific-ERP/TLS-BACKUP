@@ -59,7 +59,7 @@ class AccountMoveAdm(models.Model):
                             if move.invoice_date >= record.start_date:
                                adms.append(move.id)
             record.invoice_line_ids = [(6,0,adms)]
-                                
+    ## Build des lignes à facturé                         
     @api.onchange('invoice_line_ids')
     def _onchange_invoice_list_update_detail(self):
         for record in self:

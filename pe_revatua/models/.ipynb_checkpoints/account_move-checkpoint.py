@@ -33,9 +33,10 @@ class AccountMoveInherit(models.Model):
     
     def _add_move_line(self, sequence=1):
         self.ensure_one()
+        title = str(self.name)+' - '+str(self.invoice_partner_display_name)
         vals = {
             'sequence': sequence,
-            'name': self.name,
+            'name': title,
             'display_type': 'line_section',
             'product_id': False,
             'r_volume': 0,

@@ -62,6 +62,7 @@ class ProductTemplateInherit(models.Model):
     #Terrestre 60% du prix normal & maritime 40% du prix normal
     @api.onchange('tarif_normal','ratio_terrestre')
     def _get_default_revatua(self):
+        
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
             for record in self:
@@ -88,6 +89,7 @@ class ProductTemplateInherit(models.Model):
     #Ajout automatique de la taxes RPA si le champs RPA est remplis
     @api.onchange('tarif_rpa')
     def _add_rpa_taxe(self):
+        _logger.error('TEST')
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
             rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=',2)])
