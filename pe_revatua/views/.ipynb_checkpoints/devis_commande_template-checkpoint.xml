@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+        <template id="revatua_sale_order_inherit" inherit_id="sale.report_saleorder_document">
+        <!-- Volume -->
+            <xpath expr="/t/t/div/table/thead/tr/th[1]" position="after">
+                <th>
+                    <span>Vol(m³)</span>
+                </th>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/tr/t[1]/td[1]" position="after">
+                <td>
+                    <span t-field="line.r_volume"/>
+                </td>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/t[3]/tr/td" position="attributes">
+                <attribute name="colspan">100</attribute>
+            </xpath>
+        <!-- Poids -->
+            <xpath expr="/t/t/div/table/thead/tr/th[2]" position="after">
+            <th>
+                <span>Poids(T)</span>
+            </th>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/tr/t[1]/td[2]" position="after">
+                <td>
+                    <span t-field="line.r_weight"/>
+                </td>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/t[3]/tr/td" position="attributes">
+                <attribute name="colspan">101</attribute>
+            </xpath>
+        <!-- Bloc de text -->
+            <xpath expr="/t/t/div/p[1]" position="after">
+                <div class="row">
+                    <div class="col">
+                        <span style="font-weight: bolder;">Information additionnelles</span>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="/t/t/div/div[7]" position="after">
+                <div>
+                    <span style=" font-size: 13px">
+                            La TVA sur la part maritime est de 0% alors que sur la part terrestre, elle est de 13% du prix HT terrestre. La part terrestre et la part maritime correspondent respectivement à 60% et à 40% du total HT.
+                    </span>
+                </div>
+            </xpath>
+        
+        <!-- Terrestre -->
+            <xpath expr="/t/t/div/table/thead/tr/th[8]" position="after">
+                <th>
+                    <span>Terrestre</span>
+                </th>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/tr/t[1]/td[8]" position="after">
+                <td>
+                    <span t-field="line.tarif_terrestre"/>
+                </td>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/t[3]/tr/td" position="attributes">
+                <attribute name="colspan">102</attribute>
+            </xpath>
+        <!-- Maritime -->
+            <xpath expr="/t/t/div/table/thead/tr/th[9]" position="after">
+                <th>
+                    <span>Maritime</span>
+                </th>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/tr/t[1]/td[9]" position="after">
+                <td>
+                <span t-field="line.tarif_maritime"/>
+                </td>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/t[3]/tr/td" position="attributes">
+                <attribute name="colspan">103</attribute>
+            </xpath>
+        <!-- RPA -->
+            <xpath expr="/t/t/div/table/thead/tr/th[10]" position="after">
+                <th>
+                    <span>RPA</span>
+                </th>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/tr/t[1]/td[10]" position="after">
+                <td>
+                    <span t-field="line.tarif_rpa"/>
+                </td>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[2]/t[3]/tr/td" position="attributes">
+                <attribute name="colspan">104</attribute>
+            </xpath>
+            <!-- Ajustement 
+            <xpath expr="/t/t/div/div[8]/div/span" position="attributes">
+                <attribute name="style" separator=";" add="width:750px"/>
+            </xpath>
+            <xpath expr="/t/t/div/div[8]/div/span" position="attributes">
+                <attribute name="style" separator=";" add="margin-bottom:30px"/>
+            </xpath>
+            -->
+            <xpath expr="/t[1]/t[1]/div[1]/div[2]/div[2]/p[1]" position="attributes">
+                <attribute name="t-options-widget">"date"</attribute>
+            </xpath>
+            <xpath expr="/t/t/div/table/thead/tr/th[7]" position="attributes">
+                <attribute name="style" separator=";" add="width:87px" remove="width:85px"/>
+            </xpath>
+            <xpath expr="/t/t/div/table/thead/tr/th[8]/span[1]" position="replace">
+                <span groups="account.group_show_line_subtotals_tax_excluded" studio_groups="[{&quot;id&quot;: 23, &quot;name&quot;: &quot;Affichage des taxes B2B&quot;, &quot;display_name&quot;: &quot;Technique / Affichage des taxes B2B&quot;}]">Total HT</span>
+            </xpath>
+        </template>
+</data></odoo>

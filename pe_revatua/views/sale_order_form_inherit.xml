@@ -109,12 +109,12 @@
                         <table style="width:200px">
                             <tbody>
                                 <tr>
-                                    <td style="width:200px"><b>Montant ADM :</b></td>
-                                    <td style="width:100px;text-align:right !important;"><b><field name="sum_adm" attrs='{"readonly": [["state","=","done"]]}'/></b></td>
-                                </tr>
-                                <tr>
                                     <td style="width:200px"><b>Montant Client :</b></td>
                                     <td style="width:100px;text-align:right !important;"><b><field name="sum_customer" attrs='{"readonly": ["|",["state","=","done"],["state","=","sale"]]}'/></b></td>
+                                </tr>
+                                <tr>
+                                    <td style="width:200px"><b>Montant ADM :</b></td>
+                                    <td style="width:100px;text-align:right !important;"><b><field name="sum_adm" attrs='{"readonly": [["state","=","done"]]}'/></b></td>
                                 </tr>
                             </tbody>
                         </table>

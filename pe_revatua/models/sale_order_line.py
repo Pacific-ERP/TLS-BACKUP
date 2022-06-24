@@ -142,9 +142,12 @@ class SaleOrderLineInherit(models.Model):
                 'base_qty': self.product_uom_qty,
                 'base_unit_price':self.price_unit,
                 'base_subtotal':self.price_subtotal,
-                'base_rpa':self.tarif_rpa,
-                'base_maritime':self.tarif_maritime,
-                'base_terrestre':self.tarif_terrestre,
+                'base_rpa':self.base_rpa,
+                'base_maritime':self.base_maritime,
+                'base_terrestre':self.base_terrestre,
+                'tarif_minimum_rpa': self.tarif_minimum_rpa,
+                'tarif_minimum_maritime': self.tarif_minimum_maritime,
+                'tarif_minimum_terrestre': self.tarif_minimum_terrestre,
                 'base_total':self.price_total,
             })
         else:
@@ -167,9 +170,9 @@ class SaleOrderLineInherit(models.Model):
                 'base_qty': self.product_uom_qty,
                 'base_unit_price':self.price_unit,
                 'base_subtotal':self.price_subtotal,
-                'base_rpa':self.tarif_rpa,
-                'base_maritime':self.tarif_maritime,
-                'base_terrestre':self.tarif_terrestre,
+                'base_rpa':self.base_rpa,
+                'base_maritime':self.base_maritime,
+                'base_terrestre':self.base_terrestre,
                 'base_total':self.price_total,
             })
             for tax in self.tax_id:
@@ -195,9 +198,9 @@ class SaleOrderLineInherit(models.Model):
                 'base_qty': self.product_uom_qty,
                 'base_unit_price':self.price_unit,
                 'base_subtotal':self.price_subtotal,
-                'base_rpa':self.tarif_rpa,
-                'base_maritime':self.tarif_maritime,
-                'base_terrestre':self.tarif_terrestre,
+                'base_rpa':self.base_rpa,
+                'base_maritime':self.base_maritime,
+                'base_terrestre':self.base_terrestre,
                 'base_total':self.price_total,
             })
             tax_list=[]

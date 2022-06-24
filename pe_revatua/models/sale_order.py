@@ -38,8 +38,8 @@ class SaleOrderInherit(models.Model):
                 # Sum tarif_terrestre and maritime
                 for line in order.order_line:
                     if line.check_adm:
-                        sum_adm += round(line.tarif_maritime) + round(line.tarif_rpa)
-                        sum_customer += round(line.tarif_terrestre)
+                        sum_adm += line.tarif_maritime + line.tarif_rpa
+                        sum_customer += line.price_total - (line.tarif_maritime + line.tarif_rpa)
                     else:
                         sum_customer += line.price_total
                 # Write fields values car les champs sont en readonly
@@ -160,7 +160,8 @@ class SaleOrderInherit(models.Model):
                     if line.check_adm:
                         invoice_line_vals_no_adm.append((0, 0, line._prepare_invoice_line_non_adm(sequence=invoice_item_sequence,)),)
                         invoice_line_vals_adm.append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
-                        invoice_vals_adm.update({'partner_id':line.product_id.contact_adm})
+                        if line.product_id.contact_adm:
+                            invoice_vals_adm.update({'partner_id':line.product_id.contact_adm})
                     else:
                         invoice_line_vals.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence,)),)
                 else:
