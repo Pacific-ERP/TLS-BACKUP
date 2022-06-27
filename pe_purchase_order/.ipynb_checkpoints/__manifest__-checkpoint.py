@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Ajout des détails d'état de facturation et livraison(PE)",
+    "name": "Achat :Ajout des détails d'état de facturation et livraison(PE)",
     "summary": "Récupère l'état d'avancement des facture et livraison lié à l'achat et les affiches sur la vue list du modèle achats",
-    "version": "15.0.0.0.2",
+    "version": "15.0.0.0.3",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",

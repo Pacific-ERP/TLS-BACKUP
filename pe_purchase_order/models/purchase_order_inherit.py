@@ -37,6 +37,17 @@ class PurchaseOrderInherit(models.Model):
             else:
                 purchase.delivery_status = 'no'
 
+    # Si il n'ya que des services dans la liste des articles (donc pas de réception à faire) passer le status de reception en complète
+    def button_confirm(self):
+        ### OVERRIDE ###
+        res = super(PurchaseOrderInherit, self).button_confirm()
+        _logger.error('button_confirm')
+        for record in self:
+            _logger.error('before if')
+            if (all(line.product_id.detailed_type == 'service' for line in record.order_line)) and record.order_line and record.state in ('done','purchase'):
+                record.delivery_status = 'all_delivered'
+        return res
+
     # Vérification de l'avancement des factures     
     @api.depends('order_line.qty_to_invoice')
     def _get_invoices_state(self):
