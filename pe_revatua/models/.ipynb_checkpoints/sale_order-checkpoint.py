@@ -161,7 +161,10 @@ class SaleOrderInherit(models.Model):
                         invoice_line_vals_no_adm.append((0, 0, line._prepare_invoice_line_non_adm(sequence=invoice_item_sequence,)),)
                         invoice_line_vals_adm.append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
                         if line.product_id.contact_adm:
-                            invoice_vals_adm.update({'partner_id':line.product_id.contact_adm})
+                            invoice_vals_adm.update({
+                                'partner_id': line.product_id.contact_adm,
+                                'partner_shipping_id': line.product_id.contact_adm,
+                            })
                     else:
                         invoice_line_vals.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence,)),)
                 else:
