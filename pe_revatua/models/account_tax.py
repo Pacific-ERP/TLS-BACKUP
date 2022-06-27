@@ -23,19 +23,17 @@ class AccountTaxInherit(models.Model):
                 #=============OVERRIDE=============#
                 #========================================================================#
                 # --- Check if revatua is activate ---#
-                if self.env.company.revatua_ck:
-                    if self.name == 'RPA' and product.tarif_rpa > 0:
-                        return math.copysign(quantity, base_amount) * product.tarif_rpa
+                if self.name == 'RPA' and product.tarif_rpa > 0:
+                    if product.tarif_minimum_rpa and (math.copysign(quantity, base_amount) * product.tarif_rpa) < product.tarif_minimum_rpa:
+                        return product.tarif_minimum_rpa
                     else:
-                        return math.copysign(quantity, base_amount) * self.amount
+                        return math.copysign(quantity, base_amount) * product.tarif_rpa
                 else:
-                    _logger.error('Revatua not activate : account_tax.py -> _compute_amount 1')
+                    return math.copysign(quantity, base_amount) * self.amount
                 #========================================================================#
                 #=============OVERRIDE=============#
                 #==================================#
                 #############################################################################################################################
-                
-                return math.copysign(quantity, base_amount) * self.amount
             else:
                 return quantity * self.amount
 
@@ -48,19 +46,23 @@ class AccountTaxInherit(models.Model):
             #=============OVERRIDE=============#
             #========================================================================#
             # --- Check if revatua is activate ---#
-            if self.env.company.revatua_ck:
-                if product.tarif_terrestre and product.tarif_terrestre > 0:
-                    base_amount = base_amount * 0.6
-                    return base_amount * self.amount / 100
+            # La taxe s'applique que à la part Terrestre base_amount = montant HT multilier par 0.6 pour obtenir la part terrestre
+            if product.tarif_terrestre and product.tarif_terrestre > 0:
+                if product.tarif_minimum_terrestre and (math.copysign(quantity, base_amount) * product.tarif_terrestre) < product.tarif_minimum_terrestre:
+                    base_amount = product.tarif_minimum_terrestre
+                else:
+                    base_amount = math.copysign(quantity, base_amount) * product.tarif_terrestre
+                ## Arrondis down pour la CPS uniquement
+                if 'CPS' in self.name:
+                    return math.floor(base_amount * self.amount / 100)
                 else:
                     return base_amount * self.amount / 100
             else:
-                _logger.error('Revatua not activate : account_tax.py -> _compute_amount 2')
+                return base_amount * self.amount / 100
             #========================================================================#
             #=============OVERRIDE=============#
             #==================================#
             #############################################################################################################################
-            return base_amount * self.amount / 100
 
         # <=> new_base = base / (1 + tax_amount)
         if self.amount_type == 'percent' and price_include:

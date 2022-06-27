@@ -30,3 +30,24 @@ class AccountMoveInherit(models.Model):
     sum_mar_ter = fields.Monetary(string="Total Maritime & Terrestre", store=True)
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
+    
+    def _add_move_line(self, sequence=1):
+        self.ensure_one()
+        title = str(self.name)+' - '+str(self.invoice_partner_display_name)
+        vals = {
+            'sequence': sequence,
+            'name': title,
+            'display_type': 'line_section',
+            'product_id': False,
+            'r_volume': 0,
+            'r_weight': 0,
+            'quantity': 0,
+            'price_subtotal': 0,
+            'tax_id': [], #RPA id
+            'tarif_terrestre': 0,
+            'tarif_maritime': 0,
+            'tarif_rpa': 0,
+            'price_total': 0,
+        }
+        _logger.error('Seq : %s | Ligne: %s' % (sequence,vals))
+        return vals

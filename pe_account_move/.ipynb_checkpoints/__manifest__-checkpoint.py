@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Custom module Comptabilité (PE)",
+    "name": "Blocage du CA fin de mois(PE)",
     "summary": "Modif non studio (PE)",
-    "version": "0.1",
+    "version": "15.0.0.0.1",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",

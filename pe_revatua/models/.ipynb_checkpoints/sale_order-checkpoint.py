@@ -24,9 +24,6 @@ class SaleOrderInherit(models.Model):
     mobil_dest = fields.Char(string='Mobile destinataire', related='contact_dest.mobile', store=True)
                 
     # Maritime
-    sum_maritime = fields.Monetary(string="Maritime", store=True, help="La part maritime correspond à 40% du prix HT")
-    sum_terrestre = fields.Monetary(string="Terrestre", store=True, help="La part terrestre correspond à 60% du prix HT")
-    sum_mar_ter = fields.Monetary(string="Total Maritime & Terrestre", store=True)
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
     
@@ -35,42 +32,34 @@ class SaleOrderInherit(models.Model):
     def _total_tarif(self):
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
-            sum_mar = 0
-            sum_ter = 0
-            sum_adm = 0
             sum_customer = 0
+            sum_adm = 0
             for order in self:
                 # Sum tarif_terrestre and maritime
                 for line in order.order_line:
-                    sum_customer += line.price_total
-                    if line.tarif_maritime:
-                        if line.check_adm:
-                            sum_adm += round(line.tarif_maritime) + round(line.tarif_rpa)
-                            sum_mar += round(line.tarif_maritime)
-                        else:
-                            sum_mar += round(line.tarif_maritime)
-                    if line.tarif_terrestre:
-                        sum_ter += round(line.tarif_terrestre)
+                    if line.check_adm:
+                        sum_adm += line.tarif_maritime + line.tarif_rpa
+                        sum_customer += line.price_total - (line.tarif_maritime + line.tarif_rpa)
+                    else:
+                        sum_customer += line.price_total
                 # Write fields values car les champs sont en readonly
                 order.write({
-                    'sum_maritime' : sum_mar,
-                    'sum_terrestre' : sum_ter,
-                    'sum_mar_ter' : sum_mar + sum_ter,
                     'sum_adm' : sum_adm,
-                    'sum_customer' : sum_customer - sum_adm,
+                    'sum_customer' : sum_customer,
                 })
         else:
             _logger.error('Revatua not activate : sale_order.py -> _total_tarif')
-                
+            
+    #------------------------------------------------------------------------------------------------------------------------------------------#
+    #                                                    Modification Facturations                                                             #
+    #------------------------------------------------------------------------------------------------------------------------------------------#
+    
     def _prepare_invoice(self):
         #### OVERRIDE ####
         invoice_vals = super(SaleOrderInherit,self)._prepare_invoice()
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
             invoice_vals.update({
-                'sum_maritime' : self.sum_maritime,
-                'sum_terrestre' : self.sum_terrestre,
-                'sum_mar_ter' : self.sum_mar_ter,
                 'sum_adm': self.sum_adm,
                 'sum_customer': self.sum_customer,
             })
@@ -120,10 +109,12 @@ class SaleOrderInherit(models.Model):
             #========================================================================#
             # --- Check if revatua is activate ---#
             if self.env.company.revatua_ck:
+                journal = self.env['account.journal'].sudo().search([('name','=','Facture ADM')])
+                _logger.error(journal)
                 invoice_vals_adm = order._prepare_invoice()
                 invoice_vals_adm.update({
                     'is_adm_invoice':True,
-                    'journal_id':22,
+                    'journal_id':journal.id,
                 })
             else:
                 _logger.error('Revatua not activate : sale_order.py -> _create_invoices 1')
@@ -169,6 +160,8 @@ class SaleOrderInherit(models.Model):
                     if line.check_adm:
                         invoice_line_vals_no_adm.append((0, 0, line._prepare_invoice_line_non_adm(sequence=invoice_item_sequence,)),)
                         invoice_line_vals_adm.append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
+                        if line.product_id.contact_adm:
+                            invoice_vals_adm.update({'partner_id':line.product_id.contact_adm})
                     else:
                         invoice_line_vals.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence,)),)
                 else:
@@ -329,8 +322,9 @@ class SaleOrderInherit(models.Model):
         if self.env.company.revatua_ck:
             #=============# Create an ADM invoices #=============#
             _logger.error(invoice_vals_list_adm)
-            moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list_adm)
-            if invoice_vals_list_adm:
+            if invoice_line_vals_adm:
+                moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list_adm)
+            if invoice_line_vals_adm:
                 for order in self:
                     order.invoice_status = 'invoiced'
         else:
@@ -352,3 +346,6 @@ class SaleOrderInherit(models.Model):
             )
         return moves
     
+    #------------------------------------------------------------------------------------------------------------------------------------------#
+    #                                                    Modification Transfert                                                                #
+    #------------------------------------------------------------------------------------------------------------------------------------------#

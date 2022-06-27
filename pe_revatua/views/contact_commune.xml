@@ -22,7 +22,7 @@
                     <sheet>
                         <group string="Information">
                             <field name="name"/>
-                            <field name="ile_id"/>
+                            <field name="ile_id" domain='[["country_id.code","=","PF"]]'/>
                         </group>
                     </sheet>
                 </form>

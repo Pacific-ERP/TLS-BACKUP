@@ -8,12 +8,21 @@
             <field name="inherit_id" ref="product.product_template_form_view" />
             <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
             <field name="arch" type="xml">
+                <!-- button ADM -->
                 <xpath expr="//field[@name='purchase_ok']/.." position="after">
                     <span class="d-inline-block">
                         <field name="check_adm"/>
                         <label for="check_adm"/>
                     </span>
                 </xpath>
+                <!-- Famille d'article -->
+                <xpath expr="//field[@name='company_id']" position="before">
+                    <field name="famille_produit"/>
+                </xpath>
+                <xpath expr="//field[@name='uom_po_id']" position="after">
+                    <field name="contact_adm" attrs="{'invisible': [['check_adm','=',False]]}" string="Département (ADM)" domain="[['id_adm','=',True]]"/>
+                </xpath>
+                <!-- Champs tarif Revatua -->
                 <xpath expr="//notebook/page[1]/group[1]" position="after">
                     <group>
                         <group string="Normal">
@@ -31,10 +40,7 @@
                         <group string="RPA">
                             <field name="tarif_rpa" class="oe_inline" widget='monetary'/>
                             <field name="tarif_minimum_rpa" class="oe_inline" widget='monetary'/>
-                        </group>
-                        <group string="Autres">
-                            <field name="famille_produit"/>
-                            <field name="etiquette_produit" widget="many2many_tags"/>
+                            <field name="check_adm" invisible="1"/>
                         </group>
                     </group>
                 </xpath>
