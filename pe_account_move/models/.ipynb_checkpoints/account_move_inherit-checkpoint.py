@@ -16,14 +16,20 @@ class AccountMoveIhnerit(models.Model):
             invoice_date = move.date # date du document
             today = date.today() # date d'aujourd'hui
             lock_date = today + relativedelta(day=10) # date limite avant blocage définitif des facture le mois actuelle le 12ème jours
+            lock_date_manager = lock_date + timedelta(days=3)
             last_day_of_prev_month = date.today().replace(day=1) - timedelta(days=1) #dernier jours M-1 pour avoir le dernier jour du mois précédent
             # Pour récupérer le group de l'utilisateur : self.user_has_groups() ici group_account_manager c'est le [Comptabilité / Paramétrage facturation]
             #### IF condition ####
             # Si la date de facturation est inférieur ou égale au 10 du mois actuelle et que la date de blocage est inférieur ou égale au jour d'aujourd'hui
             # Et que l'utilisateur n'est pas dans le groupe [Comptabilité / Paramétrage facturation] retourn un message d'erreur et return True
-            if invoice_date <= last_day_of_prev_month and lock_date <= today and not self.user_has_groups('account.group_account_manager'):
-                message = _("You cannot add/modify entries prior to and inclusive of the lock date %s, refer to your invoice manager.", format_date(self.env, lock_date))
-                raise UserError(message)
+            if self.user_has_groups('account.group_account_manager'):
+                if invoice_date <= last_day_of_prev_month and lock_date_manager <= today:
+                    message = _("Vous ne pouvez pas modifier/créer de facture pour le mois précédent après la date %s", format_date(self.env, lock_date_manager))
+                    raise UserError(message)
+            else:
+                if invoice_date <= last_day_of_prev_month and lock_date <= today:
+                    message = _("Vous ne pouvez pas modifier/créer de facture pour le mois précédent après la date %s, veuillez contactez un responsable en comptabilité", format_date(self.env, lock_date))
+                    raise UserError(message)
         return True
         
     def write(self, vals):
