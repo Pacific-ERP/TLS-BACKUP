@@ -125,5 +125,9 @@
                     </div>
                 </xpath>
                 
+            <!-- retire la possibilité de créer un article directement du formualire de vente -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_id']" position="attributes">
+                    <attribute name="options">{"no_create":true}</attribute>
+                </xpath>
             </field></record>
 </data></odoo>       

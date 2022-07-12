@@ -30,9 +30,9 @@ class PurchaseOrderInherit(models.Model):
             if purchase.state not in ('purchase', 'done'):
                 purchase.delivery_status = 'no'
                 continue
-            if any(line.state != 'done' for line in purchase.delivery_line):
+            if any(line.state not in ('done','cancel') for line in purchase.delivery_line):
                 purchase.delivery_status = 'in_delivery'
-            elif (all(line.state == 'done' for line in purchase.delivery_line) and purchase.delivery_line):
+            elif (all(line.state in ('done','cancel') for line in purchase.delivery_line) and purchase.delivery_line):
                 purchase.delivery_status = 'all_delivered'
             else:
                 purchase.delivery_status = 'no'
@@ -41,9 +41,7 @@ class PurchaseOrderInherit(models.Model):
     def button_confirm(self):
         ### OVERRIDE ###
         res = super(PurchaseOrderInherit, self).button_confirm()
-        _logger.error('button_confirm')
         for record in self:
-            _logger.error('before if')
             if (all(line.product_id.detailed_type == 'service' for line in record.order_line)) and record.order_line and record.state in ('done','purchase'):
                 record.delivery_status = 'all_delivered'
         return res

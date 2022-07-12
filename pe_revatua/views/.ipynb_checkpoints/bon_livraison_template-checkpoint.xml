@@ -17,7 +17,7 @@
                                     <span t-field="o.mobil_expediteur"/>
                                 </t>  
                             </div>
-                            <div>
+                            <div t-if="o.ile_recup and o.commune_recup">
                                 <span t-field="o.ile_recup"/>
                                 <span> - </span>
                                 <span t-field="o.commune_recup"/>
@@ -35,7 +35,7 @@
                                     <span t-field="o.dest"/>
                                 </t>  
                             </div>
-                            <div>
+                            <div t-if="o.ile_dest and o.commune_dest">
                                 <span t-field="o.ile_dest"/>
                                 <span> - </span>
                                 <span t-field="o.commune_dest"/>
@@ -44,30 +44,17 @@
                     </div>
                 </t>
                 <!-- TLS -->
-                <t t-set="address" t-if='o.company_id.id == 1'>
-                    <span t-esc="o.company_id.id"/>
-                    <div name="div_outgoing_address">
-                        <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id">
-                            <span><strong>Delivery Address:</strong></span>
-                            <div t-field="o.move_ids_without_package[0].partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
-                        </div>
-                        <div t-if="o.picking_type_id.code != 'internal' and (not o.move_ids_without_package or not o.move_ids_without_package[0].partner_id) and o.picking_type_id.warehouse_id.partner_id">
-                            <span><strong>Warehouse Address:</strong></span>
-                            <div t-field="o.picking_type_id.warehouse_id.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
-                        </div>
-                    </div>
-                </t>
                 <t t-set="information_block" t-if='o.company_id.id == 1'>
                     <div class="row">
                         <div class="col-7" name="div_incoming_address">
                             <div t-if="o.picking_type_id.code=='incoming' and partner">
-                                <span><strong>Vendor Address:</strong></span>
+                                <span><strong>Adresse vendeur:</strong></span>
                             </div>
                             <div t-if="o.picking_type_id.code=='internal' and partner">
-                                <span><strong>Warehouse Address:</strong></span>
+                                <span><strong>Adresse de l'entrepot:</strong></span>
                             </div>
                             <div t-if="o.picking_type_id.code=='outgoing' and partner">
-                                <span><strong>Customer Address:</strong></span>
+                                <span><strong>Adresse client:</strong></span>
                             </div>
                             <div t-if="partner" name="partner_header">
                                 <div t-field="partner.self" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
@@ -77,6 +64,19 @@
                     </div>
                 </t>
             </xpath>
-            <xpath expr="/t/t/t/t[3]" position="replace"/>
+            <xpath expr="/t/t/t/t[3]" position="replace">
+                <t t-set="address" t-if="o.company_id.id == 1">
+                    <div name="div_outgoing_address">
+                        <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id">
+                            <span><strong>Adresse de livraison:</strong></span>
+                            <div t-field="o.move_ids_without_package[0].partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
+                        </div>
+                        <div t-if="o.picking_type_id.code != 'internal' and (not o.move_ids_without_package or not o.move_ids_without_package[0].partner_id) and o.picking_type_id.warehouse_id.partner_id">
+                            <span><strong>Adresse entrepôt:</strong></span>
+                            <div t-field="o.picking_type_id.warehouse_id.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
+                        </div>
+                    </div>
+                </t>
+            </xpath>
         </template>
 </data></odoo>

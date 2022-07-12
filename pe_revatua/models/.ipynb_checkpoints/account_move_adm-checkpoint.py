@@ -59,7 +59,8 @@ class AccountMoveAdm(models.Model):
                             if move.invoice_date >= record.start_date:
                                adms.append(move.id)
             record.invoice_line_ids = [(6,0,adms)]
-    ## Build des lignes à facturé                         
+            
+    # Build des lignes à facturé                         
     @api.onchange('invoice_line_ids')
     def _onchange_invoice_list_update_detail(self):
         for record in self:
@@ -77,6 +78,7 @@ class AccountMoveAdm(models.Model):
                         sequence += 1
             record.product_line_ids = adm_line
     
+    # Calcul des totaux
     @api.onchange('product_line_ids')
     def _compute_total(self):
         for record in self:
@@ -102,6 +104,7 @@ class AccountMoveAdm(models.Model):
                     adm.write({'adm_group_id': record.id})
             record.write({'state':'done'})
     
+    # changement d'état sur létat du paiement
     @api.onchange('invoice_ids.payment_state')
     def _onchange_paiement_state(self):
         for record in self:
