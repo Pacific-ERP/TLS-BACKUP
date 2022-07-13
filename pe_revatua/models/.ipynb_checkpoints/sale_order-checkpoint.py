@@ -57,7 +57,7 @@ class SaleOrderInherit(models.Model):
         def compute_taxes(order_line):
             price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             order = order_line.order_id
-            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount)
+            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre)
 
         account_move = self.env['account.move']
         for order in self:
@@ -66,7 +66,7 @@ class SaleOrderInherit(models.Model):
             order.tax_totals_json = json.dumps(tax_totals)
     
     #------------------------------------------------------------------------------------------------------------------------------------------#
-    #                                                    Modification Facturations                                                             #
+    #                                                    Modification Création d'une Facture(Override)                                         #
     #------------------------------------------------------------------------------------------------------------------------------------------#
     
     def _prepare_invoice(self):
@@ -330,6 +330,7 @@ class SaleOrderInherit(models.Model):
         
         # Manage the creation of invoices in sudo because a salesperson must be able to generate an invoice from a
         # sale order without "billing" access rights. However, he should not be able to create an invoice from scratch.
+        _logger.error(invoice_vals_list)
         moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list)
         
         #############################################################################################################################
