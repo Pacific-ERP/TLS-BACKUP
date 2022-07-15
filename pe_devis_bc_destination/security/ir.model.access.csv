@@ -1,0 +1,2 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+pe_devis_bc_destination.access_sale_destination,Vente Destination accés,pe_devis_bc_destination.model_sale_destination,,1,1,1,1

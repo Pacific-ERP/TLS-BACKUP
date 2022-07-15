@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    <!-- form -->
+    <record id="account_move_bc_desitnation_form" model="ir.ui.view">
+        <field name="name">account.move.bc.desitnation.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_reference']" position="after">
+                <field name="pe_bc"/>
+                <field name="pe_destination"/>
+            </xpath>
+        </field>
+    </record>   
+    
+</data></odoo>
