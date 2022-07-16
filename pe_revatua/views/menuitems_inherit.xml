@@ -2,7 +2,7 @@
 <odoo><data>
 
 <!-- Communes -->
-    <!-- Action pour ouvrir le modèle des communes -->
+    <!-- Action pour ouvrir le modèle des communes 
     <record model="ir.actions.act_window" id="contacts_commune_list_action">
             <field name="name">Communes</field>
             <field name="res_model">res.commune</field>
@@ -12,10 +12,10 @@
                     Créer une commune
                 </p>
             </field>
-    </record>
-    <!-- Ajout de notre menu au sous menu des configuration dans le modules contacts -->
+    </record>-->
+    <!-- Ajout de notre menu au sous menu des configuration dans le modules contacts 
     <menuitem name="Communes" id="pe_revatua_communes" parent="contacts.menu_localisation" action="contacts_commune_list_action" sequence="2"/>
-
+    -->
 <!-- ADM -->
     <!-- Action pour ouvrir le modèle des facture adm globale -->
     <record model="ir.actions.act_window" id="revatua_adm_invoice_action">

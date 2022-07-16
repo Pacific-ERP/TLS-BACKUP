@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 from odoo import fields, models, api
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -102,3 +103,19 @@ class ProductTemplateInherit(models.Model):
                             record.taxes_id = [(3,taxe.id)]
         else:
             _logger.error('Revatua not activate : product_template.py -> _add_rpa_taxe')
+            
+    @api.onchange('tarif_minimum_maritime','tarif_minimum_terrestre')
+    def _compute_tarif_normal(self):
+        # --- Check if revatua is activate ---#
+        if self.env.company.revatua_ck:
+            for record in self:
+                if record.tarif_minimum_maritime > record.tarif_maritime:
+                    raise UserError('Le tarif minimum maritime ne peut pas être supérieur au tarif maritime')
+                elif record.tarif_minimum_terrestre > record.tarif_terrestre:
+                    raise UserError('Le tarif minimum terrestre ne peut pas être supérieur au tarif terrestre')
+                else:
+                    record.tarif_minimum = (record.tarif_minimum_maritime or 0) + (record.tarif_minimum_terrestre or 0)
+        else:
+            _logger.error('Revatua not activate : product_template.py -> _compute_tarif_normal')
+            
+            

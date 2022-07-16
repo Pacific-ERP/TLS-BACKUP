@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- list -->
+        <record model="ir.ui.view" id="sale_order_destination_list_view">
+            <field name="name">sale.order.destination.list.view</field>
+            <field name="model">sale.destination</field>
+            <field name="arch" type="xml">
+                <tree string="Destination" editable="bottom">
+                    <field name="sequence" widget="handle"/>
+                    <field name="id" width="7px" optional="hide"/>
+                    <field name="name" optional="show"/>
+                    <field name="description" optional="show"/>
+                </tree>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

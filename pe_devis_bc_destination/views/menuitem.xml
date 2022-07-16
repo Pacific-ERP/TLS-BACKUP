@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+<!-- Shipping Management -->
+    <!-- Action pour ouvrir le modèle Shipping Management -->
+    <record model="ir.actions.act_window" id="sale_destination_action">
+            <field name="name">Destination de vente</field>
+            <field name="res_model">sale.destination</field>
+            <field name="views">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Créer destination
+                </p>
+            </field>
+    </record>
+
+    <!-- Ajout de notre menu à la page d'acceuil des modules (sans attributs parent) -->
+    <menuitem name="Destination" id="pe_sale_destination" action="sale_destination_action" sequence="15" parent="sale.menu_sale_config"/>
+      
+</data></odoo>
