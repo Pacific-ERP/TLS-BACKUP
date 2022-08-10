@@ -117,5 +117,16 @@ class ProductTemplateInherit(models.Model):
                     record.tarif_minimum = (record.tarif_minimum_maritime or 0) + (record.tarif_minimum_terrestre or 0)
         else:
             _logger.error('Revatua not activate : product_template.py -> _compute_tarif_normal')
+    
+    @api.onchange('tarif_terrestre','tarif_maritime')
+    def _onchange_ter_mar_part(self):
+        if self.env.company.revatua_ck:
+            for record in self:
+                if record.tarif_terrestre and record.tarif_maritime and record.tarif_normal:
+                    if record.tarif_normal < (record.tarif_terrestre + record.tarif_maritime):
+                        raise UserError('La somme des tarif terrestre et maritime ne peut pas être supérieur au tarif normal')
+        else:
+            _logger.error('Revatua not activate : product_template.py -> _onchange_ter_mar_part')
+            
             
             

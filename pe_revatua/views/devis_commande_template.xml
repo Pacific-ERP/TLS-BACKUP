@@ -104,12 +104,12 @@
             <xpath expr="/t/t/t[3]" position="replace">
                 <!-- aremiti -->
                 <t t-if="doc.company_id.id == 2">
-                    <div class="row">
+                    <div class="row" style="padding-bottom:20px">
                         <div class="col-4" name="div_incoming_address"><!--t-options='{&quot;phone_icons&quot;: True}-->
                             <span><strong>Client:</strong></span>
                             <div t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
                         </div>
-                        <div class="col-4" name="div_incoming_address"><!--t-options='{&quot;phone_icons&quot;: True}-->
+                        <div class="col-4" name="div_incoming_address" t-if='doc.contact_expediteur'><!--t-options='{&quot;phone_icons&quot;: True}-->
                             <span><strong>Expéditeur:</strong></span>
                             <div t-field="doc.contact_expediteur.name"/>
                             <div>
@@ -121,15 +121,15 @@
                                     <span t-field="doc.mobil_expediteur"/>
                                 </t>  
                             </div>
-                            <div t-if="doc.ile_recup and doc.commune_recup">
+                            <div>
                                 <span t-field="doc.ile_recup"/>
                                 <span> - </span>
                                 <span t-field="doc.commune_recup"/>
                             </div>
                         </div>
-                        <div class="col-4" name="div_incoming_address">
+                        <div class="col-4" name="div_incoming_address" t-if='doc.contact_dest'>
                             <span><strong>Destinataire:</strong></span>
-                            <div t-field="doc.contact_expediteur.name"/>
+                            <div t-field="doc.contact_dest.name" />
                             <div>
                                 <span>Tél:</span>
                                 <t t-if="doc.tel_dest">

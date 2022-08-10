@@ -228,7 +228,7 @@ class AccountTaxInherit(models.Model):
 ### Ajout de la remise pour le calcul de taxe + champs terrestre ###
 ####################################################################
                         # tax.amount_type == other (python)
-                        _logger.error('1st compute : %s ' % terrestre)
+                        #_logger.error('1st compute : %s ' % terrestre)
                         tax_amount = tax._compute_amount(base, sign * price_unit, quantity, product, partner, discount=discount, terrestre=terrestre) * sum_repartition_factor
                         incl_fixed_amount += tax_amount
                         # Avoid unecessary re-computation
@@ -247,11 +247,13 @@ class AccountTaxInherit(models.Model):
         #==================================#
         #=============OVERRIDE=============#
         #========================================================================#
+        #_logger.warning('Avant: %s | qty: %s | maritime: %s ' % (total_excluded,quantity,product.tarif_maritime))
         if product.tarif_minimum:
-            if product.tarif_minimum and total_excluded < product.tarif_minimum:
+            if product.tarif_minimum and total_excluded < product.tarif_minimum and total_excluded != product.tarif_maritime * quantity:
                 total_excluded = product.tarif_minimum
         else:
             _logger.error('Revatua not activate : account_tax.py -> compute_all')
+        #_logger.warning('Après: %s' % total_excluded)
         #========================================================================#
         #=============OVERRIDE=============#
         #==================================#
@@ -260,7 +262,7 @@ class AccountTaxInherit(models.Model):
         # 4) Iterate the taxes in the sequence order to compute missing tax amounts.
         # Start the computation of accumulated amounts at the total_excluded value.
         base = total_included = total_void = total_excluded
-        _logger.error('base : %s' % total_included)
+        #_logger.error('base : %s' % total_included)
         
         # Flag indicating the checkpoint used in price_include to avoid rounding issue must be skipped since the base
         # amount has changed because we are currently mixing price-included and price-excluded include_base_amount
@@ -294,7 +296,7 @@ class AccountTaxInherit(models.Model):
 ####################################################################
 ### Ajout de la remise pour le calcul de taxe + champs terrestre ###
 ####################################################################
-                _logger.error('2nd compute : %s ' % terrestre)
+                #_logger.error('2nd compute : %s ' % terrestre)
                 tax_amount = tax.with_context(force_price_include=False)._compute_amount(
                     tax_base_amount, sign * price_unit, quantity, product, partner, discount=discount, terrestre=terrestre)
 
@@ -370,7 +372,7 @@ class AccountTaxInherit(models.Model):
                     skip_checkpoint = True
 
             total_included += factorized_tax_amount
-            _logger.error('+factorized : %s' % total_included)
+            #_logger.error('+factorized : %s' % total_included)
             i += 1
         
         base_taxes_for_tags = taxes

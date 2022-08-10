@@ -2,7 +2,7 @@
 {
     "name": "Revatua",
     "summary": "Ajout des fonctionnalité en liens à Revatua (création de connaissement, visualisation des planing bateau, etc...)",
-    "version": "15.1.0.8.8",
+    "version": "15.1.0.8.9",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",
@@ -13,7 +13,6 @@
     "data": [
         "security/res_groups.xml",
         "security/ir.model.access.csv",
-        #"wizard/account_move_adm_wizard.xml",
         "data/account_journal.xml",
         "data/account_tax_data.xml",
         "data/ir_actions_report.xml",
@@ -26,8 +25,6 @@
         "views/connaissement_template.xml",
         "views/admg_template.xml",
         "views/setting_inherits.xml",
-        #"views/contact_commune.xml",
-        #"views/contact_country.xml",
         "views/contact_partner.xml",
         "views/menuitems_inherit.xml",
         "views/product_template_inherit.xml",
