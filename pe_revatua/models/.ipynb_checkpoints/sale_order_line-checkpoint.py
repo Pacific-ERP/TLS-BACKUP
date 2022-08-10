@@ -26,8 +26,8 @@ class SaleOrderLineInherit(models.Model):
     tarif_minimum_terrestre = fields.Float(string='Minimum Terrestre', store=True)
     
     # Calcul & check
-    r_volume = fields.Float(string='Volume Revatua (m³)', store=True)
-    r_weight = fields.Float(string='Volume weight (T)', store=True)
+    r_volume = fields.Float(string='Volume Revatua (m³)', store=True, digits=(12, 3))
+    r_weight = fields.Float(string='Volume weight (T)', store=True, digits=(12, 3))
     check_adm = fields.Boolean(string='Payé par ADM', store=True)
 
 # --------------------------------- Modification des méthode de calculs des taxes et sous totaux --------------------------------- #
@@ -145,6 +145,8 @@ class SaleOrderLineInherit(models.Model):
             # Tonne
             elif self.r_weight and not self.r_volume:
                 self.product_uom_qty = self.r_weight
+                _logger.error(self.product_uom_qty)
+                _logger.error(self.product_uom_qty)
                 self.product_uom = t
             # Métre cube
             elif self.r_volume and not self.r_weight:

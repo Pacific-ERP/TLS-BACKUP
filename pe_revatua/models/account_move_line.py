@@ -8,8 +8,8 @@ _logger = logging.getLogger(__name__)
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
     
-    r_volume = fields.Float(string='Volume Revatua (m³)', default=0, store=True)
-    r_weight = fields.Float(string='Volume weight (T)', default=0, store=True)
+    r_volume = fields.Float(string='Volume Revatua (m³)', default=0, store=True, digits=(12, 3))
+    r_weight = fields.Float(string='Volume weight (T)', default=0, store=True, digits=(12, 3))
     check_adm = fields.Boolean(string='Payé par ADM', related="product_id.check_adm")
     
     # Field from Sales line before recompute of value

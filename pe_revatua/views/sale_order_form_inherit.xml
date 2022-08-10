@@ -49,6 +49,7 @@
                 <!-- Renommer Quantité -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="attributes">
                     <attribute name="string">Qté</attribute>
+                    <attribute name="digits">[12,3]</attribute>
                 </xpath>
                 <!-- Renommer Prix unitaire -->
                 <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_unit']" position="attributes">

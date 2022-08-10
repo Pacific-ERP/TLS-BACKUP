@@ -11,6 +11,7 @@
             <!-- Modification du label Quantité en Qté -->
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='invoice_line_ids']/tree[1]/field[@name='quantity']" position="attributes">
                 <attribute name="string">Qté</attribute>
+                <attribute name="digits">[12,3]</attribute>
             </xpath>
             <!-- Modification du label Prix en Total HT -->
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='invoice_line_ids']/tree[1]/field[@name='price_unit']" position="attributes">
