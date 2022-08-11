@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+<template id="pe_devis_bc_destination_account_inherit" inherit_id="account.report_invoice_document">
+    <xpath expr="//p[@name='payment_communication']" position="before">
+        <div class="row" style="padding-bottom:15px">
+            <div class="col-3" t-if="o.pe_destination">
+                <span>
+                    <strong>Destination:</strong>
+                </span>
+                <span t-field="o.pe_destination"/>
+            </div>
+            <div class="col-3" t-if="o.pe_bc">
+                <span>
+                    <strong>Référence Clients:</strong>
+                </span>
+                <span t-field="o.pe_bc"/>
+            </div>
+            <div class="col-6"/>
+        </div>
+    </xpath>
+</template>
+
+</data></odoo>
