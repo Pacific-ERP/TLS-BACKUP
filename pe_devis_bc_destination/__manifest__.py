@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Ventes : Ajout de champs (destination,bon commande)",
-    "summary": "Pacific-ERP : devis bc et destination",
+    "summary": "Pacific-ERP : devis bc et destinations",
     "version": "15.0.0.0.2",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
