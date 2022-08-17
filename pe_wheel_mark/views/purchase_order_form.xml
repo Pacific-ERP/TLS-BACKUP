@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <record id="pe_wheel_mark_purchase_order_form_view_inherit" model="ir.ui.view">
+        <field name="name">pe_wheel_mark_purchase_order_form_view_inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="one_article_wheelmark"/>
+            </xpath>
+        <!-- Confirmé la commande -->
+            <xpath expr="//button[@name='button_confirm'][1]" position='replace'>
+                <!-- Invi si WM = Vrais -->
+                <button name="button_confirm" type="object" states="sent" string="Confirmer la commande" class="oe_highlight" id="bid_confirm" data-hotkey="v" attrs="{'invisible': ['|',('one_article_wheelmark', '=',True)]}"/>
+                <!-- Invi si WM = Faux | states="sent" -->
+                <button name="button_confirm_wheelmark" type="object" states="sent" string="Confirmer la commande" class="oe_highlight" id="bid_confirm" data-hotkey="v" 
+                        attrs="{'invisible': ['|',('one_article_wheelmark', '=',False)]}" 
+                        confirm="Cette commande comprend un article 'barre à roue'- 'wheelmark'. Merci de vous référer au manuel Division 311 'équipement marin'. Les certificats de conformité sont à demander au fournisseur et devront être validés par la cellule ISM avant l'édition du bon de commande"/>
+            </xpath>
+            <xpath expr="//button[@name='button_confirm'][2]" position='replace'>
+                <!-- Invi si WM = Vrais -->
+                <button name="button_confirm" type="object" states="draft" string="Confirmer la commande" id="draft_confirm" attrs="{'invisible': ['|',('one_article_wheelmark', '=',True)]}"/>
+                <!-- Invi si WM = Faux -->
+                <button name="button_confirm_wheelmark" type="object" states="draft" string="Confirmer la commande" id="draft_confirm" 
+                        attrs="{'invisible': ['|',('one_article_wheelmark', '=',False)]}" 
+                        confirm="Cette commande comprend un article 'barre à roue'- 'wheelmark'. Merci de vous référer au manuel Division 311 'équipement marin'. Les certificats de conformité sont à demander au fournisseur et devront être validés par la cellule ISM avant l'édition du bon de commande"/>
+            </xpath>
+        <!-- Envoyer par email -->
+            <!-- 1 -->
+            <xpath expr="//button[@name='action_rfq_send'][1]" position='replace'>
+                <button name="action_rfq_send" states="draft" string="Envoyer par email" type="object" context="{'send_rfq':True}" class="oe_highlight" data-hotkey="g" attrs="{'invisible': ['|',('one_article_wheelmark', '=',True)]}"/>
+                <button name="action_rfq_send_wheelmark" states="draft" string="Envoyer par email" type="object" context="{'send_rfq':True}" class="oe_highlight" data-hotkey="g"
+                        attrs="{'invisible': ['|',('one_article_wheelmark', '=',False)]}"
+                        confirm="Cette commande comprend un article 'barre à roue'- 'wheelmark'. Merci de vous référer au manuel Division 311 'équipement marin'. Les certificats de conformité sont à demander au fournisseur et devront être validés par la cellule ISM avant l'édition du bon de commande"/>
+            </xpath>
+            <!-- 2 -->
+            <xpath expr="//button[@name='action_rfq_send'][2]" position='replace'>
+                <button name="action_rfq_send" states="sent" string="Renvoyer par Email" type="object" context="{'send_rfq':True}" data-hotkey="g" attrs="{'invisible': ['|',('one_article_wheelmark', '=',True)]}"/>
+                <button name="action_rfq_send_wheelmark" states="sent" string="Renvoyer par Email" type="object" context="{'send_rfq':True}" data-hotkey="g"
+                        attrs="{'invisible': ['|',('one_article_wheelmark', '=',False)]}"
+                        confirm="Cette commande comprend un article 'barre à roue'- 'wheelmark'. Merci de vous référer au manuel Division 311 'équipement marin'. Les certificats de conformité sont à demander au fournisseur et devront être validés par la cellule ISM avant l'édition du bon de commande"
+                        />
+            </xpath>
+            <!-- 3 -->
+            <xpath expr="//button[@name='print_quotation'][2]" position='replace'>
+                <button name="action_rfq_send" states="purchase" string="Envoyer quotation par Email" type="object" context="{'send_rfq':False}" data-hotkey="g" attrs="{'invisible': ['|',('one_article_wheelmark', '=',True)]}"/>
+                <button name="action_rfq_send_wheelmark" states="purchase" string="Envoyer quotayion par Email" type="object" context="{'send_rfq':False}" data-hotkey="g"
+                        attrs="{'invisible': ['|',('one_article_wheelmark', '=',False)]}"
+                        confirm="Cette commande comprend un article 'barre à roue'- 'wheelmark'. Merci de vous référer au manuel Division 311 'équipement marin'. Les certificats de conformité sont à demander au fournisseur et devront être validés par la cellule ISM avant l'édition du bon de commande"
+                        />
+            </xpath>
+        <!-- Imprimer demande de prix -->
+            <xpath expr="//button[@name='print_quotation'][1]" position='replace'>
+                <button name="print_quotation" string="Imprimer demande de prix" type="object" states="draft" class="oe_highlight" groups="base.group_user" data-hotkey="k" attrs="{'invisible': ['|',('one_article_wheelmark', '=',True)]}"/>
+                <button name="print_quotation_wheelmark" string="Imprimer demande de prix" type="object" states="draft" class="oe_highlight" groups="base.group_user" data-hotkey="k" 
+                        attrs="{'invisible': ['|',('one_article_wheelmark', '=',False)]}"
+                        confirm="Cette commande comprend un article 'barre à roue'- 'wheelmark'. Merci de vous référer au manuel Division 311 'équipement marin'. Les certificats de conformité sont à demander au fournisseur et devront être validés par la cellule ISM avant l'édition du bon de commande"/>
+            </xpath>
+        <!-- À approuvé-->
+            <xpath expr="//button[@name='button_approve'][1]" position='replace'>
+                <button name="button_approve" type="object" states="to approve" string="À approuver" class="oe_highlight" groups="purchase.group_purchase_manager" data-hotkey="z" attrs="{'invisible': ['|',('one_article_wheelmark', '=',True)]}"/>
+                <button name="button_approve_wheelmark" type="object" states="to approve" string="À approuver" class="oe_highlight" groups="purchase.group_purchase_manager" data-hotkey="z"
+                        attrs="{'invisible': ['|',('one_article_wheelmark', '=',False)]}"
+                        confirm="Cette commande comprend un article 'barre à roue'- 'wheelmark'. Merci de vous référer au manuel Division 311 'équipement marin'. Les certificats de conformité sont à demander au fournisseur et devront être validés par la cellule ISM avant l'édition du bon de commande"/>
+            </xpath>
+        </field>
+    </record>
+
+</data></odoo>
+<!-- attrs="{'invisible': ['|',('one_article_wheelmark', '=',True)]}"  -> Normal ||||||||| attrs="{'invisible': ['|',('one_article_wheelmark', '=',False)]}"   -> Custom -->
+<!-- confirm="Cette commande comprend un article 'barre à roue'- 'wheelmark'. Merci de vous référer au manuel Division 311 'équipement marin'. Les certificats de conformité sont à demander au fournisseur et devront être validés par la cellule ISM avant l'édition du bon de commande" -->
