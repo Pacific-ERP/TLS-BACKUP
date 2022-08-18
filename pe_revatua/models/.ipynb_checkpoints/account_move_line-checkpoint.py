@@ -378,7 +378,7 @@ class AccountMoveLine(models.Model):
                         currency,
                         move.company_id,
                         move.date,
-                        terrestre = vals.get('tarif_terrestre', 0.0),
+#                         terrestre = vals.get('tarif_terrestre', 0.0),
                     ))
 
         lines = super(AMoveLine, self).create(vals_list)

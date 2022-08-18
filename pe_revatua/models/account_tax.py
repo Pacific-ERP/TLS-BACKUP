@@ -248,8 +248,8 @@ class AccountTaxInherit(models.Model):
         #=============OVERRIDE=============#
         #========================================================================#
         #_logger.warning('Avant: %s | qty: %s | maritime: %s ' % (total_excluded,quantity,product.tarif_maritime))
-        if product.tarif_minimum:
-            if product.tarif_minimum and total_excluded < product.tarif_minimum and total_excluded != product.tarif_maritime * quantity:
+        if product and product.tarif_minimum:
+            if total_excluded < product.tarif_minimum and total_excluded != product.tarif_maritime * quantity:
                 total_excluded = product.tarif_minimum
         else:
             _logger.error('Revatua not activate : account_tax.py -> compute_all')
