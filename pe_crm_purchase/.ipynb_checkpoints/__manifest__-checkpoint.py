@@ -2,7 +2,7 @@
 {
     "name": "Pacific-ERP : Liens Achat et CRM",
     "summary": "Lie le module CRM au module Achats avec automatisme de status",
-    "version": "15.0.0.0.1",
+    "version": "15.0.0.0.2",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",

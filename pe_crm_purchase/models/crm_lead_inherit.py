@@ -10,7 +10,7 @@ class CrmLeadInherit(models.Model):
     _inherit = "crm.lead"
     
     invoice_ids = fields.One2many(string='Factures', comodel_name='account.move',inverse_name='opportunity_id', domain="[('opportunity_id','=',False)]")
-    purchase_ids = fields.One2many(string='Achats', comodel_name='purchase.order',inverse_name='opportunity_id', domain="[('opportunity_id','=',False)]")
+    purchase_ids = fields.Many2many(string='Achats', comodel_name='purchase.order')
     
     # Méthode du bouton de création d'un achat principe copier de la création d'un devis
     def action_purchase_quotations_new(self):
@@ -31,7 +31,6 @@ class CrmLeadInherit(models.Model):
             'default_origin': self.name,
             'default_source_id': self.source_id.id,
             'default_company_id': self.company_id.id or self.env.company.id,
-            'default_move_type' :'out_invoice',
             'default_journal_id' : 1,
             'default_invoice_user_id': self.user_id.id,
             'default_invoice_date': fields.Datetime.now(),
