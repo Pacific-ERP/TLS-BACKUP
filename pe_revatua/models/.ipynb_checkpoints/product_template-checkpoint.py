@@ -71,6 +71,7 @@ class ProductTemplateInherit(models.Model):
                 r_t = record.ratio_terrestre
                 r_m = 1 - r_t
                 record.ratio_maritime = r_m
+                _logger.error('test')
                 # Si tarif normal existe on initialise tout les champs qui suivent (prix de vente,tarif terrester/maritime, RPA)
                 # Vérification si l'option revatua est cocher pour cette société >>> self.env.company.revatua_ck
                 if record.tarif_normal and self.env.company.revatua_ck:

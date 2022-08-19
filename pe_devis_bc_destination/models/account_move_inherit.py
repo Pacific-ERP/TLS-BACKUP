@@ -14,10 +14,11 @@ class AccountMoveInherit(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         res = super(AccountMoveInherit, self).create(vals_list)
-        so = self.env['sale.order'].sudo().search([('name','=',res.invoice_origin)])
-        if so:
-            res.write({
-                'pe_bc' : so.pe_bc,
-                'pe_destination' : so.pe_destination,
-            })
+        for record in res:
+            so = self.env['sale.order'].sudo().search([('name','=',record.invoice_origin)])
+            if so:
+                record.write({
+                    'pe_bc' : so.pe_bc,
+                    'pe_destination' : so.pe_destination,
+                })
         return res

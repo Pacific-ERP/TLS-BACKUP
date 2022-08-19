@@ -14,13 +14,14 @@ class AccountMoveInherit(models.Model):
     def create(self, vals_list):
         # OVERRIDE
         res = super(AccountMoveInherit, self).create(vals_list)
-        if res.invoice_origin and not res.opportunity_id:
-            sale = self.env['sale.order'].sudo().search([('name','=',res.invoice_origin)])
-            achat = self.env['purchase.order'].sudo().search([('name','=',res.invoice_origin)])
-            if sale:
-                if sale.opportunity_id:
-                    res.opportunity_id = sale.opportunity_id
-            elif achat:
-                if achat.opportunity_id:
-                    res.opportunity_id = achat.opportunity_id
+        for record in res:
+            if record.invoice_origin and not record.opportunity_id:
+                sale = self.env['sale.order'].sudo().search([('name','=',record.invoice_origin)])
+                achat = self.env['purchase.order'].sudo().search([('name','=',record.invoice_origin)])
+                if sale:
+                    if sale.opportunity_id:
+                        record.opportunity_id = sale.opportunity_id
+                elif achat:
+                    if achat.opportunity_id:
+                        record.opportunity_id = achat.opportunity_id
         return res
