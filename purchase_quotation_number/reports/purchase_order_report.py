@@ -11,7 +11,6 @@ class PurchaseOrderReport(models.AbstractModel):
      
     @api.model
     def _get_report_values(self, docids, data=None):
-        _logger.error("titoy")
         purchases = self.env['purchase.order'].browse(docids)
         for purchase in purchases:
             _logger.error("Name : " + purchase.name + "| State : " +purchase.state)
