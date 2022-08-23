@@ -24,7 +24,7 @@ class CrmLeadInherit(models.Model):
         action = self.env["ir.actions.actions"]._for_xml_id("pe_crm_purchase.purchase_action_quotations_new")
         action['context'] = {
             'search_default_opportunity_id': self.id,
-            'default_opportunity_id': self.id,
+            'default_opportunity_ids': [(4,self.id)],
             'search_default_partner_id': self.partner_id.id,
             'default_campaign_id': self.campaign_id.id,
             'default_medium_id': self.medium_id.id,

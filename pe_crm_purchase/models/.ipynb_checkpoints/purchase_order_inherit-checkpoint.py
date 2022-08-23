@@ -12,22 +12,28 @@ class PurchaseOrderInherit(models.Model):
     
     @api.depends('origin')
     def _compute_opportunities(self):
+        _logger.error('_compute_opportunities')
         for purchase in self:
             sales = self.env['sale.order']
+            leads = self.env['crm.lead']
             if purchase.origin:
                 origin = tuple(purchase.origin.replace(" ","").split(','))
+                _logger.error(origin)
                 sales += self.env['sale.order'].sudo().search([('name','in',origin)])
+                origin2 = tuple(purchase.origin.split(','))
+                _logger.error(origin2)
+                leads += self.env['crm.lead'].sudo().search([('name','in',origin2)])
                 if sales:
+                    _logger.error('origin : sales %s' % sales)
                     for sale in sales:
                         if sale.opportunity_id:
                             purchase.opportunity_ids += sale.opportunity_id
                             crm = self.env['crm.lead'].sudo().search([('id','=',sale.opportunity_id.id)])
                             crm.purchase_ids += purchase
-                else:
-                    purchase.opportunity_ids = False
+                if leads:
+                    _logger.error('origin : leads %s ' % leads)
+                    for lead in leads:
+                        purchase.opportunity_ids += lead
+                        lead.purchase_ids += purchase
             else:
-                purchase.opportunity_ids = False
-                
-        
-    
-    
+                purchase.opportunity_ids = False               
