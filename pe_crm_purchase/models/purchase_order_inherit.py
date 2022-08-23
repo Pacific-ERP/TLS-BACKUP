@@ -8,16 +8,7 @@ _logger = logging.getLogger(__name__)
 class PurchaseOrderInherit(models.Model):
     _inherit = "purchase.order"
     
-    opportunity_ids = fields.Many2many(string='Opportunité', comodel_name='crm.lead', compute='_compute_opportunities')
-    
-    @api.model_create_multi
-    def create(self, vals_list):
-        # OVERRIDE
-        res = super(PurchaseOrderInherit, self).create(vals_list)
-        if res.opportunity_id:
-            message=('Cet achat à été créé à partir de <a href=# data-oe-model=crm.lead data-oe-id=%s>%s</a>') % (res.opportunity_id.id,res.opportunity_id.name)
-            res.message_post(body=message)
-        return res
+    opportunity_ids = fields.Many2many(string='Opportunités', comodel_name='crm.lead', compute='_compute_opportunities')
     
     @api.depends('origin')
     def _compute_opportunities(self):
