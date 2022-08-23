@@ -30,11 +30,16 @@ class PurchaseOrderInherit(models.Model):
                             purchase.opportunity_ids += sale.opportunity_id
                             crm = self.env['crm.lead'].sudo().search([('id','=',sale.opportunity_id.id)])
                             crm.purchase_ids += purchase
+                        elif all(not so.opportunity_id for so in sales):
+                            purchase.opportunity_ids = False
+                        else:
+                            continue
                 if leads:
                     _logger.error('origin : leads %s ' % leads)
                     for lead in leads:
                         purchase.opportunity_ids += lead
                         lead.purchase_ids += purchase
+                        
                 if not sales and not leads:
                     purchase.opportunity_ids = False
             else:
