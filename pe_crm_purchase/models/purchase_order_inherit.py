@@ -35,5 +35,7 @@ class PurchaseOrderInherit(models.Model):
                     for lead in leads:
                         purchase.opportunity_ids += lead
                         lead.purchase_ids += purchase
+                if not sales and not leads:
+                    purchase.opportunity_ids = False
             else:
-                purchase.opportunity_ids = False               
+                purchase.opportunity_ids = False            
