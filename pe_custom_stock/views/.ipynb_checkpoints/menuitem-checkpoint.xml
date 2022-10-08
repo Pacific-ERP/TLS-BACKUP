@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+<!-- Shipping Management -->
+    <!-- Action pour ouvrir le modèle Shipping Management -->
+    <record model="ir.actions.act_window" id="pe_product_emplacement_action">
+            <field name="name">Emplacement</field>
+            <field name="res_model">product.emplacement</field>
+            <field name="views">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Créer un emplacement d'article
+                </p>
+            </field>
+    </record>
+
+    <!-- Sous menu du menu parent -->
+    <menuitem id="menu_emplacement_produit" name="Emplacement" parent="	stock.menu_product_in_config_stock" action="pe_product_emplacement_action" sequence="2"/>
+      
+</data></odoo>

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-from odoo import fields, models, api
+from odoo import fields, models, api, _
+from odoo.tools import format_amount
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -128,6 +129,27 @@ class ProductTemplateInherit(models.Model):
                         raise UserError('La somme des tarif terrestre et maritime ne peut pas être supérieur au tarif normal')
         else:
             _logger.error('Revatua not activate : product_template.py -> _onchange_ter_mar_part')
+            
+    # Calcul de la tax sur le TTC de l'article
+    # --------------- Override --------------- #
+    def _construct_tax_string(self, price):
+        currency = self.currency_id
+        if self.tarif_terrestre:
+            res = self.taxes_id.compute_all(price, product=self, partner=self.env['res.partner'], terrestre=self.tarif_terrestre)
+        else:
+            res = self.taxes_id.compute_all(price, product=self, partner=self.env['res.partner'])
+        joined = []
+        included = res['total_included']
+        if currency.compare_amounts(included, price):
+            joined.append(_('%s Incl. Taxes', format_amount(self.env, included, currency)))
+        excluded = res['total_excluded']
+        if currency.compare_amounts(excluded, price):
+            joined.append(_('%s Excl. Taxes', format_amount(self.env, excluded, currency)))
+        if joined:
+            tax_string = f"(= {', '.join(joined)})"
+        else:
+            tax_string = " "
+        return tax_string
             
             
             

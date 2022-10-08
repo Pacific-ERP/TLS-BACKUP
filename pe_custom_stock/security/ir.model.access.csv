@@ -1,0 +1,4 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+pe_product_emplacement,Accès Emplacement d'article,model_product_emplacement,group_product_emplacement,1,1,1,1
+pe_product_emplacement_template,Accès Template Limité,product.model_product_template,group_product_emplacement,1,1,0,0
+pe_product_emplacement_product,Accès Product Limité,product.model_product_product,group_product_emplacement,1,1,0,0

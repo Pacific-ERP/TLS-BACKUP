@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Space Mission -->
+    <record id="group_product_emplacement" model="res.groups">
+        <field name="name">Product emplacement</field>
+    </record>
+</odoo>
