@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 class ProductTemplate(models.Model):
     _inherit = "product.template"
     
-    pe_emplacement = fields.Char(string="Emplacement", groups="pe_custom_stock.group_product_emplacement")
+    pe_emplacement = fields.Char(string="Emplacement")
     pe_customer_denomination = fields.Char(string="Dénomination client")
     pe_emplacement_bis = fields.Many2one(string="Emplacement(bis)", comodel_name="product.emplacement")
     
