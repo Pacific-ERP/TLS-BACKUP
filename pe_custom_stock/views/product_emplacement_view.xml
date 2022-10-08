@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- pour les id des record : model + type de vue -->
+        <!-- list -->
+        <record id="pe_emplacement_product" model="ir.ui.view">
+            <field name="name">pe.emplacement.prodcut.list</field>
+            <field name="model">product.emplacement</field>
+            <field name="arch" type="xml">
+                <tree editable="top">
+                    <field name="name"/>
+                    <field name="desc"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</odoo>

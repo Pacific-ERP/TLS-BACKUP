@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+        <!-- rend visible les champs pour le groups revatua / users -->
+        <record id="product_template_form_custom_pe" model="ir.ui.view">
+            <field name="name">product.template.form.custom.pe</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_id']" position="before">
+                    <field name="pe_emplacement"/>
+                    <field name="pe_customer_denomination"/>
+                    <field name="pe_emplacement_bis" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+    <!-- rend visible les champs pour le groups revatua / users -->
+        <record id="product_template_list_custom_pe" model="ir.ui.view">
+            <field name="name">product.template.list.custom.pe</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_tree_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='default_code']" position="after">
+                    <field name="pe_emplacement"/>
+                    <field name="pe_customer_denomination"/>
+                    <field name="pe_emplacement_bis" invisible="1"/>
+                </xpath>
+            </field>
+        </record>   
+
+</data></odoo>        

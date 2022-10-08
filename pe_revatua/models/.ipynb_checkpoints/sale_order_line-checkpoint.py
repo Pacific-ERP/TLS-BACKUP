@@ -145,8 +145,6 @@ class SaleOrderLineInherit(models.Model):
             # Tonne
             elif self.r_weight and not self.r_volume:
                 self.product_uom_qty = self.r_weight
-                _logger.error(self.product_uom_qty)
-                _logger.error(self.product_uom_qty)
                 self.product_uom = t
             # Métre cube
             elif self.r_volume and not self.r_weight:
@@ -158,6 +156,17 @@ class SaleOrderLineInherit(models.Model):
                 self.product_uom = self.product_id.uom_id
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _onchange_update_qty')
+            
+#     @api.onchange('product_uom_qty')
+#     def _compute_poid_volumetrique(self):
+#         # --- Check if revatua is activate ---#
+#         if self.env.company.revatua_ck:
+#             t_m3 = self.env['uom.uom'].sudo().search([('name','=','T/m³')])
+#             if self.product_uom_qty and self.product_id.uom_id.id == t_m3.id and not self.r_weight and not self.r_volume:
+#                 self.r_weight = symphonie
+#                 self.r_volume =
+#         else:
+#             _logger.error('Revatua not activate : sale_order_line.py -> _onchange_update_qty')
 
 # --------------------------------- Calcule des tarif  --------------------------------- #
 

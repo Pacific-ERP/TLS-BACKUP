@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Space Mission -->
+    <record id="group_space_admin" model="res.groups">
+        <field name="name">Space / Admin</field>
+    </record>
+    
+    <record id="group_space_crew" model="res.groups">
+        <field name="name">Space / Crew</field>
+    </record>
+    
+    <record id="group_space_general" model="res.groups">
+        <field name="name">Space / General</field>
+    </record>
+    
+    <!-- Library -->
+    <record id="group_librarian" model="res.groups">
+        <field name="name">Library / Librarian</field>
+    </record>
+    
+    <record id="group_customer" model="res.groups">
+        <field name="name">Library / Customer</field>
+    </record>
+    
+    <!-- Cooperative Volunteers -->
+    <record id="group_volunteer_head" model="res.groups">
+        <field name="name">Cooperative / Head Volunteer</field>
+    </record>
+    
+    <record id="group_volunteer" model="res.groups">
+        <field name="name">Cooperative / Volunteer</field>
+    </record>
+</odoo>
