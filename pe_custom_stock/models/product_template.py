@@ -14,9 +14,9 @@ class ProductTemplate(models.Model):
     
     def write(self, vals):
         _logger.error(vals)
-        editable_field = {'pe_emplacement','image_1920'}
+        editable_field = {'pe_emplacement','image_1920','pe_customer_denomination','default_code'}
         if any(val not in editable_field for val in vals) and self.env.user.has_group('pe_custom_stock.group_product_emplacement'):
-            raise AccessError('Vous pouvez modifiez uniquement le champ Emplacement et Images veuillez annuler la modification et recommencer.')
+            raise AccessError('Vous pouvez modifiez uniquement les champs(Emplacement,Images,Référence interne,Dénomination client) veuillez annuler la modification et recommencer.')
         return super(ProductTemplate, self).write(vals)
     
 class ProductEmplacement(models.Model):
