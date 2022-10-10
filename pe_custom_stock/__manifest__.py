@@ -5,7 +5,7 @@
     'description': """
         Long description of module's purpose
     """,
-    "version": "15.0.0.0.1",
+    "version": "15.0.0.0.2",
     "category": "Uncategorized",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",
