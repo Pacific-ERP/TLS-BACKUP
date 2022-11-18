@@ -34,6 +34,7 @@ class CrmLeadInherit(models.Model):
             'default_journal_id' : 1,
             'default_invoice_user_id': self.user_id.id,
             'default_invoice_date': fields.Datetime.now(),
+            'default_x_studio_priorit_de_la_commande' : self.x_studio_priorit_de_la_commande,
         }
         if self.team_id:
             action['context']['default_team_id'] = self.team_id.id,
