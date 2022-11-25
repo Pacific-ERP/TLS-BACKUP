@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+        <template id="revatua_external_layout_standard_inherit" inherit_id="web.external_layout_standard">
+            <!-- Contacts aremiti -->
+            <xpath expr="/t/div[3]/div[1]/div[1]" position="after">
+                <t t-if="o.company_id.id == 2">
+                    <div class="text-center" style="padding-top:10px !important;" >
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="font-size:17px; line-height : 2px;"><strong>Mélissa Prud'Homme - Assistante transport</strong></p>
+                                <p style="font-size:15px; line-height : 1px;">Tél : 40 50 57 93 | Vini : 87 77 25 04</p>
+                                <p style="font-size:15px; line-height : 1px;">Email : transport@aremiti.net</p>
+                            </div>
+                            <div class="col-6">
+                                <p style="font-size:17px; line-height : 2px;"><strong>Hokini PICARD Responsable Transport &amp; Logistique</strong></p>
+                                <p style="font-size:15px; line-height : 1px;">Tél : 40 50 57 93 | Fax : 40 43 61 37 | Vini: 87 74 39 40</p>
+                                <p style="font-size:15px; line-height : 1px;">Email : transport@aremiti.net</p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </xpath>
+        </template>
+</data></odoo>

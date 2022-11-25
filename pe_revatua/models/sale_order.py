@@ -28,7 +28,7 @@ class SaleOrderInherit(models.Model):
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
     
-    # total_tarif
+    # Calcul des parts client et ADM
     @api.onchange('order_line')
     def _total_tarif(self):
         # --- Check if revatua is activate ---#
@@ -44,20 +44,17 @@ class SaleOrderInherit(models.Model):
                     else:
                         sum_customer += line.price_total
                 # Write fields values car les champs sont en readonly
-                order.write({
-                    'sum_adm' : sum_adm,
-                    'sum_customer' : sum_customer,
-                })
+                order.write({'sum_adm' : sum_adm, 'sum_customer' : sum_customer})
         else:
             _logger.error('Revatua not activate : sale_order.py -> _total_tarif')
             
-            
+    # Override de l'affichage des totals taxes en ajoutant la part terrestre
     @api.depends('order_line.tax_id', 'order_line.price_unit', 'amount_total', 'amount_untaxed')
     def _compute_tax_totals_json(self):
         def compute_taxes(order_line):
             price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             order = order_line.order_id
-            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre)
+            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre, maritime=order_line.tarif_maritime)
 
         account_move = self.env['account.move']
         for order in self:
@@ -90,6 +87,7 @@ class SaleOrderInherit(models.Model):
         :param final: if True, refunds will be generated if necessary
         :returns: list of created invoices
         """
+        _logger.error('######################################################### Création de facture #########################################################')
         if not self.env['account.move'].check_access_rights('create', False):
             try:
                 self.check_access_rights('write')
@@ -102,6 +100,7 @@ class SaleOrderInherit(models.Model):
         #==================================#
         #=============OVERRIDE=============#
         #========================================================================#
+        # Préparation des valeurs pour la factures ADM
         invoice_vals_list_adm = []
         #========================================================================#
         #=============OVERRIDE=============#
@@ -125,7 +124,6 @@ class SaleOrderInherit(models.Model):
             # --- Check if revatua is activate ---#
             if self.env.company.revatua_ck:
                 journal = self.env['account.journal'].sudo().search([('name','=','Facture ADM')])
-                _logger.error(journal)
                 invoice_vals_adm = order._prepare_invoice()
                 invoice_vals_adm.update({
                     'is_adm_invoice':True,
@@ -330,7 +328,6 @@ class SaleOrderInherit(models.Model):
         
         # Manage the creation of invoices in sudo because a salesperson must be able to generate an invoice from a
         # sale order without "billing" access rights. However, he should not be able to create an invoice from scratch.
-        _logger.error(invoice_vals_list)
         moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list)
         
         #############################################################################################################################
@@ -340,7 +337,6 @@ class SaleOrderInherit(models.Model):
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
             #=============# Create an ADM invoices #=============#
-            _logger.error(invoice_vals_list_adm)
             if invoice_line_vals_adm:
                 moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list_adm)
             if invoice_line_vals_adm:
@@ -364,7 +360,3 @@ class SaleOrderInherit(models.Model):
                 subtype_id=self.env.ref('mail.mt_note').id
             )
         return moves
-    
-    #------------------------------------------------------------------------------------------------------------------------------------------#
-    #                                                    Modification Transfert                                                                #
-    #------------------------------------------------------------------------------------------------------------------------------------------#

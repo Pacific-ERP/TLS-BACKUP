@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+        <template id="revatua_facture_inherit" inherit_id="account.report_invoice_document">
+            <!-- Après description -->
+            <xpath expr="/t/t/div/table/thead/tr/th[1]" position="after">
+                <!-- Volume -->
+                <th t-if="o.company_id.id == 2">
+                    <span>Vol(m³)</span>
+                </th>
+                <!-- Poids -->
+                <th t-if="o.company_id.id == 2">
+                    <span>Poid(T)</span>
+                </th>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[3]/tr/t[1]/td[1]" position="after">
+                <!-- Volume -->
+                <td t-if="o.company_id.id == 2">
+                    <span t-field="line.r_volume"/>
+                </td>
+                <!-- Poids -->
+                <td t-if="o.company_id.id == 2">
+                    <span t-field="line.r_weight"/>
+                </td>
+            </xpath>
+            <!-- Changement du text Quantité en Qté -->
+            <xpath expr="/t/t/div/table/thead/tr/th[4]/span" position="replace">
+                <span t-if="o.company_id.id == 2">Qté</span>
+                <span t-else="">Quantité</span>
+            </xpath>
+            
+            <!-- Changement du text Unit Price en Prix Unitaire -->
+            <xpath expr="/t/t/div/table/thead/tr/th[5]/span" position="replace">
+                <span t-if="o.company_id.id == 2">Prix Unitaire</span>
+                <span t-else="">Prix Unitaire</span>
+            </xpath>
+
+           <!-- Après Total HT -->
+            <xpath expr="/t/t/div/table/thead/tr/th[8]" position="after">
+                 <!-- Terrestre -->
+                <th t-if="o.company_id.id == 2">
+                    <span>Terrestre</span>
+                </th>
+                <!-- Maritime -->
+                <th t-if="o.company_id.id == 2">
+                    <span>Maritime</span>
+                </th>
+                <!-- RPA -->
+                <th t-if="o.company_id.id == 2">
+                    <span>RPA</span>
+                </th>
+                <!-- TTC -->
+                <th t-if="o.company_id.id == 2">
+                    <span>Total TTC</span>
+                </th>
+            </xpath>
+            <xpath expr="/t/t/div/table/tbody/t[3]/tr/t[1]/td[8]" position="after">
+                 <!-- Terrestre -->
+                <td t-if="o.company_id.id == 2">
+                    <span t-field="line.tarif_terrestre"/>
+                </td>
+                <!-- Maritime -->
+                <td t-if="o.company_id.id == 2">
+                    <span t-field="line.tarif_maritime"/>
+                </td>
+                <!-- RPA -->
+                <td t-if="o.company_id.id == 2" >
+                    <span t-field="line.tarif_rpa"/>
+                </td>
+                <!-- TTC -->
+                <td t-if="o.company_id.id == 2" >
+                    <span t-field="line.price_total"/>
+                </td>
+            </xpath>
+            
+            <!-- Changement du texte Total en Total TTC -->
+            <xpath expr="/t/t/div/table/thead/tr/th[8]/span[1]" position="replace">
+                <span t-if="o.company_id.id == 2" groups="account.group_show_line_subtotals_tax_excluded" studio_groups="[{&quot;id&quot;: 23, &quot;name&quot;: &quot;Affichage des taxes B2B&quot;, &quot;display_name&quot;: &quot;Technique / Affichage des taxes B2B&quot;}]">Total HT</span>
+                <span t-else="" groups="account.group_show_line_subtotals_tax_excluded" studio_groups="[{&quot;id&quot;: 23, &quot;name&quot;: &quot;Affichage des taxes B2B&quot;, &quot;display_name&quot;: &quot;Technique / Affichage des taxes B2B&quot;}]">Total</span>
+            </xpath>
+
+            <!-- Ajustement -->
+            <xpath expr="/t/t/div/h2" position="attributes">
+                <attribute name="style" separator=";" add="margin-top:25px"/>
+            </xpath>
+        </template>
+</data></odoo>
