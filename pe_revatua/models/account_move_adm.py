@@ -32,6 +32,7 @@ class AccountMoveAdm(models.Model):
     total_rpa = fields.Float(string='Total RPA', store=True, copy=False)
     total_ttc = fields.Float(string='Total TTC', store=True, copy=False, help='Total RPA + Total HT')
     
+    # Nom séquencer automatiquement
     @api.model_create_multi
     def create(self, vals_list):
         # OVERRIDE
@@ -41,42 +42,53 @@ class AccountMoveAdm(models.Model):
             res['name'] = sequence or "/"
         return res
     
+    # Récupération des factures ADM pour facture globales
     @api.onchange('start_date','end_date')
     def _onchange_admg_date(self):
         for record in self:
             adms = []
             if record.start_date:
+                # Récupération des factures ADM
                 moves = record.env['account.move'].search([('is_adm_invoice','=',True)])
-                for move in moves:
-                    if move.invoice_date and move.state not in ('draft','cancel') and not move.adm_group_id:
-                        if record.end_date:
-                            if record.end_date <= record.start_date:
-                                raise ValidationError('La date de fin ne peut pas être inférieur à la date de départ')
-                            else: 
-                                if move.invoice_date >= record.start_date and move.invoice_date <= record.end_date:
+                if moves:
+                    for move in moves:
+                        # Vérification de l'état des factures prendre uniquement les comptabilisé et qui ne sont pas lié à un ADMG
+                        if move.invoice_date and move.state not in ('draft','cancel') and not move.adm_group_id:
+                            # Si date de départ
+                            if record.end_date:
+                                # Message d'erreur si la date de fin est inférieur à la date de départ
+                                if record.end_date <= record.start_date:
+                                    raise ValidationError('La date de fin ne peut pas être inférieur à la date de départ')
+                                else: 
+                                    # On récupère les factures ayant une date de facturation entre [start_date] et [end_date]
+                                    if move.invoice_date >= record.start_date and move.invoice_date <= record.end_date:
+                                       adms.append(move.id)
+                            else:
+                                # Si pas de date de fin on prend toute les factures supérieru à [start_date]
+                                if move.invoice_date >= record.start_date:
                                    adms.append(move.id)
-                        else:
-                            if move.invoice_date >= record.start_date:
-                               adms.append(move.id)
-            record.invoice_line_ids = [(6,0,adms)]
+                record.invoice_line_ids = [(6,0,adms)]
             
     # Build des lignes à facturé                         
     @api.onchange('invoice_line_ids')
     def _onchange_invoice_list_update_detail(self):
         for record in self:
+            # On vide les lignes à facturer
             record.product_line_ids = [(5,0,0)]
             moves = record.invoice_line_ids
             adm_line = []
             sequence = 1
             for move in moves:
-                _logger.error(move.name)
-                adm_line.append((0,0,move._add_move_line(sequence=sequence)),)
-                sequence += 1
                 if move.invoice_line_ids:
+                    # Création des section par facture
+                    adm_line.append((0,0,move._add_move_line(sequence=sequence)),)
+                    sequence += 1
                     for line in move.invoice_line_ids:
+                        # Création des ligne de chaque facture
                         adm_line.append((0,0,line._prepare_line_admg(sequence=sequence)),)
                         sequence += 1
-            record.product_line_ids = adm_line
+            # Sauvegarde des lignes
+            record.write({'product_line_ids' : adm_line})
     
     # Calcul des totaux
     @api.onchange('product_line_ids')
@@ -95,16 +107,16 @@ class AccountMoveAdm(models.Model):
             'total_ttc' : total_ttc,
         })
     
+    # Lie définitivement la facture ADM à la facture ADMG pour éviter la réutilisation
     def action_confirm_adm(self):
         _logger.error('action_confirm_adm')
         for record in self:
             for line in record.invoice_line_ids:
-                adm = record.env['account.move'].sudo().search([('id','=',line.id)])
-                if adm and not adm.adm_group_id:
-                    adm.write({'adm_group_id': record.id})
+                if not line.adm_group_id:
+                    line.write({'adm_group_id': record.id})
             record.write({'state':'done'})
     
-    # changement d'état sur létat du paiement
+    # Changement d'état sur létat du paiement
     @api.onchange('invoice_ids.payment_state')
     def _onchange_paiement_state(self):
         for record in self:
@@ -117,7 +129,7 @@ class AccountMoveAdm(models.Model):
                     continue
                 
             
-#--------- LINE ---------#   
+#--------- Ligne ADMG ---------#   
 class AccountMoveAdmLine(models.Model):
     _name = 'account.move.adm.line'
     _description = 'Ligne des facture grouper pour les administrations'

@@ -2,7 +2,7 @@
 {
     "name": "Custom access",
     "summary": "restricted acces for group of user",
-    "version": "0.1",
+    "version": "0.2",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",

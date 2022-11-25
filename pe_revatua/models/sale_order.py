@@ -54,7 +54,7 @@ class SaleOrderInherit(models.Model):
         def compute_taxes(order_line):
             price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             order = order_line.order_id
-            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre)
+            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre, maritime=order_line.tarif_maritime)
 
         account_move = self.env['account.move']
         for order in self:

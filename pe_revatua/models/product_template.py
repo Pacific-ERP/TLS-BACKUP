@@ -51,10 +51,10 @@ class ProductTemplateInherit(models.Model):
     # Création de l'article par société
     @api.model_create_multi
     def create(self, vals_list):
-        _logger.error('vals : %s | soc_id : %s' % (vals_list,self.env.company.id))
-        for vals in vals_list:
-            if self.env.company and not vals['company_id']:
-                vals['company_id'] = self.env.company.id
+        if self.env.company.revatua_ck :
+            for vals in vals_list:
+                if self.env.company and not vals['company_id']:
+                    vals['company_id'] = self.env.company.id
         return super().create(vals_list)
     
     def _compute_ratio_ter_mer(self, tarif_ter , tarif_normal):
@@ -78,6 +78,8 @@ class ProductTemplateInherit(models.Model):
                     record.tarif_maritime = record.tarif_normal * round(record.ratio_maritime,2)
                     record.tarif_rpa = 100
                     record.list_price = record.tarif_normal
+                    record.detailed_type = 'consu'
+                    # record.write({'detailed_type' : 'consu'})
                 # Si le prix normal est remis à 0 on retirer les valeurs des champs pour éviter des soucis de calcul par la suite
                 else:
                     record.ratio_terrestre = 0.6
@@ -86,6 +88,8 @@ class ProductTemplateInherit(models.Model):
                     record.tarif_terrestre = 0
                     record.tarif_maritime = 0
                     record.tarif_rpa = 0
+                    record.detailed_type = 'product'
+                    # record.write({'detailed_type' : 'product'})
         else:
             _logger.error('Revatua not activate : product_template.py -> _get_default_revatua')
     
@@ -99,7 +103,6 @@ class ProductTemplateInherit(models.Model):
                 for record in self:
                     if record.tarif_rpa:
                         record.taxes_id = [(4, rpa.id)]
-                        record.detailed_type = "consu"
                     else:
                         if any(str(rpa.id) == str(taxe.id) for taxe in record.taxes_id):
                             record.taxes_id = [(3,rpa.id)]

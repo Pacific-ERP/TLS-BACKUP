@@ -41,7 +41,7 @@
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_id']" position="replace">
                     <!-- Aremiti -->
                     <field name="product_id" 
-                        domain="[('sale_ok', '=', True),('company_id', '=', 1)]"
+                        domain="[('sale_ok', '=', True),('company_id', '=', allowed_company_ids[0])]"
                         context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
                         attrs="{'readonly': [('product_updatable', '=', False)],'required': [('display_type', '=', False)],}"
                         force_save="1"/>
