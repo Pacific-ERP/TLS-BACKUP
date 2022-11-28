@@ -1,0 +1,51 @@
+<odoo>
+    <data>
+    <!-- Retrait de la vue template les onglets autres que information générales -->
+        <record id="pe_acces_product_template_form" model="ir.ui.view">
+            <field name="name">product.template.form.restricted</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view" />
+            <field name="groups_id" eval="[(6, 0, [ref('pe_acces_right.pe_limited_product_access') ])]"/>
+            <field name="arch" type="xml">
+                <!-- page ventes -->
+                <xpath expr="//page[@name='sales']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <!-- page achat -->
+                <xpath expr="//page[@name='purchase']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <!-- page inventaire -->
+                <xpath expr="//page[@name='inventory']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+        <record id="pe_acces_product_template_variant_form" model="ir.ui.view">
+            <field name="name">product.template.variant.form.restricted</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view" />
+            <field name="groups_id" eval="[(6, 0, [ref('pe_acces_right.pe_limited_product_access') ])]"/>
+            <field name="arch" type="xml">
+                <!-- page Attributs et Variantes -->
+                <xpath expr="//page[@name='variants']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+        <record id="pe_acces_product_template_account_form" model="ir.ui.view">
+            <field name="name">product.template.account.form.restricted</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="account.product_template_form_view" />
+            <field name="groups_id" eval="[(6, 0, [ref('pe_acces_right.pe_limited_product_access') ])]"/>
+            <field name="arch" type="xml">
+                <!-- page Comptabilité -->
+                <xpath expr="//page[@name='invoicing']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+        
+    </data>
+</odoo>
+        

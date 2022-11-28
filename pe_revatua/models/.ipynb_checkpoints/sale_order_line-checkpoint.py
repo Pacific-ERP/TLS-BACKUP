@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 from odoo import fields, models, api
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -133,25 +134,19 @@ class SaleOrderLineInherit(models.Model):
     
 # --------------------------------- Calcul de l'udm : si poids + volume alors product_qty = (poids+volume)/2, sinon soit l'un soit l'autre --------------------------------- #
 
-    @api.onchange('r_volume','r_weight')
+    @api.onchange('product_uom','r_volume','r_weight')
     def _onchange_update_qty(self):
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
-            m3 = self.env['uom.uom'].sudo().search([('name','=','m3')])
-            t = self.env['uom.uom'].sudo().search([('name','=','T')])
-            t_m3 = self.env['uom.uom'].sudo().search([('name','=','T/m³')])
             # Poid volumétrique
-            if self.r_volume and self.r_weight and self.product_id.uom_id.id == m3.id:
+            if self.product_uom.name == 'T/m³' and self.r_volume and self.r_weight:
                 self.product_uom_qty = round((self.r_volume + self.r_weight) / 2,3)
-                self.product_uom = t_m3 
             # Tonne
-            elif self.r_weight and not self.r_volume:
+            elif self.product_uom.name == 'T' and self.r_weight:
                 self.product_uom_qty = self.r_weight
-                self.product_uom = t
             # Métre cube
-            elif self.r_volume and not self.r_weight:
+            elif self.product_uom.name == 'm3' and self.r_volume:
                 self.product_uom_qty = self.r_volume
-                self.product_uom = m3
             # Autres 
             else:
                 self.product_uom_qty = 1

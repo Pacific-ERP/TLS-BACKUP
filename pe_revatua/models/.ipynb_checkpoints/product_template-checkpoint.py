@@ -78,7 +78,7 @@ class ProductTemplateInherit(models.Model):
                     record.tarif_maritime = record.tarif_normal * round(record.ratio_maritime,2)
                     record.tarif_rpa = 100
                     record.list_price = record.tarif_normal
-                    record.detailed_type = 'consu'
+                    record.detailed_type = 'service'
                     # record.write({'detailed_type' : 'consu'})
                 # Si le prix normal est remis à 0 on retirer les valeurs des champs pour éviter des soucis de calcul par la suite
                 else:
@@ -98,16 +98,23 @@ class ProductTemplateInherit(models.Model):
     def _add_rpa_taxe(self):
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
-            rpa = self.env['account.tax'].sudo().search([('name','=','RPA')])
-            if rpa:
+            rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
+            tva_5 = self.env['account.tax'].sudo().search([('name','=','TVA 5%'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
+            if rpa and tva_5:
                 for record in self:
+                    # Ajout de la taxe RPA et tva 5% si le montant RPA existe
                     if record.tarif_rpa:
+                        # Taxe RPA
                         record.taxes_id = [(4, rpa.id)]
+                        # Taxe 5%
+                        record.taxes_id = [(4, tva_5.id)]
+                    # Retire la RPA et tva 5% si montant 0
                     else:
                         if any(str(rpa.id) == str(taxe.id) for taxe in record.taxes_id):
                             record.taxes_id = [(3,rpa.id)]
+                            record.taxes_id = [(3,tva_5.id)]
             else:
-                raise UserError('La taxe RPA est pas existant, la créer manuellement')
+                raise UserError("La taxe 'RPA' ou la taxe 'TVA 5%' n'est pas existant, la créer manuellement")
         else:
             _logger.error('Revatua not activate : product_template.py -> _add_rpa_taxe')
     
@@ -159,29 +166,10 @@ class ProductTemplateInherit(models.Model):
     @api.onchange('tarif_minimum_maritime','tarif_minimum_terrestre')
     def _onchange_minimum_tarif(self):
         if self.env.company.revatua_ck:
-            for record in self:
-                if record.tarif_minimum_maritime and record.tarif_minimum_maritime > record.tarif_maritime:
-                    raise UserError("Le prix minimum maritime ne peux pas être supérieur au prix normal maritime")
-                if record.tarif_minimum_terrestre and record.tarif_minimum_terrestre > record.tarif_terrestre:
-                    raise UserError("Le prix minimum terrestre ne peux pas être supérieur au prix normal terrestre")
-                # Calcul des part minimum maritime
-                if record.tarif_minimum_terrestre and not record.tarif_minimum_maritime:
-                    # Si tarif minimum n'existe pas
-                    if not record.tarif_minimum:
-                        record.tarif_minimum = round(record.tarif_minimum_terrestre / record.ratio_terrestre,2)
-                        record.tarif_minimum_maritime = round(record.tarif_minimum_terrestre / record.ratio_terrestre,2) * round(record.ratio_maritime,2)
-                    else:
-                        record.tarif_minimum_maritime = record.tarif_minimum * round(record.ratio_maritime,2)
-                # Calcul des part minimum terrestre
-                elif not record.tarif_minimum_terrestre and record.tarif_minimum_maritime:
-                    # Si tarif minimum n'existe pas
-                    if not record.tarif_minimum:
-                        record.tarif_minimum = round(record.tarif_minimum_maritime / record.ratio_maritime,2)
-                        record.tarif_minimum_terrestre = round(record.tarif_minimum_maritime / record.ratio_maritime,2) * round(record.ratio_maritime,2)
-                    else:
-                        record.tarif_minimum_terrestre = record.tarif_minimum * round(record.ratio_terrestre,2)
-                else:
-                    record.tarif_minimum = record.tarif_minimum_terrestre + record.tarif_minimum_maritime
+            if self.tarif_minimum_maritime and self.tarif_minimum_maritime > self.tarif_maritime:
+                raise UserError("Le prix minimum maritime ne peux pas être supérieur au prix normal maritime")
+            if self.tarif_minimum_terrestre and self.tarif_minimum_terrestre > self.tarif_terrestre:
+                raise UserError("Le prix minimum terrestre ne peux pas être supérieur au prix normal terrestre")
         else:
             _logger.error('Revatua not activate : product_template.py -> _onchange_minimum_tarif')
 

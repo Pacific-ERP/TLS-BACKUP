@@ -54,12 +54,18 @@ class AccountTaxInherit(models.Model):
             # La taxe s'applique que à la part Terrestre base_amount = montant HT multilier par 0.6 pour obtenir la part terrestre
             # Soucis sur la récupe de la coche société car calcul fait sur les deux société
             if terrestre: # and self.env.company.revatua_ck
+                remise = 1-(discount/100)
                 base_amount = terrestre
                 ## Arrondis down pour la CPS uniquement
                 if 'CPS' in self.name:
+                    if product.tarif_rpa:
+                        base_amount += math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)
                     return math.floor(base_amount * self.amount / 100)
                 else:
                     return base_amount * self.amount / 100
+                
+                if 'TVA 5%' in self.name and product.tarif_rpa:
+                    return (math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)) * self.amount / 100
             else:
                 return base_amount * self.amount / 100
             #========================================================================#
