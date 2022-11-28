@@ -41,25 +41,19 @@ class AccountMoveLine(models.Model):
     def _onchange_update_qty(self):
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
-            m3 = self.env['uom.uom'].sudo().search([('name','=','m3')])
-            t = self.env['uom.uom'].sudo().search([('name','=','T')])
-            t_m3 = self.env['uom.uom'].sudo().search([('name','=','T/m³')])
             # Poid volumétrique
-            if self.r_volume and self.r_weight and self.product_id.uom_id.id == m3.id:
-                self.quantity = (self.r_volume + self.r_weight) / 2
-                self.product_uom_id = t_m3 
+            if self.product_uom.name == 'T/m³' and self.r_volume and self.r_weight:
+                self.quantity = round((self.r_volume + self.r_weight) / 2,3)
             # Tonne
-            elif self.r_weight and not self.r_volume:
+            elif self.product_uom.name == 'T' and self.r_weight:
                 self.quantity = self.r_weight
-                self.product_uom_id = t
             # Métre cube
-            elif self.r_volume and not self.r_weight:
+            elif self.product_uom.name == 'm3' and self.r_volume:
                 self.quantity = self.r_volume
-                self.product_uom_id = m3
             # Autres 
             else:
                 self.quantity = 1
-                self.product_uom_id = self.product_id.uom_id
+                self.product_uom = self.product_id.uom_id
         else:
             _logger.error('Revatua not activate : account_move_line.py -> _onchange_update_qty')
 
