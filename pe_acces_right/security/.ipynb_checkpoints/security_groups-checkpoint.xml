@@ -1,10 +1,16 @@
 <odoo>
     <data noupdate="1">
+        
         <record id="purchase_create_facture_restricted" model="res.groups">
             <field name="name">Achats / Pas de creation facture</field>
         </record>
+        
         <record id="pe_facturation_no_validation" model="res.groups">
             <field name="name">Achats / Pas de confirmation</field>
+        </record>
+        
+        <record id="pe_limited_product_access" model="res.groups">
+            <field name="name">Inventaire / Modif article limité</field>
         </record>
     </data>
 </odoo>
