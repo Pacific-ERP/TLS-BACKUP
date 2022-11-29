@@ -11,7 +11,7 @@ class AccountTaxInherit(models.Model):
     _inherit = "account.tax"
     
     # Ajout du paramètre terrestre pour le calcul de la taxe
-    def _compute_amount(self, base_amount, price_unit, quantity=1.0, product=None, partner=None, invoice=None, terrestre=0, discount=0):
+    def _compute_amount(self, base_amount, price_unit, quantity=1.0, product=None, partner=None, invoice=None, terrestre=0, discount=0, rpa=0):
         #########################
         #### OVERRIDE METHOD ####
         #########################
@@ -29,11 +29,13 @@ class AccountTaxInherit(models.Model):
                 # self.env.company.revatua_ck test si l'article à une part terrestre car lors d'un calcul fait par odoo il calcul sur TLS et renvoie unen fausse taxe
                 if product.tarif_terrestre and self.name == 'RPA' and product.tarif_rpa:
                     remise = 1-(discount/100)
+                    rpa = product.tarif_rpa*remise
                     # Si un coût minimum RPA est configuré et que le total RPA(qty*rpa) et inférieur au minimum RPA
-                    if product.tarif_minimum_rpa and (math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)) < product.tarif_minimum_rpa:
+                    if product.tarif_minimum_rpa and (math.copysign(quantity, base_amount) * rpa) < product.tarif_minimum_rpa:
                         return product.tarif_minimum_rpa
                     else:
-                        return math.copysign(quantity, base_amount) * (product.tarif_rpa*remise)
+                        total_rpa = math.copysign(quantity, base_amount) * rpa 
+                        return total_rpa - (total_rpa * 0.05 + total_rpa * 0.01)
                 else:
                     return math.copysign(quantity, base_amount) * self.amount
                 #========================================================================#
@@ -46,6 +48,7 @@ class AccountTaxInherit(models.Model):
         price_include = self._context.get('force_price_include', self.price_include)
         # base * (1 + tax_amount) = new_base
         if self.amount_type == 'percent' and not price_include:
+            _logger.error('taxe ter:%s | rpa:%s' % (terrestre,rpa))
             #############################################################################################################################
             #==================================#
             #=============OVERRIDE=============#
@@ -53,19 +56,25 @@ class AccountTaxInherit(models.Model):
             # --- Check if revatua is activate ---#
             # La taxe s'applique que à la part Terrestre base_amount = montant HT multilier par 0.6 pour obtenir la part terrestre
             # Soucis sur la récupe de la coche société car calcul fait sur les deux société
-            if terrestre: # and self.env.company.revatua_ck
+            if terrestre or rpa: # and self.env.company.revatua_ck
+                _logger.error('if rpa or terrestre')
                 remise = 1-(discount/100)
                 base_amount = terrestre
-                ## Arrondis down pour la CPS uniquement
+                # Arrondis down pour la CPS uniquement
                 if 'CPS' in self.name:
-                    if product.tarif_rpa:
-                        base_amount += math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)
-                    return math.floor(base_amount * self.amount / 100)
+                    _logger.error('if cps')
+                    terrestre = math.floor(base_amount * self.amount / 100)
+                    if rpa:
+                        _logger.error('if rpa')
+                        rpa_amount = round((math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)) * self.amount / 100,1)
+                        _logger.error('ter :%s | rpa:%s' % (terrestre,rpa_amount))
+                        return terrestre + rpa_amount
+                    else:
+                        return terrestre
+                elif 'TVA 5%' in self.name and product.tarif_rpa:
+                    return (math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)) * self.amount / 100
                 else:
                     return base_amount * self.amount / 100
-                
-                if 'TVA 5%' in self.name and product.tarif_rpa:
-                    return (math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)) * self.amount / 100
             else:
                 return base_amount * self.amount / 100
             #========================================================================#
@@ -86,7 +95,8 @@ class AccountTaxInherit(models.Model):
         return 0.0
     
     # Ajout du paramètre discount pour le calcul de la taxe uniquement sur terrestre
-    def compute_all(self, price_unit, currency=None, quantity=1.0, product=None, partner=None, is_refund=False, handle_price_include=True, include_caba_tags=False, discount=0.0, terrestre=0, maritime=0, adm=False):
+    def compute_all(self, price_unit, currency=None, quantity=1.0, product=None, partner=None, is_refund=False, handle_price_include=True, include_caba_tags=False, discount=0.0, terrestre=0, maritime=0, adm=False, rpa=0):
+        _logger.error('###### -- compute_all -- ######')
         """ Returns all information required to apply taxes (in self + their children in case of a tax group).
             We consider the sequence of the parent for group of taxes.
                 Eg. considering letters as taxes and alphabetic order as sequence :
@@ -243,8 +253,8 @@ class AccountTaxInherit(models.Model):
 ### 1 - Ajout de la remise pour le calcul de taxe + champs terrestre ###
 ########################################################################
                         # soucis lors de l'éxé qui est pas bon et ce fait sur plusieurs société donc rentre pas dans le if pas d'idée (donc self.env.company.revatua_ck fonctionne pas)
-                        if terrestre:
-                            tax_amount = tax._compute_amount(base, sign * price_unit, quantity, product, partner, terrestre=terrestre, discount=discount) * sum_repartition_factor
+                        if terrestre or rpa:
+                            tax_amount = tax._compute_amount(base, sign * price_unit, quantity, product, partner, terrestre=terrestre, discount=discount, rpa=rpa) * sum_repartition_factor
                         else:
                             tax_amount = tax._compute_amount(base, sign * price_unit, quantity, product, partner) * sum_repartition_factor
 ########################################################################
@@ -347,8 +357,8 @@ class AccountTaxInherit(models.Model):
 #########################################################################
                 #_logger.error('2nd compute : %s ' % terrestre)
                 # soucis lors de l'éxé qui est pas bon et ce fait sur plusieurs société donc rentre pas dans le if pas d'idée (donc self.env.company.revatua_ck fonctionne pas)
-                if terrestre:
-                    tax_amount = tax.with_context(force_price_include=False)._compute_amount(tax_base_amount, sign * price_unit, quantity, product, partner, terrestre=terrestre, discount=discount)
+                if terrestre or rpa:
+                    tax_amount = tax.with_context(force_price_include=False)._compute_amount(tax_base_amount, sign * price_unit, quantity, product, partner, terrestre=terrestre, discount=discount, rpa=rpa)
                 else:
                     tax_amount = tax.with_context(force_price_include=False)._compute_amount(tax_base_amount, sign * price_unit, quantity, product, partner)
 #########################################################################

@@ -38,6 +38,7 @@
                 <field name="tarif_terrestre" sum="Terrestre" digits="[42,0]" optional="show"/>
                 <field name="tarif_maritime" sum="Maritime" digits="[42,0]" optional="show"/>
                 <field name="tarif_rpa" sum="RPA" digits="[42,0]" optional="show"/>
+                <field name="tarif_rpa_ttc" sum="RPA" digits="[42,0]" optional="hide"/>
                 <field name="price_total" optional="show" string="Total TTC"/>
             </xpath>
             
@@ -61,6 +62,7 @@
                 <field name="tarif_minimum" optional="hide"/>
                 <field name="check_adm" optional="hide"/>
                 <field name="tarif_rpa" optional="hide"/>
+                <field name="tarif_rpa_ttc" optional="hide"/>
             </xpath>
         <!-- Form -->
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/group[1]/group[1]/field[@name='narration']" position="after">

@@ -35,6 +35,10 @@ class AccountMoveInherit(models.Model):
     def _add_move_line(self, sequence=1):
         self.ensure_one()
         title = str(self.name)+' - '+str(self.invoice_partner_display_name)
+        if self.invoice_origin:
+            order = self.env['sale.order'].search([('name','=',self.invoice_origin)])
+            if order and len(order) == 1:
+                title += ' - '+str(order.name)+' - '+str(order.date_order.date())
         vals = {
             'sequence': sequence,
             'name': title,
@@ -127,6 +131,7 @@ class AccountMoveInherit(models.Model):
                     discount = base_line.discount,
                     terrestre = base_line.tarif_terrestre,
                     maritime = base_line.tarif_maritime,
+                    rpa = base_line.tarif_rpa,
                     adm = move.is_adm_invoice,
                 )
             else:

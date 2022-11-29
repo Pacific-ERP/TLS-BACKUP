@@ -14,6 +14,7 @@ class SaleOrderLineInherit(models.Model):
     # -- RPA --#
     base_rpa = fields.Float(string='Base RPA', store=True)
     tarif_rpa = fields.Float(string='RPA', default=0, store=True)
+    tarif_rpa_ttc = fields.Float(string='RPA TTC', default=0, store=True)
     tarif_minimum_rpa = fields.Float(string='Minimum RPA', store=True)
     
     # -- Maritime --#
@@ -41,7 +42,7 @@ class SaleOrderLineInherit(models.Model):
         for line in self:
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
             # Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre)
-            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_shipping_id, discount=line.discount, terrestre=line.tarif_terrestre, maritime=line.tarif_maritime)
+            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_shipping_id, discount=line.discount, terrestre=line.tarif_terrestre, maritime=line.tarif_maritime,rpa = line.tarif_rpa)
             line.update({
                 'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
                 'price_total': taxes['total_included'],
@@ -85,6 +86,7 @@ class SaleOrderLineInherit(models.Model):
                         product=line.product_id,
                         terrestre = line.tarif_terrestre,
                         maritime = line.tarif_maritime,
+                        rpa = line.tarif_rpa,
                         partner=line.order_id.partner_shipping_id)['total_excluded']
                 inv_lines = line._get_invoice_lines()
                 if any(inv_lines.mapped(lambda l: l.discount != line.discount)):
@@ -94,7 +96,7 @@ class SaleOrderLineInherit(models.Model):
                     for l in inv_lines:
                         if len(l.tax_ids.filtered(lambda tax: tax.price_include)) > 0:
     # -----Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre)
-                            amount += l.tax_ids.compute_all(l.currency_id._convert(l.price_unit, line.currency_id, line.company_id, l.date or fields.Date.today(), round=False) * l.quantity,terrestre=line.tarif_terrestre)['total_excluded']
+                            amount += l.tax_ids.compute_all(l.currency_id._convert(l.price_unit, line.currency_id, line.company_id, l.date or fields.Date.today(), round=False) * l.quantity,terrestre=line.tarif_terrestre,rpa = line.tarif_rpa,)['total_excluded']
                         else:
                             amount += l.currency_id._convert(l.price_unit, line.currency_id, line.company_id, l.date or fields.Date.today(), round=False) * l.quantity
 
@@ -182,7 +184,9 @@ class SaleOrderLineInherit(models.Model):
                 quantity = line.product_uom_qty
                 line.tarif_terrestre = line._compute_amount_base_revatua(line.base_terrestre, quantity, discount, line.tarif_minimum_terrestre)
                 line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, discount, line.tarif_minimum_maritime)
-                line.tarif_rpa = line._compute_amount_base_revatua(line.base_rpa, quantity, discount, line.tarif_minimum_rpa)
+                line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, discount, line.tarif_minimum_rpa)
+                # Tarif RPA = Tarif RPA HT = Tartif RPA TTC - 5% - 1%
+                line.tarif_rpa = line.tarif_rpa_ttc - (line.tarif_rpa_ttc * 0.05 + line.tarif_rpa_ttc * 0.01)
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _compute_revatua_part')
         
@@ -220,6 +224,7 @@ class SaleOrderLineInherit(models.Model):
         if self.env.company.revatua_ck:
             values.update({
                 'tarif_rpa': self.tarif_rpa,
+                'tarif_rpa_ttc' : self.tarif_rpa_ttc,
                 'tarif_maritime': self.tarif_maritime,
                 'tarif_terrestre': self.tarif_terrestre,
                 'check_adm': self.check_adm,
@@ -248,6 +253,7 @@ class SaleOrderLineInherit(models.Model):
         if self.env.company.revatua_ck:
             values.update({
                 'tarif_rpa': self.tarif_rpa,
+                'tarif_rpa_ttc' : self.tarif_rpa_ttc,
                 'tarif_maritime': self.tarif_maritime,
                 'tarif_terrestre': 0,
                 'check_adm': self.check_adm,
@@ -261,9 +267,11 @@ class SaleOrderLineInherit(models.Model):
                 'base_terrestre':self.base_terrestre,
                 'base_total':self.price_total,
             })
+            tax_list=[]
             for tax in self.tax_id:
-                if tax.name == 'RPA':
-                    values.update({'tax_ids' : [(6,0,[tax.id])]})
+                if not tax.name == 'TVA 13%':
+                    tax_list.append(tax.id)
+            values.update({'tax_ids' : [(6,0,tax_list)]})
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line_adm_part')
         return values
@@ -277,6 +285,7 @@ class SaleOrderLineInherit(models.Model):
             values.update({
                 'tarif_rpa': 0,
                 'tarif_maritime': 0,
+                'tarif_rpa_ttc' : self.tarif_rpa_ttc,
                 'tarif_terrestre': self.tarif_terrestre,
                 'check_adm': self.check_adm,
                 'r_volume': self.r_volume,
@@ -291,7 +300,7 @@ class SaleOrderLineInherit(models.Model):
             })
             tax_list=[]
             for tax in self.tax_id:
-                if not tax.name == 'RPA':
+                if not tax.name in ('RPA','TVA 5%'):
                     tax_list.append(tax.id)
             values.update({'tax_ids' : [(6,0,tax_list)]})
         else:
