@@ -27,6 +27,22 @@ class SaleOrderInherit(models.Model):
     # Maritime
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
+    is_deliver = fields.Boolean(string="Est livré", store=True, default=False, help="Définie si la commande est livré ou non")
+    
+    # Vérification de l'avancement des livraisons     
+    @api.depends('delivery_line.state','is_deliver')
+    def _get_deliveries_state(self):
+        # Override
+        for sale in self:
+            if sale.state not in ('sale', 'done'):
+                sale.delivery_status = 'no'
+                continue
+            if any(line.state != 'done' for line in sale.delivery_line):
+                sale.delivery_status = 'in_delivery'
+            elif (all(line.state == 'done' for line in sale.delivery_line) and sale.delivery_line) or sale.is_deliver:
+                sale.delivery_status = 'all_delivered'
+            else:
+                sale.delivery_status = 'no'
     
     # Calcul des parts client et ADM
     @api.onchange('order_line')
@@ -39,8 +55,8 @@ class SaleOrderInherit(models.Model):
                 # Sum tarif_terrestre and maritime
                 for line in order.order_line:
                     if line.check_adm:
-                        sum_adm += line.tarif_maritime + line.tarif_rpa
-                        sum_customer += line.price_total - (line.tarif_maritime + line.tarif_rpa)
+                        sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
+                        sum_customer += line.price_total - (line.tarif_maritime + line.tarif_rpa_ttc)
                     else:
                         sum_customer += line.price_total
                 # Write fields values car les champs sont en readonly
@@ -54,7 +70,7 @@ class SaleOrderInherit(models.Model):
         def compute_taxes(order_line):
             price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             order = order_line.order_id
-            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre, maritime=order_line.tarif_maritime)
+            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre, maritime=order_line.tarif_maritime, rpa=order_line.tarif_rpa)
 
         account_move = self.env['account.move']
         for order in self:

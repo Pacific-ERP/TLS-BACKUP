@@ -27,12 +27,13 @@ class SaleOrderInherit(models.Model):
     @api.depends('delivery_line.state')
     def _get_deliveries_state(self):
         for sale in self:
+            _logger.error('_get_deliveries_state')
             if sale.state not in ('sale', 'done'):
                 sale.delivery_status = 'no'
                 continue
             if any(line.state != 'done' for line in sale.delivery_line):
                 sale.delivery_status = 'in_delivery'
-            elif (all(line.state == 'done' for line in sale.delivery_line) and sale.delivery_line):
+            elif (all(line.state == 'done' for line in sale.delivery_line) and sale.delivery_line) or sale.is_deliver:
                 sale.delivery_status = 'all_delivered'
             else:
                 sale.delivery_status = 'no'

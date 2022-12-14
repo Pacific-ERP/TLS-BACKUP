@@ -22,6 +22,8 @@ class AccountMoveAdm(models.Model):
                                                                       ('in_payment','Paiement Partiel'),
                                                                       ('payed','Paiement complet')]
                              ,store=True, default='draft', copy=False, tracking=True)
+    # 
+    
     # M2m/O2m
     invoice_line_ids = fields.Many2many(string='Factures ADM', store=True, comodel_name='account.move')
     invoice_ids = fields.One2many(string='Factures lié ADM', store=True, comodel_name='account.move', inverse_name='adm_group_id')

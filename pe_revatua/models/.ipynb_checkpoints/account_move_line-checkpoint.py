@@ -21,6 +21,7 @@ class AccountMoveLine(models.Model):
     # -- RPA --#
     base_rpa = fields.Float(string='Base RPA', store=True)
     tarif_rpa = fields.Float(string='RPA', default=0, store=True)
+    tarif_rpa_ttc = fields.Float(string='RPA TTC', default=0, store=True)
     tarif_minimum_rpa = fields.Float(string='Minimum RPA', store=True)
     
     # -- Maritime --#
@@ -108,21 +109,25 @@ class AccountMoveLine(models.Model):
                 if not line.move_id.is_adm_invoice:
                     line.tarif_terrestre = line._compute_amount_base_revatua(line.base_terrestre, quantity, discount, line.tarif_minimum_terrestre)
                     line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, discount, line.tarif_minimum_maritime)
-                    line.tarif_rpa = line._compute_amount_base_revatua(line.base_rpa, quantity, discount, line.tarif_minimum_rpa)
+                    line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, discount, line.tarif_minimum_rpa)
+                    # Tarif RPA = Tarif RPA HT = Tartif RPA TTC - 5% - 1%
+                    line.tarif_rpa = line.tarif_rpa_ttc - (line.tarif_rpa_ttc * 0.05 + line.tarif_rpa_ttc * 0.01)
                 # Facture ADM
                 else:
                     # Partie administration
                     rpa = self.env['account.tax'].sudo().search([('name','=','RPA')])
                     if line.check_adm:
                         line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, discount, line.tarif_minimum_maritime)
-                        line.tarif_rpa = line._compute_amount_base_revatua(line.base_rpa, quantity, discount, line.tarif_minimum_rpa)
+                        line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, discount, line.tarif_minimum_rpa)
+                        # Tarif RPA = Tarif RPA HT = Tartif RPA TTC - 5% - 1%
+                        line.tarif_rpa = line.tarif_rpa_ttc - (line.tarif_rpa_ttc * 0.05 + line.tarif_rpa_ttc * 0.01)
                         line.tarif_terrestre = 0.0
                         line.tax_ids = [(6,0,[rpa.id])]
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _compute_revatua_part')
 # --------------------------------- Modification des méthode de calculs des taxes et sous totaux  --------------------------------- #
     # --------------------------------- Price Total & Subtotal  --------------------------------- #
-    def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None, terrestre=None, maritime=None, adm=None):
+    def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None, terrestre=None, maritime=None, adm=None, rpa=None):
         self.ensure_one()
         return self._get_price_total_and_subtotal_model(
             price_unit=self.price_unit if price_unit is None else price_unit,
@@ -136,10 +141,11 @@ class AccountMoveLine(models.Model):
             terrestre=self.tarif_terrestre if terrestre is None else terrestre,
             maritime=self.tarif_maritime if maritime is None else maritime,
             adm=self.move_id.is_adm_invoice if adm is None else adm,
+            rpa=self.tarif_rpa if rpa is None else rpa,
         )
     
     @api.model
-    def _get_price_total_and_subtotal_model(self, price_unit, quantity, discount, currency, product, partner, taxes, move_type, terrestre, maritime, adm):
+    def _get_price_total_and_subtotal_model(self, price_unit, quantity, discount, currency, product, partner, taxes, move_type, terrestre, maritime, adm, rpa):
         ''' This method is used to compute 'price_total' & 'price_subtotal'.
 
         :param price_unit:  The current price unit.
@@ -179,8 +185,9 @@ class AccountMoveLine(models.Model):
         if taxes:
 # ----- Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre)
             if self.env.company.revatua_ck:
+                _logger.error('taxes_res rpa :%s' % rpa)
                 taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
-                quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'), terrestre=terrestre, maritime=maritime, adm=adm, discount=discount) #
+                quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'), terrestre=terrestre, maritime=maritime, adm=adm, discount=discount, rpa=rpa) #
             else:
                 taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
                 quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'))

@@ -13,6 +13,10 @@
                 <xpath expr="//field[@name='validity_date']" position="before">
                     <xpath expr="//field[@name='picking_policy']" position="move"/>
                 </xpath>
+                <!-- Ajout du bouton livré -->
+                <xpath expr="//field[@name='pe_destination']" position="after">
+                    <field name="is_deliver" widget="boolean_toggle" attrs="{'readonly': [('state', 'not in', ('sale','done'))]}"/>
+                </xpath>
                 <!-- Client unituqment aremiti -->
                 <xpath expr="//field[@name='partner_id']" position="replace">
                     <field name="partner_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" domain="[('company_id','=',allowed_company_ids[0])]" options='{"always_reload":true,"no_create":true}'/>
@@ -71,25 +75,9 @@
                     <field name="tarif_terrestre" sum="Terrestre" digits="[42,0]" optional="show"/>
                     <field name="tarif_maritime" sum="Maritime" digits="[42,0]" optional="show"/>
                     <field name="tarif_rpa" sum="RPA" digits="[42,0]" optional="show"/>
+                    <field name="tarif_rpa_ttc" sum="RPA" digits="[42,0]" optional="hide"/>
                     <field name="price_total" optional="show" string="Total TTC"/>
                 </xpath>
-                
-                <!-- Affichage sur les autres list view lié à sale.order.line sinon à la sauvegarde du devis les données sont 
-                supprimer comportement de base odoo qui doit récupérer 2fois le formulaire un avec donnée remplis et l'autre 
-                non remplis il compile le tout est finis par avoir des données à blanc -->
-<!--                 <xpath expr="//page[@name='optional_products']/field[@name='sale_order_option_ids']/tree[1]/field[@name='sequence']" position="after">
-                    <field name="base_rpa" invisible="1"/>
-                    <field name="tarif_minimum_rpa" invisible="1"/>
-                    <field name="base_maritime" invisible="1"/>
-                    <field name="tarif_minimum_maritime" invisible="1"/>
-                    <field name="base_terrestre" invisible="1"/>
-                    <field name="tarif_minimum_terrestre" invisible="1"/>
-                    <field name="tarif_minimum" invisible="1"/>
-                    <field name="tarif_terrestre" invisible="1"/>
-                    <field name="tarif_maritime" invisible="1"/>
-                    <field name="tarif_rpa" invisible="1"/>
-                    <field name="check_adm" invisible="1"/>
-                </xpath> -->
                 
                 <!-- Remplacer l'uom de base par un fictif pour information -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="after">

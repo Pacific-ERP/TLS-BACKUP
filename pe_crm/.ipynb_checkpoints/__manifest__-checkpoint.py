@@ -11,6 +11,6 @@
     "installable": True,
     "depends": ["crm"],
     "data": [
-        "views/crm_case_kanban_view_leads.xml"
+        "views/crm_lead.xml"
         ],
 }

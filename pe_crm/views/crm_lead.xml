@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
+    <!-- Kanban -->
     <record id="crm_case_kanban_view_leads_custom" model="ir.ui.view">
         <field name="name">Pacific-ERP CRM Kanban</field>
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_case_kanban_view_leads" />
         <field name="arch" type="xml">
-            <!-- modification avec xpath  // recherche sur tout le documents -->
             <xpath expr="//progressbar" position="replace">
                 <progressbar field="activity_state" colors="{&quot;planned&quot;: &quot;success&quot;, &quot;today&quot;: &quot;warning&quot;, &quot;overdue&quot;: &quot;danger&quot;}" help="This bar allows to filter the opportunities based on scheduled activities."/>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="crm_status" display="full"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Form -->
+    <record id="pe_crm_crm_lead_form" model="ir.ui.view">
+        <field name="name">Pacific-ERP CRM Form</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="crm_status"/>
+                <field name="eta_date"/>
             </xpath>
         </field>
     </record>
