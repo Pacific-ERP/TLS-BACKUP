@@ -21,10 +21,18 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form" />
         <field name="arch" type="xml">
+            <!-- Ajoute les champs crm_status -->
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="crm_status"/>
                 <field name="eta_date"/>
             </xpath>
+            <!-- Ajoute la page Note client -->
+            <xpath expr="//notebook/page[@name='internal_notes']" position="after">
+              <page string="Note Client" name="customer_notes">
+                <field name="customer_desc" placeholder="Ajouter une note client..."/>
+              </page>
+            </xpath>
+            
         </field>
     </record>
 </odoo>
