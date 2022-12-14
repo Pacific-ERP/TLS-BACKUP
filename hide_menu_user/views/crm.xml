@@ -38,6 +38,17 @@
                     <h1><field class="text-break" name="name" placeholder="e.g. Product Pricing"/></h1>
                     <field name="team_id" invisible="1"/>
                 </div>
+                <group>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="crm_status" readonly="1"/>
+                    <field name="eta_date" readonly="1"/>
+                    <field name="tag_ids" readonly="1" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                </group>
+                <notebook>
+                  <page string="Internal Notes" name="internal_notes">
+                      <field name="description" placeholder="Add a description..."/>
+                  </page>
+                </notebook>
               </sheet>
             </xpath>
             

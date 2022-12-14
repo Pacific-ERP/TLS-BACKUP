@@ -20,16 +20,46 @@
         <field name="inherit_id" ref="crm.crm_lead_view_form" />
         <field name="groups_id" eval="[(4, ref('pe_restricted_crm_consultation'))]"/>
         <field name="arch" type="xml">
+            <!-- Retire l'entete et laisse le status -->
             <xpath expr="//header" position="replace">
-                <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" domain="['|', ('team_id', '=', team_id), ('team_id', '=', False)]" attrs="{'invisible': ['|', ('active', '=', False), ('type', '=', 'lead')]}"/>
+              <header>
+                <field name="active" invisible="1"/>
+                <field name="type" invisible="1"/>
+                <field name="stage_id" readonly="1" widget="statusbar" options="{'fold_field': 'fold'}" domain="['|', ('team_id', '=', team_id), ('team_id', '=', False)]" attrs="{'invisible': ['|', ('active', '=', False), ('type', '=', 'lead')]}"/>
+              </header>
             </xpath>
+            
+            <!-- Retire le corp et laisse que le nom -->
             <xpath expr="//sheet" position="replace">
+              <sheet>
                 <div class="oe_title">
                     <label for="name" string="Lead" attrs="{'invisible': [('type', '=', 'opportunity')]}"/>
                     <label for="name" attrs="{'invisible': [('type', '=', 'lead')]}"/>
                     <h1><field class="text-break" name="name" placeholder="e.g. Product Pricing"/></h1>
+                    <field name="team_id" invisible="1"/>
                 </div>
+                <group>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="crm_status" readonly="1"/>
+                    <field name="eta_date" readonly="1"/>
+                    <field name="tag_ids" readonly="1" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                </group>
+                <notebook>
+                  <page string="Internal Notes" name="internal_notes">
+                      <field name="description" placeholder="Add a description..."/>
+                  </page>
+                </notebook>
+              </sheet>
             </xpath>
+            
+            <!-- Retire la modif et la création -->
+            <xpath expr="//form" position="attributes">
+              <attribute name="create">0</attribute>
+              <attribute name="edit">0</attribute>
+            </xpath>
+            
+            <!-- Retire le chatter -->
+            <xpath expr="//div[hasclass('oe_chatter')]" position="replace"/>
             
         </field>
     </record>
