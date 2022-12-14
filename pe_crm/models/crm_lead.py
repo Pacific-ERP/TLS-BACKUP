@@ -10,6 +10,7 @@ class CrmLead(models.Model):
     
     crm_status = fields.Char(string='Status', compute="_get_crm_status")
     eta_date = fields.Datetime(string='ETA')
+    customer_desc = fields.Text('Description')
     
     @api.depends('stage_id')
     def _get_crm_status(self):

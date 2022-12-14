@@ -30,11 +30,9 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': "https://www.cybrosys.com",
-    'depends': ['base','crm','pe_crm'],
+    'depends': ['base','crm'],
     'data': [
-        'security/res_group.xml',
         'views/res_users.xml',
-        'views/crm.xml',
         'security/security.xml'
     ],
     'license': 'LGPL-3',
