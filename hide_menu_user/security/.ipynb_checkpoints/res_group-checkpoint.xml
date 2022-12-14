@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Space Mission -->
+    <record id="pe_restricted_crm_consultation" model="res.groups">
+        <field name="name">Consultant CRM</field>
+    </record>
+</odoo>

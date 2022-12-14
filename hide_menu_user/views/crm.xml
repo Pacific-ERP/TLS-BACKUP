@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    <!-- Kanban -->
+    <record id="pe_restricted_create_crm_consultation_kanban" model="ir.ui.view">
+        <field name="name">pe_restricted_create_crm_consultation.kanban</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads" />
+        <field name="groups_id" eval="[(4, ref('pe_restricted_crm_consultation'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="create">0</attribute>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Form -->
+    <record id="pe_restricted_create_crm_consultation_form" model="ir.ui.view">
+        <field name="name">pe_restricted_read_crm_consultation.form</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form" />
+        <field name="groups_id" eval="[(4, ref('pe_restricted_crm_consultation'))]"/>
+        <field name="arch" type="xml">
+            <!-- Retire l'entete et laisse le status -->
+            <xpath expr="//header" position="replace">
+              <header>
+                <field name="active" invisible="1"/>
+                <field name="type" invisible="1"/>
+                <field name="stage_id" readonly="1" widget="statusbar" options="{'fold_field': 'fold'}" domain="['|', ('team_id', '=', team_id), ('team_id', '=', False)]" attrs="{'invisible': ['|', ('active', '=', False), ('type', '=', 'lead')]}"/>
+              </header>
+            </xpath>
+            
+            <!-- Retire le corp et laisse que le nom -->
+            <xpath expr="//sheet" position="replace">
+              <sheet>
+                <div class="oe_title">
+                    <label for="name" string="Lead" attrs="{'invisible': [('type', '=', 'opportunity')]}"/>
+                    <label for="name" attrs="{'invisible': [('type', '=', 'lead')]}"/>
+                    <h1><field class="text-break" name="name" placeholder="e.g. Product Pricing"/></h1>
+                    <field name="team_id" invisible="1"/>
+                </div>
+              </sheet>
+            </xpath>
+            
+            <!-- Retire la modif et la création -->
+            <xpath expr="//form" position="attributes">
+              <attribute name="create">0</attribute>
+              <attribute name="edit">0</attribute>
+            </xpath>
+            
+            <!-- Retire le chatter -->
+            <xpath expr="//div[hasclass('oe_chatter')]" position="replace"/>
+            
+        </field>
+    </record>
+
+</data></odoo>

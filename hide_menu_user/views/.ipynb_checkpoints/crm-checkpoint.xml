@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    <!-- Kanban -->
+    <record id="pe_restricted_create_crm_consultation_kanban" model="ir.ui.view">
+        <field name="name">pe_restricted_create_crm_consultation.kanban</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads" />
+        <field name="groups_id" eval="[(4, ref('pe_restricted_crm_consultation'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="create">0</attribute>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Form -->
+    <record id="pe_restricted_create_crm_consultation_form" model="ir.ui.view">
+        <field name="name">pe_restricted_read_crm_consultation.form</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form" />
+        <field name="groups_id" eval="[(4, ref('pe_restricted_crm_consultation'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="replace">
+                <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" domain="['|', ('team_id', '=', team_id), ('team_id', '=', False)]" attrs="{'invisible': ['|', ('active', '=', False), ('type', '=', 'lead')]}"/>
+            </xpath>
+            <xpath expr="//sheet" position="replace">
+                <div class="oe_title">
+                    <label for="name" string="Lead" attrs="{'invisible': [('type', '=', 'opportunity')]}"/>
+                    <label for="name" attrs="{'invisible': [('type', '=', 'lead')]}"/>
+                    <h1><field class="text-break" name="name" placeholder="e.g. Product Pricing"/></h1>
+                </div>
+            </xpath>
+            
+        </field>
+    </record>
+
+</data></odoo>
