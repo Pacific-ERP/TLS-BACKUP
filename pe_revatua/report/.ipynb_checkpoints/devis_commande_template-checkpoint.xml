@@ -135,8 +135,8 @@
                                 <t t-if="doc.tel_dest">
                                     <span t-field="doc.tel_dest"/>
                                 </t>
-                                <t t-if="not doc.tel_dest and doc.dest">
-                                    <span t-field="doc.dest"/>
+                                <t t-if="not doc.tel_dest and doc.mobil_dest">
+                                    <span t-field="doc.mobil_dest"/>
                                 </t>  
                             </div>
                             <div t-if="doc.ile_dest and doc.commune_dest">

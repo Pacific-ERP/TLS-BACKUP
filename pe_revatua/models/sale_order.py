@@ -90,6 +90,10 @@ class SaleOrderInherit(models.Model):
             invoice_vals.update({
                 'sum_adm': self.sum_adm,
                 'sum_customer': self.sum_customer,
+                'commune_recup': self.commune_recup,
+                'contact_expediteur': self.contact_expediteur,
+                'commune_dest': self.commune_dest,
+                'contact_dest': self.contact_dest,
             })
         else:
             _logger.error('Revatua not activate : sale_order.py -> _prepare_invoice')
