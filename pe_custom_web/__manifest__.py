@@ -17,6 +17,7 @@
     "installable": True,
     "depends": ["sale","website_crm_partner_assign"],
     "data": [
+        "views/portal_my_home_menu_lead.xml",
         "report/portal_my_orders.xml",
         "report/portal_my_quotations.xml",
         "report/portal_my_opportunity.xml",

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="pe_custom_web_portal_my_home_lead" model="ir.ui.view">
+        <field name="name">pe_custom_web.portal_my_home_lead</field>
+        <field name="inherit_id" ref="website_crm_partner_assign.portal_my_home_lead" />
+        <field name="arch" type="xml">
+            <xpath expr="//t[@t-call='portal.portal_docs_entry']" position="replace"/>
+        </field>
+    </record>
+
+</odoo>
