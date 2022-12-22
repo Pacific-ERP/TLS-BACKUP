@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <template id="pe_custom_web_portal_my_opportunity" inherit_id="website_crm_partner_assign.portal_my_opportunity">
+        <!-- Status unique -->
+        <xpath expr="//small/../div[1]" position="replace">
+            <span class="btn btn-sm px-2 opp-stage-button btn-primary disabled" t-if="opportunity.crm_status" t-field="opportunity.crm_status"/> 
+        </xpath>
+        <!-- Modification de l'affichage récupération des informations importante uniquement -->
+        <xpath expr="//t[1]/t[1]/t[2]" position="replace">
+            <t t-set="card_body">
+                <div class="row">
+                    <!-- Gauche -->
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <!-- Champs : Priorité de la commande -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-6">Priorité de la commande</strong>
+                            <div class="col">
+                                <span t-if="opportunity.x_studio_priorit_de_la_commande" t-field="opportunity.x_studio_priorit_de_la_commande"/>
+                            </div>
+                        </div>
+                        <!-- Champs : Date de livraison souhaitée -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-6">Date de livraison souhaitée</strong>
+                            <div class="col">
+                                <span t-if="opportunity.x_studio_date_order" t-field="opportunity.x_studio_date_order"/>
+                            </div>
+                        </div>
+                        <!-- Champs : Date de fermeture prévu -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-6">Date de fermeture prévu</strong>
+                            <div class="col">
+                                <span t-if="opportunity.date_deadline" t-field="opportunity.date_deadline"/>
+                            </div>
+                        </div>
+                        <!-- Champs : ETA -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-6">ETA</strong>
+                            <div class="col">
+                                <span t-if="opportunity.eta_date" t-field="opportunity.eta_date"/>
+                            </div>
+                        </div>
+                        <!-- Champs : Destination -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-6">Destination</strong>
+                            <div class="col">
+                                <span t-if="opportunity.pe_destination" t-field="opportunity.pe_destination"/>
+                            </div>
+                        </div>
+                        <!-- Champs : Référence Client -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-6">Référence Client</strong>
+                            <div class="col">
+                                <span t-if="opportunity.pe_bc" t-field="opportunity.pe_bc"/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Droite -->
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <!-- Champs : Courriels -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-4">Courriel</strong>
+                            <div class="col">
+                                <span t-if="opportunity.email_from" t-field="opportunity.email_from"/>
+                            </div>
+                        </div>
+                        <!-- Champs : Phone -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-4">Téléphone</strong>
+                            <div class="col">
+                                <span t-if="opportunity.phone" t-field="opportunity.phone"/>
+                            </div>
+                        </div>
+                        <!-- Champs : Vendeur -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-4">Vendeur</strong>
+                            <div class="col">
+                                <span t-if="opportunity.user_id" t-field="opportunity.user_id"/>
+                            </div>
+                        </div>
+                        <!-- Champs : Priorité -->
+                        <div class="row mb-2">
+                            <strong class="col-12 col-sm-4">Priorité</strong>
+                            <div class="col">
+                                <span class="" title="Rating" role="img" t-attf-aria-label="Rating: #{opportunity.priority} on 4">
+                                    <t t-foreach="range(1, 4)" t-as="i">
+                                        <span t-attf-class="fa text-warning fa-lg fa-star#{'' if i &lt;= int(opportunity.priority) else '-o'}" role="img" t-att-aria-label="'Star %d of 3' % i"/>
+                                    </t>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+</data></odoo>
