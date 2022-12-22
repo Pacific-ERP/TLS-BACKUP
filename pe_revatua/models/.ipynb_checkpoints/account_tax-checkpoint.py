@@ -48,7 +48,7 @@ class AccountTaxInherit(models.Model):
         price_include = self._context.get('force_price_include', self.price_include)
         # base * (1 + tax_amount) = new_base
         if self.amount_type == 'percent' and not price_include:
-            _logger.error('taxe ter:%s | rpa:%s' % (terrestre,rpa))
+            # _logger.error('taxe ter:%s | rpa:%s' % (terrestre,rpa))
             #############################################################################################################################
             #==================================#
             #=============OVERRIDE=============#
