@@ -22,6 +22,7 @@
         "report/portal_my_quotations.xml",
         "report/portal_my_opportunity.xml",
         "report/portal_my_opportunities.xml",
+        "report/products_item.xml",
         "report/sale_order_portal_template.xml",
         ],
 }
