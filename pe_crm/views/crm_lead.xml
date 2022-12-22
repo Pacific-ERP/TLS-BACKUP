@@ -15,7 +15,7 @@
         </field>
     </record>
     
-    <!-- Form -->
+    <!-- Form CRM de base -->
     <record id="pe_crm_crm_lead_form" model="ir.ui.view">
         <field name="name">Pacific-ERP CRM Form</field>
         <field name="model">crm.lead</field>
@@ -26,6 +26,7 @@
                 <field name="crm_status"/>
                 <field name="eta_date"/>
                 <field name="partner_assigned_id"/>
+                <field name="pe_sale_counter" invisible="1"/>
             </xpath>
             <!-- Ajoute la page Note client -->
             <xpath expr="//notebook/page[@name='internal_notes']" position="after">
@@ -34,6 +35,35 @@
               </page>
             </xpath>
             
+            <xpath expr="//notebook" position="inside">
+                <page string="Ventes" name="sale_orders">
+                  <field name="order_ids" invisible="0"/>
+                </page>
+            </xpath>
+            
         </field>
     </record>
+    
+    <!-- Form CRM lié au Sales -->
+    <record id="pe_crm_case_form_view_oppor_form" model="ir.ui.view">
+        <field name="name">pe_crm.case_form_view_oppor_form</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor" />
+        <field name="arch" type="xml">
+            <!-- retire le bouton devis quotation -->
+            <xpath expr="//button[@name='action_view_sale_quotation']" position="replace"/>
+            
+            <xpath expr="//field[@name='sale_order_count']/../.." position="replace">
+                <button class="oe_stat_button" type="object" attrs="{'invisible': ['|', ('sale_order_count', '=', 0), ('type', '=', 'lead')]}" name="action_view_sale_order" icon="fa-usd">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value"><field name="pe_sale_counter"/></span>
+                        <span class="o_stat_text"> Devis</span>
+                        <field name="sale_order_count" invisible="1"/>
+                        <field name="pe_sale_counter" invisible="1"/>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    
 </odoo>

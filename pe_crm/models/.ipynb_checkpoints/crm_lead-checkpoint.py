@@ -11,6 +11,7 @@ class CrmLead(models.Model):
     crm_status = fields.Char(string='Status', compute="_get_crm_status")
     eta_date = fields.Datetime(string='ETA')
     customer_desc = fields.Text('Description')
+    pe_sale_counter = fields.Integer(compute='_pe_compute_sale_order_count')
     
     # Permet de récupérer le status en text directe
     @api.depends('stage_id')
@@ -29,3 +30,10 @@ class CrmLead(models.Model):
             if crm.partner_id.grade_id:
                 crm.partner_assigned_id = crm.partner_id
         return res
+    
+    # Compteur pour les devis
+    def _pe_compute_sale_order_count(self):
+        for record in self:
+            record.pe_sale_counter = 0
+            if record.order_ids:
+                record.pe_sale_counter = len(record.order_ids)
