@@ -25,6 +25,7 @@
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="crm_status"/>
                 <field name="eta_date"/>
+                <field name="partner_assigned_id"/>
             </xpath>
             <!-- Ajoute la page Note client -->
             <xpath expr="//notebook/page[@name='internal_notes']" position="after">
