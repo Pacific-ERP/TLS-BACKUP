@@ -17,6 +17,7 @@ class PurchaseOrderInherit(models.Model):
             sales = self.env['sale.order']
             leads = self.env['crm.lead']
             if purchase.origin:
+                
                 origin = tuple(purchase.origin.replace(" ","").split(','))
                 _logger.error(origin)
                 sales += self.env['sale.order'].sudo().search([('name','in',origin)])

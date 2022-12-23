@@ -7,8 +7,11 @@
         <div class="card-body p-0 o_wsale_product_information">
             <div class="p-2 o_wsale_product_information_text">
                 <h6 class="o_wsale_products_item_title mb-1">
-                    <a t-if="product.default_code" class="text-primary text-decoration-none" itemprop="name" style="font-size:16px;" t-att-href="product_href" t-att-content="product.name" t-esc="'[%s] %s'% (product.default_code,product.name)"/>
-                    <a t-else="" class="text-primary text-decoration-none" itemprop="name" style="font-size:16px;" t-att-href="product_href" t-att-content="product.name" t-field="product.name"/>
+                    <a class="text-primary text-decoration-none" itemprop="name" style="font-size:16px;" t-att-href="product_href" t-att-content="product.name" t-field="product.name"/>
+                    <t t-if="product.default_code">
+                        <br></br>
+                        <span class="text-primary text-decoration-none" style="font-size:16px;color:#2B2275 !important;" t-esc="'[%s]' % product.default_code"/>
+                    </t>
                     <a role="button" t-if="not product.website_published" t-att-href="product_href" class="btn btn-sm btn-danger" title="This product is unpublished.">Unpublished</a>
                 </h6>
                 <div class="product_price mb-1" itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer">
