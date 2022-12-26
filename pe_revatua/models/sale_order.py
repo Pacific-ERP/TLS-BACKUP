@@ -27,22 +27,21 @@ class SaleOrderInherit(models.Model):
     # Maritime
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
-    is_deliver = fields.Boolean(string="Est livré", store=True, default=False, help="Définie si la commande est livré ou non")
     
     # Vérification de l'avancement des livraisons     
-    @api.depends('delivery_line.state','is_deliver')
-    def _get_deliveries_state(self):
-        # Override
-        for sale in self:
-            if sale.state not in ('sale', 'done'):
-                sale.delivery_status = 'no'
-                continue
-            if any(line.state != 'done' for line in sale.delivery_line):
-                sale.delivery_status = 'in_delivery'
-            elif (all(line.state == 'done' for line in sale.delivery_line) and sale.delivery_line) or sale.is_deliver:
-                sale.delivery_status = 'all_delivered'
-            else:
-                sale.delivery_status = 'no'
+    # @api.depends('delivery_line.state','is_deliver')
+    # def _get_deliveries_state(self):
+    #     # Override
+    #     for sale in self:
+    #         if sale.state not in ('sale', 'done'):
+    #             sale.delivery_status = 'no'
+    #             continue
+    #         if any(line.state != 'done' for line in sale.delivery_line):
+    #             sale.delivery_status = 'in_delivery'
+    #         elif (all(line.state == 'done' for line in sale.delivery_line) and sale.delivery_line) or sale.is_deliver:
+    #             sale.delivery_status = 'all_delivered'
+    #         else:
+    #             sale.delivery_status = 'no'
     
     # Calcul des parts client et ADM
     @api.onchange('order_line')
@@ -90,6 +89,10 @@ class SaleOrderInherit(models.Model):
             invoice_vals.update({
                 'sum_adm': self.sum_adm,
                 'sum_customer': self.sum_customer,
+                'commune_recup': self.commune_recup,
+                'contact_expediteur': self.contact_expediteur,
+                'commune_dest': self.commune_dest,
+                'contact_dest': self.contact_dest,
             })
         else:
             _logger.error('Revatua not activate : sale_order.py -> _prepare_invoice')

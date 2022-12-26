@@ -48,7 +48,7 @@ class AccountTaxInherit(models.Model):
         price_include = self._context.get('force_price_include', self.price_include)
         # base * (1 + tax_amount) = new_base
         if self.amount_type == 'percent' and not price_include:
-            _logger.error('taxe ter:%s | rpa:%s' % (terrestre,rpa))
+            # _logger.error('taxe ter:%s | rpa:%s' % (terrestre,rpa))
             #############################################################################################################################
             #==================================#
             #=============OVERRIDE=============#
@@ -281,7 +281,7 @@ class AccountTaxInherit(models.Model):
         # if self.env.company.revatua_ck:
         # Si Uniquement part terrestre alors 100% du prix de ventes
         remise = 1-(discount/100)
-        if product.tarif_terrestre and not product.tarif_maritime:
+        if product and product.tarif_terrestre and not product.tarif_maritime:
             #_logger.error('1')
             # Si un tarif terrestre minimum existe et que le terrestre actuelle est plus petit que le minmum alors pv = minimum terrestre
             if product.tarif_minimum_terrestre and (product.tarif_terrestre * quantity) < product.tarif_minimum_terrestre:
@@ -291,7 +291,7 @@ class AccountTaxInherit(models.Model):
                 #_logger.error('1.2')
                 total_excluded = currency.round((remise*product.tarif_terrestre) * quantity)
         # Si deux part bien repartager
-        elif product.tarif_terrestre and product.tarif_maritime:
+        elif product and product.tarif_terrestre and product.tarif_maritime:
             #_logger.error('2')
             # Facture ADM client et administration
             if adm:

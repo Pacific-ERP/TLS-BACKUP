@@ -8,6 +8,10 @@
         <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
         <field name="arch" type="xml">
         <!-- ligne d'article -->
+            <!-- Rendre invisible le bouton remettre en brouillon -->
+            <xpath expr="//button[@name='button_draft']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <!-- Modification du label Quantité en Qté -->
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='invoice_line_ids']/tree[1]/field[@name='quantity']" position="attributes">
                 <attribute name="string">Qté</attribute>
@@ -65,9 +69,27 @@
                 <field name="tarif_rpa_ttc" optional="hide"/>
             </xpath>
         <!-- Form -->
+            <!-- Somme de la facture -->
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/group[1]/group[1]/field[@name='narration']" position="after">
                 <field name="sum_customer"/>
                 <field name="sum_adm"/>
+            </xpath>
+             <!-- champs custom revatua -->
+            <xpath expr="//group[@id='header_right_group']" position="after">
+                <group name="lieu_recuperation" string="Lieu de récupération">
+                    <field name="commune_recup"/>
+                    <field name="ile_recup"/>
+                    <field name="contact_expediteur"/>
+                    <field name="tel_expediteur" attrs="{'invisible': ['&amp;',['tel_expediteur','=',False],['mobil_expediteur','!=',False]]}"/>
+                    <field name="mobil_expediteur" attrs="{'invisible': ['|',['tel_expediteur','!=',False],['mobil_expediteur','=',False]]}"/>
+                </group>
+                <group name="lieu_destinataire" string="Destinataire">
+                    <field name="commune_dest"/>
+                    <field name="ile_dest"/>
+                    <field name="contact_dest"/>
+                    <field name="tel_dest" attrs="{'invisible': ['&amp;',['tel_dest','=',False],['mobil_dest','!=',False]]}"/>
+                    <field name="mobil_dest" attrs="{'invisible': ['|',['tel_dest','!=',False],['mobil_dest','=',False]]}"/>
+                </group>
             </xpath>
     </field></record>
     

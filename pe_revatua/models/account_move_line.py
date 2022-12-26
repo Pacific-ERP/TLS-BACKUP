@@ -203,7 +203,8 @@ class AccountMoveLine(models.Model):
     # Erreur de création
     @api.model
     def create(self, vals_list):
-        res = super(AMoveLine,self).create(vals_list)
+        _logger.error('Revatua create')
+        vals_list['currency_id'] = self.env.company.currency_id.id
         return res
     
 # --------------------------------- Méthode de récupération des champs du model : account.admg  --------------------------------- #  

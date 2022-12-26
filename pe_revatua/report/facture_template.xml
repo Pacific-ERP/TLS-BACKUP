@@ -1,7 +1,75 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo><data>
         <template id="revatua_facture_inherit" inherit_id="account.report_invoice_document">
-            <!-- Après description -->
+        <!-- Avant le tableau is_adm_invoice-->
+            <!-- Clients -->
+            <xpath expr="/t/t/t[3]" position="replace">
+                <!-- aremiti -->
+                <t t-if="o.company_id.id == 2">
+                    <div class="row" style="padding-bottom:20px">
+                        <div class="col-4" name="div_incoming_address"><!--t-options='{&quot;phone_icons&quot;: True}-->
+                            <span><strong>Client :</strong></span>
+                            <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                        </div>
+                        <div class="col-4" name="div_incoming_address" t-if='o.contact_expediteur'><!--t-options='{&quot;phone_icons&quot;: True}-->
+                            <span><strong>Expéditeur :</strong></span>
+                            <div t-field="o.contact_expediteur.name"/>
+                            <div>
+                                <span>Tél:</span>
+                                <t t-if="o.tel_expediteur">
+                                    <span t-field="o.tel_expediteur"/>
+                                </t>
+                                <t t-if="not o.tel_expediteur and o.mobil_expediteur">
+                                    <span t-field="o.mobil_expediteur"/>
+                                </t>  
+                            </div>
+                            <div>
+                                <span t-field="o.ile_recup"/>
+                                <span> - </span>
+                                <span t-field="o.commune_recup"/>
+                            </div>
+                        </div>
+                        <div class="col-4" name="div_incoming_address" t-if='o.contact_dest'>
+                            <span><strong>Destinataire:</strong></span>
+                            <div t-field="o.contact_dest.name" />
+                            <div>
+                                <span>Tél:</span>
+                                <t t-if="o.tel_dest">
+                                    <span t-field="o.tel_dest"/>
+                                </t>
+                                <t t-if="not o.tel_dest and o.mobil_dest">
+                                    <span t-field="o.mobil_dest"/>
+                                </t>  
+                            </div>
+                            <div t-if="o.ile_dest and o.commune_dest">
+                                <span t-field="o.ile_dest"/>
+                                <span> - </span>
+                                <span t-field="o.commune_dest"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+                <t t-else="" t-set="address">
+                    <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                    <p t-if="o.partner_id.vat"><t t-esc="o.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>: <span t-field="o.partner_id.vat"/></p>
+                </t>
+            </xpath>
+            <!-- Titre de la facture -->
+            <xpath expr="//h2" position="replace">
+                <h2 style="font-size:24px;">
+                    <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Facture</span>
+                    <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Facture brouillon</span>
+                    <span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'">Facture annulé</span>
+                    <span t-if="o.move_type == 'out_refund'">Avoir</span>
+                    <span t-if="o.move_type == 'in_refund'">Avoir fournisseur</span>
+                    <span t-if="o.move_type == 'in_invoice'">Facture fournisseur</span>
+                    <span t-if="o.is_adm_invoice" t-esc="'AREMITI FERRY vers %s' % o.partner_id.name" />
+                    <span t-if="o.name != '/' and o.company_id.id == 2 " t-esc="'(%s)'% o.name"/>
+                    <span t-if="o.name != '/' and not o.company_id.id == 2" t-field="o.name"/>
+                </h2>
+            </xpath>
+        
+        <!-- Dans le tableau-->
             <xpath expr="/t/t/div/table/thead/tr/th[1]" position="after">
                 <!-- Volume -->
                 <th t-if="o.company_id.id == 2">

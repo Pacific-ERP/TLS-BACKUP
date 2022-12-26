@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+        <template id="pe_custom_web_sale_order_portal_template" inherit_id="sale.sale_order_portal_content">
+            <!-- Portail client : Visu des devis formulaires -->
+              <xpath expr="//div[@id='so_date']" position="after">
+                <div class="row" id="so_date">
+                  <div class="mb-3 col-6">
+                    <strong>Référence client:</strong>
+                    <t t-if="sale_order.pe_bc">
+                      <span t-field="sale_order.pe_bc"/>
+                    </t>
+                  </div>
+                  <div class="mb-3 col-6">
+                    <strong>Lieu de livraison:</strong>
+                    <t t-if="sale_order.pe_destination">
+                      <span t-field="sale_order.pe_destination"/>
+                    </t>
+                  </div>
+                </div>
+                <div class="row" id="so_date">
+                  <div class="mb-3 col-6">
+                    <strong>Status de l'opportunité:</strong>
+                    <t t-if="sale_order.opportunity_id">
+                      <span t-field="sale_order.opportunity_id.crm_status"/>
+                    </t>
+                  </div>
+                </div>
+              </xpath>
+        </template>
+
+</data></odoo>

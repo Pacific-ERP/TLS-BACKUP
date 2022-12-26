@@ -8,7 +8,7 @@ class PurchaseOrderInherit(models.Model):
     _inherit = "purchase.order"
     
     #ajouter le module purchase_stock dans les dépendances du manifest pour avoir le champs purchase_id sinon erreur d'existence
-    delivery_line = fields.One2many(comodel_name='stock.picking', inverse_name='purchase_id', string='delivery line', copy=True)
+    delivery_line = fields.One2many(comodel_name='stock.picking', inverse_name='purchase_id', string='delivery line', copy=False)
 
     delivery_status = fields.Selection([
         ('no','Pas de réception'),
@@ -30,10 +30,13 @@ class PurchaseOrderInherit(models.Model):
             if purchase.state not in ('purchase', 'done'):
                 purchase.delivery_status = 'no'
                 continue
+            # Si il reste des livraison à valider
             if any(line.state not in ('done','cancel') for line in purchase.delivery_line):
                 purchase.delivery_status = 'in_delivery'
-            elif (all(line.state in ('done','cancel') for line in purchase.delivery_line) and purchase.delivery_line):
+            # Si toutes livraison sont faites ou si c'est uniquement des articles services passer en livraison complète
+            elif (all(line.state in ('done','cancel') for line in purchase.delivery_line) and purchase.delivery_line) or (all(line.product_id.detailed_type == 'service' for line in purchase.order_line)):
                 purchase.delivery_status = 'all_delivered'
+            # Sinon aucune livraison fait
             else:
                 purchase.delivery_status = 'no'
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <template id="pe_custom_web_portal_my_opportunities" inherit_id="website_crm_partner_assign.portal_my_opportunities">
+        <!-- Retrait du bouton d'ajout d'un CRM -->
+        <xpath expr="//t[1]/t[2]/div" position="replace"/>
+        
+        <!-- Modification des colonnes tableaux -->
+        <xpath expr="//t[1]/t[4]" position="replace">
+            <t t-if="opportunities" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Date</th>
+                        <th class="w-50">Name</th>
+                        <th>Contact</th>
+                        <!--<th>Expected</th>-->
+                        <th>Stage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="opportunities" t-as="opp">
+                        <td><span t-field="opp.create_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/></td>
+                        <td>
+                            <a t-attf-href="/my/opportunity/#{opp.id}"><span t-field="opp.name"/></a>
+                        </td>
+                        <td><span t-field="opp.contact_name"/></td>
+                        <!--<td>-->
+                        <!--    <span t-if="opp.company_currency" class="text-nowrap" t-esc="opp.expected_revenue" t-options="{'widget': 'monetary', 'display_currency': opp.company_currency}"/>-->
+                        <!--    <span t-else="" class="text-nowrap" t-esc="opp.expected_revenue"/>-->
+                        <!--    <span> at </span>-->
+                        <!--    <span t-field="opp.probability"/>%-->
+                        <!--</td>-->
+                        <td>
+                            <span class="badge badge-info badge-pill" title="Current stage of the opportunity" t-esc="opp.stage_id.name"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </t>
+        </xpath>
+    </template>
+
+</data></odoo>

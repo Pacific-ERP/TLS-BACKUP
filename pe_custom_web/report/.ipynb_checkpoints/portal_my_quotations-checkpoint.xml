@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+        <template id="pe_custom_web_portal_my_quotations" inherit_id="sale.portal_my_orders">
+            <!-- Portail client : Ajout des totaux pour les bon de commandes -->
+            <xpath expr="//t[1]/t[4]/t[1]" position="replace">
+                <t t-set="total_order_amount" t-value="0"/>
+                <t t-foreach="quotations" t-as="quotation">
+                    <t t-set="total_order_amount" t-value="total_order_amount + quotation.amount_total"/>
+                    <tr>
+                        <td><a t-att-href="quotation.get_portal_url()"><t t-esc="quotation.name"/></a></td>
+                        <td class="text-right"><span t-field="quotation.date_order"/></td>
+                        <td class="text-right"><span t-field="quotation.validity_date"/></td>
+                        <td class="text-center">
+                            <span t-if="quotation.state == 'cancel'" class="badge badge-pill badge-secondary"><i class="fa fa-fw fa-remove"/> Cancelled</span>
+                            <span t-if="quotation.is_expired" class="badge badge-pill badge-secondary"><i class="fa fa-fw fa-clock-o"/> Expired</span>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="quotation.amount_total"/>
+                        </td>
+                    </tr>
+                </t>
+                <tr>
+                    <td/><!-- Numéro -->
+                    <td/><!-- Date -->
+                    <td/><!-- Status -->
+                    <td class="text-right"><span t-if="quotation" t-esc="'Total : {0:,.0f} XPF'.format(total_order_amount).replace(',', ' ')"></span></td><!-- Montant total -->
+                </tr>
+            </xpath>
+        </template>
+
+</data></odoo>

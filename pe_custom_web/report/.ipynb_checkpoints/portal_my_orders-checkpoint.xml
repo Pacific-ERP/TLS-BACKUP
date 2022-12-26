@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+        <template id="pe_custom_web_portal_my_orders" inherit_id="sale.portal_my_orders">
+            <!-- Portail client : Ajout des totaux pour les bon de commandes -->
+            <xpath expr="//t[1]/t[4]/t[1]" position="replace">
+                <t t-set="total_order_amount" t-value="0"/>
+                <t t-foreach="orders" t-as="order">
+                    <t t-set="total_order_amount" t-value="total_order_amount + order.amount_total"/>
+                    <tr>
+                        <td><a t-att-href="order.get_portal_url()"><t t-esc="order.name"/></a></td>
+                        <td class="text-right">
+                            <span t-field="order.date_order" t-options="{'widget': 'date'}"/>&amp;nbsp;
+                            <span class="d-none d-md-inline" t-field="order.date_order" t-options="{'time_only': True}"/>
+                        </td>
+                        <td class="text-center">
+                            <span t-if="order.state == 'done'" class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" role="img" aria-label="Done" title="Done"/>Done
+                            </span>
+                        </td>
+                        <td class="text-right"><span t-field="order.amount_total"/></td>
+                    </tr>
+                </t>
+                <!-- Détails sum -->
+                <tr>
+                    <td/><!-- Numéro -->
+                    <td/><!-- Date -->
+                    <td/><!-- Status -->
+                    <td class="text-right"><span t-if="order" t-esc="'Total : {0:,.0f} XPF'.format(total_order_amount).replace(',', ' ')"></span></td><!-- Montant total -->
+                </tr>
+            </xpath>
+        </template>
+
+</data></odoo>
