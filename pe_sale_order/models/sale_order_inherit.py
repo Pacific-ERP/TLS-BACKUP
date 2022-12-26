@@ -7,8 +7,10 @@ _logger = logging.getLogger(__name__)
 class SaleOrderInherit(models.Model):
     _inherit = "sale.order"
     
-    #ajouter le module sale_stock dans les dépendances du manifest pour avoir le champs sale_id sinon erreur d'existence
-    delivery_line = fields.One2many(comodel_name='stock.picking', inverse_name='sale_id', string='delivery line (sale)', copy=True)
+    # Ajouter le module sale_stock dans les dépendances du manifest pour avoir le champs sale_id sinon erreur d'existence
+    delivery_line = fields.One2many(comodel_name='stock.picking', inverse_name='sale_id', string='delivery line (sale)', copy=False)
+    # Option en plus pour valider le transfert pour Aremiti (temporaire)
+    is_deliver = fields.Boolean(string="Est livré", store=True, default=False, help="Définie si la commande est livré ou non")
 
     delivery_status = fields.Selection([
         ('no','Pas de livraison'),
@@ -24,16 +26,16 @@ class SaleOrderInherit(models.Model):
     ], string='État de facturations', compute='_get_invoices_state', store=True, readonly=True, copy=False, default='no')
     
     # Vérification de l'avancement des livraisons     
-    @api.depends('delivery_line.state')
+    @api.depends('delivery_line.state','is_deliver','state')
     def _get_deliveries_state(self):
+        _logger.error('## _get_deliveries_state ##')
         for sale in self:
-            _logger.error('_get_deliveries_state')
             if sale.state not in ('sale', 'done'):
                 sale.delivery_status = 'no'
                 continue
             if any(line.state != 'done' for line in sale.delivery_line):
                 sale.delivery_status = 'in_delivery'
-            elif (all(line.state == 'done' for line in sale.delivery_line) and sale.delivery_line) or sale.is_deliver:
+            elif (all(line.state == 'done' for line in sale.delivery_line) and sale.delivery_line) or (all(line.product_id.detailed_type == 'service' and line.product_id.company_id.id != 2 for line in sale.order_line)) or sale.is_deliver:
                 sale.delivery_status = 'all_delivered'
             else:
                 sale.delivery_status = 'no'
