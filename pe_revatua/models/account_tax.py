@@ -63,7 +63,7 @@ class AccountTaxInherit(models.Model):
                 # Arrondis down pour la CPS uniquement
                 if 'CPS' in self.name:
                     _logger.error('if cps')
-                    terrestre = math.floor(base_amount * self.amount / 100)
+                    terrestre = math.ceil(base_amount * self.amount / 100)
                     if rpa:
                         _logger.error('if rpa')
                         rpa_amount = round((math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)) * self.amount / 100,1)

@@ -204,6 +204,7 @@ class AccountMoveLine(models.Model):
     @api.model
     def create(self, vals_list):
         _logger.error('Revatua create')
+        res = super(AMoveLine,self).create(vals_list)
         vals_list['currency_id'] = self.env.company.currency_id.id
         return res
     
