@@ -8,10 +8,6 @@
         <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
         <field name="arch" type="xml">
         <!-- ligne d'article -->
-            <!-- Rendre invisible le bouton remettre en brouillon -->
-            <xpath expr="//button[@name='button_draft']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
             <!-- Modification du label Quantité en Qté -->
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='invoice_line_ids']/tree[1]/field[@name='quantity']" position="attributes">
                 <attribute name="string">Qté</attribute>
