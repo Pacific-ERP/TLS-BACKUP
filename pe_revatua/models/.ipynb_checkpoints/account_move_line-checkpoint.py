@@ -185,7 +185,7 @@ class AccountMoveLine(models.Model):
         if taxes:
 # ----- Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre)
             if self.env.company.revatua_ck:
-                _logger.error('taxes_res rpa :%s' % rpa)
+                # _logger.error('taxes_res rpa :%s' % rpa)
                 taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
                 quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'), terrestre=terrestre, maritime=maritime, adm=adm, discount=discount, rpa=rpa) #
             else:
@@ -204,9 +204,9 @@ class AccountMoveLine(models.Model):
     @api.model
     def create(self, vals_list):
         _logger.error('Revatua create')
-        res = super(AMoveLine,self).create(vals_list)
-        vals_list['currency_id'] = self.env.company.currency_id.id
-        return res
+        if not vals_list.get('currency_id'):
+            vals_list['currency_id'] = self.env.company.currency_id.id
+        return super(AMoveLine,self).create(vals_list)
     
 # --------------------------------- Méthode de récupération des champs du model : account.admg  --------------------------------- #  
 

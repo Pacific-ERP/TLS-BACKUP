@@ -111,7 +111,7 @@ class AccountMoveAdm(models.Model):
     
     # Lie définitivement la facture ADM à la facture ADMG pour éviter la réutilisation
     def action_confirm_adm(self):
-        _logger.error('action_confirm_adm')
+        # _logger.error('action_confirm_adm')
         for record in self:
             for line in record.invoice_line_ids:
                 if not line.adm_group_id:

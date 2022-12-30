@@ -41,7 +41,7 @@ class SaleOrderInherit(models.Model):
                     taxe = 0.0
                     for tax in line.tax_id.filtered(lambda tax_line: tax_line.amount in (1,13)):
                         taxe += tax.amount
-                    _logger.error(taxe)
+                    # _logger.error(taxe)
                     if line.check_adm:
                         sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
                         sum_customer += line.tarif_terrestre * (1+(taxe/100))
@@ -183,11 +183,11 @@ class SaleOrderInherit(models.Model):
                 if self.env.company.revatua_ck:
                     # Si article ADM
                     if line.check_adm:
-                        _logger.error('IS ADM')
+                        # _logger.error('IS ADM')
                         invoice_line_vals_no_adm.append((0, 0, line._prepare_invoice_line_non_adm(sequence=invoice_item_sequence,)),)
                         invoice_line_vals_adm.append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
                         if line.product_id.contact_adm:
-                            _logger.error('IS contact adm configure')
+                            # _logger.error('IS contact adm configure')
                             # Si une facture adm existe déjà pour ce département rajouter la ligne à la liste
                             if any(adm_invoice.get('partner_id') == line.product_id.contact_adm for adm_invoice in invoice_vals_list_adm):
                                 # ajouter la ligne d'article au liste d'articles et cumulé à la liste des facture adm
@@ -223,10 +223,8 @@ class SaleOrderInherit(models.Model):
             #=============OVERRIDE=============#
             #========================================================================#
             # --- Check if revatua is activate ---#
-            _logger.error(invoice_vals_list_adm)
             if self.env.company.revatua_ck:
                 # Facture adm partie client
-                
                 invoice_vals['invoice_line_ids'] += invoice_line_vals_no_adm
             else:
                 _logger.error('Revatua not activate : sale_order.py -> _create_invoices 3')
