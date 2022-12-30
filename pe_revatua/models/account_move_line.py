@@ -63,8 +63,8 @@ class AccountMoveLine(models.Model):
     def _onchange_product_id(self):
         # Override #
         # --- Check if revatua is activate ---#
+        res = super(AccountMoveLine,self)._onchange_product_id()
         if self.env.company.revatua_ck:
-            res = super(AccountMoveLine,self)._onchange_product_id()
             for line in self:
                 if line.product_id:
                     line.tarif_minimum = self.product_id.tarif_minimum
@@ -78,7 +78,7 @@ class AccountMoveLine(models.Model):
                     line.base_rpa = self.product_id.tarif_rpa
                     line.tarif_rpa = self.product_id.tarif_rpa
                     line.tarif_minimum_rpa = self.product_id.tarif_minimum_rpa
-            return res
+        return res
    
     # Méthode de calcule pour les tarifs par lignes
     def _compute_amount_base_revatua(self, base, qty, discount, mini_amount=0):
@@ -204,9 +204,11 @@ class AccountMoveLine(models.Model):
     @api.model
     def create(self, vals_list):
         _logger.error('Revatua create')
+        _logger.error(vals_list)
         if not vals_list.get('currency_id'):
             vals_list['currency_id'] = self.env.company.currency_id.id
-        return super(AMoveLine,self).create(vals_list)
+        res = super(AMoveLine,self).create(vals_list)
+        return res        
     
 # --------------------------------- Méthode de récupération des champs du model : account.admg  --------------------------------- #  
 
