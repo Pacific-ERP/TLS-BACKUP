@@ -28,21 +28,6 @@ class SaleOrderInherit(models.Model):
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
     
-    # Vérification de l'avancement des livraisons     
-    # @api.depends('delivery_line.state','is_deliver')
-    # def _get_deliveries_state(self):
-    #     # Override
-    #     for sale in self:
-    #         if sale.state not in ('sale', 'done'):
-    #             sale.delivery_status = 'no'
-    #             continue
-    #         if any(line.state != 'done' for line in sale.delivery_line):
-    #             sale.delivery_status = 'in_delivery'
-    #         elif (all(line.state == 'done' for line in sale.delivery_line) and sale.delivery_line) or sale.is_deliver:
-    #             sale.delivery_status = 'all_delivered'
-    #         else:
-    #             sale.delivery_status = 'no'
-    
     # Calcul des parts client et ADM
     @api.onchange('order_line')
     def _total_tarif(self):
@@ -53,11 +38,15 @@ class SaleOrderInherit(models.Model):
             for order in self:
                 # Sum tarif_terrestre and maritime
                 for line in order.order_line:
+                    taxe = 0.0
+                    for tax in line.tax_id.filtered(lambda tax_line: tax_line.amount in (1,13)):
+                        taxe += tax.amount
+                    # _logger.error(taxe)
                     if line.check_adm:
                         sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
-                        sum_customer += line.price_total - (line.tarif_maritime + line.tarif_rpa_ttc)
+                        sum_customer += line.tarif_terrestre * (1+(taxe/100))
                     else:
-                        sum_customer += line.price_total
+                        sum_customer += line.price_subtotal
                 # Write fields values car les champs sont en readonly
                 order.write({'sum_adm' : sum_adm, 'sum_customer' : sum_customer})
         else:
@@ -93,6 +82,7 @@ class SaleOrderInherit(models.Model):
                 'contact_expediteur': self.contact_expediteur,
                 'commune_dest': self.commune_dest,
                 'contact_dest': self.contact_dest,
+                'invoice_line_ids': [],
             })
         else:
             _logger.error('Revatua not activate : sale_order.py -> _prepare_invoice')
@@ -119,7 +109,7 @@ class SaleOrderInherit(models.Model):
         #==================================#
         #=============OVERRIDE=============#
         #========================================================================#
-        # Préparation des valeurs pour la factures ADM
+        # [] : Variable qui regroupe la liste des factures adm
         invoice_vals_list_adm = []
         #========================================================================#
         #=============OVERRIDE=============#
@@ -143,6 +133,7 @@ class SaleOrderInherit(models.Model):
             # --- Check if revatua is activate ---#
             if self.env.company.revatua_ck:
                 journal = self.env['account.journal'].sudo().search([('name','=','Facture ADM')])
+                # {} : Dictionnaire des valeur pour la création d'une facture
                 invoice_vals_adm = order._prepare_invoice()
                 invoice_vals_adm.update({
                     'is_adm_invoice':True,
@@ -188,15 +179,31 @@ class SaleOrderInherit(models.Model):
                 #=============OVERRIDE=============#
                 #========================================================================#
                 # --- Check if revatua is activate ---#
+                # Si Fonctionnalité Revatua
                 if self.env.company.revatua_ck:
+                    # Si article ADM
                     if line.check_adm:
+                        # _logger.error('IS ADM')
                         invoice_line_vals_no_adm.append((0, 0, line._prepare_invoice_line_non_adm(sequence=invoice_item_sequence,)),)
                         invoice_line_vals_adm.append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
                         if line.product_id.contact_adm:
-                            invoice_vals_adm.update({
-                                'partner_id': line.product_id.contact_adm,
-                                'partner_shipping_id': line.product_id.contact_adm,
-                            })
+                            # _logger.error('IS contact adm configure')
+                            # Si une facture adm existe déjà pour ce département rajouter la ligne à la liste
+                            if any(adm_invoice.get('partner_id') == line.product_id.contact_adm for adm_invoice in invoice_vals_list_adm):
+                                # ajouter la ligne d'article au liste d'articles et cumulé à la liste des facture adm
+                                adm_invoice = list(filter(lambda x: x['partner_id'].id == line.product_id.contact_adm.id, invoice_vals_list_adm))[1]
+                                adm_invoice['invoice_line_ids'].append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
+                            # Sinon ajouter une facture à la liste avec le bon client
+                            else:
+                                invoice_sub = order._prepare_invoice()
+                                invoice_sub.update({
+                                    'partner_id': line.product_id.contact_adm,
+                                    'partner_shipping_id': line.product_id.contact_adm,
+                                    'is_adm_invoice':True,
+                                    'journal_id':journal.id,
+                                })
+                                invoice_sub['invoice_line_ids'].append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
+                                invoice_vals_list_adm.append(invoice_sub)
                     else:
                         invoice_line_vals.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence,)),)
                 else:
@@ -217,9 +224,8 @@ class SaleOrderInherit(models.Model):
             #========================================================================#
             # --- Check if revatua is activate ---#
             if self.env.company.revatua_ck:
+                # Facture adm partie client
                 invoice_vals['invoice_line_ids'] += invoice_line_vals_no_adm
-                invoice_vals_adm['invoice_line_ids'] += invoice_line_vals_adm
-                invoice_vals_list_adm.append(invoice_vals_adm)
             else:
                 _logger.error('Revatua not activate : sale_order.py -> _create_invoices 3')
             #========================================================================#

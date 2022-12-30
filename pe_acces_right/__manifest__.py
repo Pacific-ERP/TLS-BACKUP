@@ -18,6 +18,7 @@
     "depends": ["purchase","stock"],
     "data": [
         "security/security_groups.xml",
+        "views/account_move.xml",
         "views/purchase_view_inherit.xml",
         "views/product_template.xml"
         ],

@@ -2,32 +2,32 @@
 <odoo><data>
     
     <template id="pe_custom_web_products_item" inherit_id="website_sale.products_item">
-        <!-- Retrait du bouton d'ajout d'un CRM -->
-<!--         <xpath expr="//t[1]/t[2]/div" position="replace"/> -->
-        <div class="card-body p-0 o_wsale_product_information">
-            <div class="p-2 o_wsale_product_information_text">
-                <h6 class="o_wsale_products_item_title mb-1">
-                    <a class="text-primary text-decoration-none" itemprop="name" style="font-size:16px;" t-att-href="product_href" t-att-content="product.name" t-field="product.name"/>
-                    <t t-if="product.default_code">
-                        <br></br>
-                        <span class="text-primary text-decoration-none" style="font-size:16px;color:#2B2275 !important;" t-esc="'[%s]' % product.default_code"/>
-                    </t>
-                    <a role="button" t-if="not product.website_published" t-att-href="product_href" class="btn btn-sm btn-danger" title="This product is unpublished.">Unpublished</a>
-                </h6>
-                <div class="product_price mb-1" itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer">
-                    <span class="h5" t-if="combination_info['price'] and combination_info['price'] > 1" t-esc="combination_info['price']" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
-                    <del t-attf-class="text-danger ml-1 h6 {{'' if combination_info['has_discounted_price'] else 'd-none'}}" style="white-space: nowrap;" t-esc="combination_info['list_price']" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
-                    <t t-if="combination_info['price'] > 1">
-                        <span itemprop="price" style="display:none;" t-esc="combination_info['price']"/>
-                        <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name"/>
-                    </t>
-                    <t t-else="">
-                        <span class="h5" style="color:red;">Prix sur devis</span>
-                    </t>
+        <xpath expr="//div[2]" position="replace">
+            <div class="card-body p-0 o_wsale_product_information">
+                <div class="p-2 o_wsale_product_information_text">
+                    <h6 class="o_wsale_products_item_title mb-1">
+                        <a class="text-primary text-decoration-none" itemprop="name" style="font-size:16px;" t-att-href="product_href" t-att-content="product.name" t-field="product.name"/>
+                        <t t-if="product.default_code">
+                            <br></br>
+                            <span class="text-primary text-decoration-none" style="font-size:16px;color:#2B2275 !important;" t-esc="'[%s]' % product.default_code"/>
+                        </t>
+                        <a role="button" t-if="not product.website_published" t-att-href="product_href" class="btn btn-sm btn-danger" title="This product is unpublished.">Unpublished</a>
+                    </h6>
+                    <div class="product_price mb-1" itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer">
+                        <span class="h5" t-if="combination_info['price'] and combination_info['price'] > 1" t-esc="combination_info['price']" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                        <del t-attf-class="text-danger ml-1 h6 {{'' if combination_info['has_discounted_price'] else 'd-none'}}" style="white-space: nowrap;" t-esc="combination_info['list_price']" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                        <t t-if="combination_info['price'] > 1">
+                            <span itemprop="price" style="display:none;" t-esc="combination_info['price']"/>
+                            <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name"/>
+                        </t>
+                        <t t-else="">
+                            <span class="h5" style="color:red;">Prix sur devis</span>
+                        </t>
+                    </div>
                 </div>
+                <div class="o_wsale_product_btn pl-2"/>
             </div>
-            <div class="o_wsale_product_btn pl-2"/>
-        </div>
+        </xpath>
     </template>
 
 </data></odoo>

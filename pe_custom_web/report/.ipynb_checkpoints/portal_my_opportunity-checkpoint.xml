@@ -23,7 +23,7 @@
                         <div class="row mb-2">
                             <strong class="col-12 col-sm-6">Date de livraison souhaitée</strong>
                             <div class="col">
-                                <span t-if="opportunity.x_studio_date_order" t-field="opportunity.x_studio_date_order"/>
+                                <span t-if="opportunity.x_studio_date_de_livraison_souhaite_1" t-field="opportunity.x_studio_date_order"/>
                             </div>
                         </div>
                         <!-- Champs : Date de fermeture prévu -->

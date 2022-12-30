@@ -57,17 +57,17 @@ class AccountTaxInherit(models.Model):
             # La taxe s'applique que à la part Terrestre base_amount = montant HT multilier par 0.6 pour obtenir la part terrestre
             # Soucis sur la récupe de la coche société car calcul fait sur les deux société
             if terrestre or rpa: # and self.env.company.revatua_ck
-                _logger.error('if rpa or terrestre')
+                # _logger.error('if rpa or terrestre')
                 remise = 1-(discount/100)
                 base_amount = terrestre
                 # Arrondis down pour la CPS uniquement
                 if 'CPS' in self.name:
-                    _logger.error('if cps')
-                    terrestre = math.floor(base_amount * self.amount / 100)
+                    # _logger.error('if cps')
+                    terrestre = math.ceil(base_amount * self.amount / 100)
                     if rpa:
-                        _logger.error('if rpa')
+                        # _logger.error('if rpa')
                         rpa_amount = round((math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)) * self.amount / 100,1)
-                        _logger.error('ter :%s | rpa:%s' % (terrestre,rpa_amount))
+                        # _logger.error('ter :%s | rpa:%s' % (terrestre,rpa_amount))
                         return terrestre + rpa_amount
                     else:
                         return terrestre
@@ -96,7 +96,6 @@ class AccountTaxInherit(models.Model):
     
     # Ajout du paramètre discount pour le calcul de la taxe uniquement sur terrestre
     def compute_all(self, price_unit, currency=None, quantity=1.0, product=None, partner=None, is_refund=False, handle_price_include=True, include_caba_tags=False, discount=0.0, terrestre=0, maritime=0, adm=False, rpa=0):
-        _logger.error('###### -- compute_all -- ######')
         """ Returns all information required to apply taxes (in self + their children in case of a tax group).
             We consider the sequence of the parent for group of taxes.
                 Eg. considering letters as taxes and alphabetic order as sequence :

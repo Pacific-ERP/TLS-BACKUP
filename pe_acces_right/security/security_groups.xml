@@ -12,5 +12,9 @@
         <record id="pe_limited_product_access" model="res.groups">
             <field name="name">Inventaire / Modif article limité</field>
         </record>
+        
+        <record id="pe_create_credit_note" model="res.groups">
+            <field name="name">Facturation / Retrait du bouton d'avoir</field>
+        </record>
     </data>
 </odoo>

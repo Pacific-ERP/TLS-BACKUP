@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="account.view_move_form" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='payment_reference']" position="after">
-                <field name="pe_bc"/>
+                <field name="pe_bc" string="Réf commande client"/>
                 <field name="pe_destination"/>
             </xpath>
         </field>

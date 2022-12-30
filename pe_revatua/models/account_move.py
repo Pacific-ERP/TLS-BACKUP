@@ -63,19 +63,20 @@ class AccountMoveInherit(models.Model):
         if self.env.company.revatua_ck:
             sum_customer = 0
             sum_adm = 0
-            for order in self:
+            for move in self:
                 # Sum tarif_terrestre and maritime
-                for line in order.invoice_line_ids:
+                for line in move.order_line:
+                    taxe = 0.0
+                    for tax in line.tax_id.filtered(lambda tax_line: tax_line.amount in (1,13)):
+                        taxe += tax.amount
+                    # _logger.error(taxe)
                     if line.check_adm:
-                        sum_adm += line.tarif_maritime + line.tarif_rpa
-                        sum_customer += line.price_total - (line.tarif_maritime + line.tarif_rpa)
+                        sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
+                        sum_customer += line.tarif_terrestre * (1+(taxe/100))
                     else:
-                        sum_customer += line.price_total
+                        sum_customer += line.price_subtotal
                 # Write fields values car les champs sont en readonly
-                order.write({
-                    'sum_adm' : sum_adm,
-                    'sum_customer' : sum_customer,
-                })
+                move.write({'sum_adm' : sum_adm, 'sum_customer' : sum_customer})
         else:
             _logger.error('Revatua not activate : sale_order.py -> _total_tarif')
     
