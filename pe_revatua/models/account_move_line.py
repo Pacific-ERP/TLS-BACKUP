@@ -145,7 +145,7 @@ class AccountMoveLine(models.Model):
         )
     
     @api.model
-    def _get_price_total_and_subtotal_model(self, price_unit, quantity, discount, currency, product, partner, taxes, move_type, terrestre, maritime, adm, rpa):
+    def _get_price_total_and_subtotal_model(self, price_unit, quantity, discount, currency, product, partner, taxes, move_type, terrestre=None, maritime=None, adm=None, rpa=None):
         ''' This method is used to compute 'price_total' & 'price_subtotal'.
 
         :param price_unit:  The current price unit.
@@ -199,16 +199,6 @@ class AccountMoveLine(models.Model):
         if currency:
             res = {k: currency.round(v) for k, v in res.items()}
         return res
-    
-    # Erreur de création
-    @api.model
-    def create(self, vals_list):
-        _logger.error('Revatua create')
-        _logger.error(vals_list)
-        if not vals_list.get('currency_id'):
-            vals_list['currency_id'] = self.env.company.currency_id.id
-        res = super(AMoveLine,self).create(vals_list)
-        return res        
     
 # --------------------------------- Méthode de récupération des champs du model : account.admg  --------------------------------- #  
 

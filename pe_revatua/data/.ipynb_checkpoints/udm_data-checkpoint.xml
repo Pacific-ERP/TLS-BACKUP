@@ -7,20 +7,20 @@
     
         <!-- UOM.UOM -->
         <!-- ref -->
-        <record id="revatua_udm_ref" model="uom.uom">
+<!--         <record id="revatua_udm_ref" model="uom.uom">
             <field name="category_id" ref="pe_revatua.revatua_udm_category"/>
             <field name="name">ref</field>
             <field name="uom_type">reference</field>
             <field name="factor_inv" eval='1'/>
             <field name="rounding" eval='0.001'/>
-        </record>
+        </record> -->
     
         <!-- m³ -->
         <record id="revatua_udm_mcube" model="uom.uom">
             <field name="category_id" ref="pe_revatua.revatua_udm_category"/>
             <field name="name">m3</field>
-            <field name="uom_type">bigger</field>
-            <field name="factor_inv" eval='1000'/>
+            <field name="uom_type">reference</field>
+            <field name="factor_inv" eval='1'/>
             <field name="rounding" eval='0.001'/>
         </record>
     
@@ -29,7 +29,7 @@
             <field name="category_id" ref="pe_revatua.revatua_udm_category"/>
             <field name="name">T</field>
             <field name="uom_type">bigger</field>
-            <field name="factor_inv" eval='1000'/>
+            <field name="factor_inv" eval='1'/>
             <field name="rounding" eval='0.001'/>
         </record>
     
@@ -38,7 +38,7 @@
             <field name="category_id" ref="pe_revatua.revatua_udm_category"/>
             <field name="name">T/m³</field>
             <field name="uom_type">bigger</field>
-            <field name="factor_inv" eval='1000'/>
+            <field name="factor_inv" eval='1'/>
             <field name="rounding" eval='0.001'/>
         </record>
     
