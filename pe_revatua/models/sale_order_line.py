@@ -132,6 +132,7 @@ class SaleOrderLineInherit(models.Model):
             self.write(vals)
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> product_id_change')
+        _logger.error(res)
         return res        
     
 # --------------------------------- Calcul de l'udm : si poids + volume alors product_qty = (poids+volume)/2, sinon soit l'un soit l'autre --------------------------------- #
