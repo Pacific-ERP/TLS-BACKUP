@@ -2,7 +2,7 @@
 {
     "name": "Vente : Ajout des détails d'état de facturation et livraison(PE)",
     "summary": "Récupère l'état d'avancement des facture et livraison lié à la vente et les affiches sur la vue list du modèle ventes",
-    "version": "15.0.0.0.2",
+    "version": "15.0.0.0.3",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",
