@@ -5,6 +5,7 @@ from odoo import fields, models, api
 
 _logger = logging.getLogger(__name__)
 
+# Opportunité
 class CrmLead(models.Model):
     _inherit = "crm.lead"
     
@@ -37,3 +38,12 @@ class CrmLead(models.Model):
             record.pe_sale_counter = 0
             if record.order_ids:
                 record.pe_sale_counter = len(record.order_ids)
+
+from odoo import fields, models
+
+# Etape des CRM
+class CrmStage(models.Model):
+
+    _inherit = "crm.stage"
+
+    company_id = fields.Many2one(string="Company", comodel_name="res.company", default=lambda self: self.env.company.id, index=True)
