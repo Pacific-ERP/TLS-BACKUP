@@ -30,6 +30,10 @@ class CrmLead(models.Model):
         for crm in res:
             if crm.partner_id.grade_id:
                 crm.partner_assigned_id = crm.partner_id
+            if crm.company_id.id == 1:
+                crm.stage_id = self.env['crm.stage'].search([('id','=',2)])
+            else:
+                crm.stage_id = self.env['crm.stage'].search([('id','=',1)])
         return res
     
     # Compteur pour les devis
