@@ -26,14 +26,13 @@ class CrmLead(models.Model):
     # Permet d'auto assigner le client à l'opportunité
     @api.model_create_multi
     def create(self, vals_list):
+        # Override #
         res = super(CrmLead, self).create(vals_list)
         for crm in res:
             if crm.partner_id.grade_id:
                 crm.partner_assigned_id = crm.partner_id
-            if crm.company_id.id == 1:
-                crm.stage_id = self.env['crm.stage'].search([('id','=',2)])
-            else:
-                crm.stage_id = self.env['crm.stage'].search([('id','=',1)])
+            if not crm.company_id:
+                crm.company_id = self.env.company.id
         return res
     
     # Compteur pour les devis
