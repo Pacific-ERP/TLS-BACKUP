@@ -6,35 +6,36 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form" />
         <field name="arch" type="xml">
+            <!-- Bouton ouverture des achats -->
+            <xpath expr="//button[@name='action_show_potential_duplicates']" position="after">
+                <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-shopping-basket" attrs="{'invisible': [('pe_purchase_counter', '=', 0)]}">
+                    <div class="o_stat_info">
+                        <field name="pe_purchase_counter" class="o_stat_value"/>
+                        <span class="o_stat_text" attrs="{'invisible': [('pe_purchase_counter', '&lt;', 2)]}"> Achats</span>
+                        <span class="o_stat_text" attrs="{'invisible': [('pe_purchase_counter', '&gt;', 1)]}"> Achat</span>
+                    </div>
+                </button>
+            </xpath>
             <!-- modification avec xpath  // recherche sur tout le documents -->
             <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
                 <page string="Factures">
-                  <field name='invoice_ids'>
-                  </field>
+                    <field name='invoice_ids'>
+                    </field>
                 </page>
                 <page string="Achats">
-                  <field name='purchase_ids'>
-                  </field>
+                    <field name='purchase_ids'>
+                    </field>
+                    <field name="pe_purchase_counter" invisible="1"/>
                 </page>
             </xpath>
+            <!-- Bouton création d'achat -->
             <xpath expr="//header" position="inside">
                 <button string="Nouvel Achat" name="action_purchase_quotations_new" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('type', '=', 'lead'), '&amp;', ('probability', '=', 0), ('active', '=', False)]}"/>
             </xpath>
         </field>
     </record>
-<!--     List      -->
-<!--     <record id="pe_crm_account_inherit_list_view" model="ir.ui.view">
-        <field name="name">pe.crm.account.inherit.list.view</field>
-        <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor" />
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="after">
-                <field name="invoice_ids" widget="many2many_tags"/>
-            </xpath>
-        </field>
-        </record> -->
     
-    <!-- action de renvoie vers la création d'une facture (repris de la création d'un devis) Créer/Visualiser --> 
+<!-- action de renvoie vers la création d'une facture (repris de la création d'un devis) Créer/Visualiser --> 
     <record id="purchase_action_quotations_new" model="ir.actions.act_window">
         <field name="name">CRM : Création d'un Achat</field>
         <field name="res_model">purchase.order</field>
