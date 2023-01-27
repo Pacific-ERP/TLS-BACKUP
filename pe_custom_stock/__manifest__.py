@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Pacific-ERP: Customisation module Stock",
-    "summary": "Modification fait dans le module achat",
+    "summary": "Modification fait dans le module stock",
     'description': """
-        Long description of module's purpose
+        - Modifier la méthoded de calcul d'arrondis erreur car arrondi à 0
     """,
     "version": "15.0.0.0.2",
     "category": "Uncategorized",
