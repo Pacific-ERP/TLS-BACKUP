@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <template id="pe_custom_web_payment_checkout" inherit_id="website_sale.payment_footer">
+        <xpath expr="//div[1]" position="before">
+        <section class="s_website_form pt16 pb16 o_colored_level" data-vcss="001" data-snippet="s_website_form" data-name="Form" style="background-image: none;">
+        <div class="s_allow_columns container">
+          <h3 style="text-align: center;"><font class="text-o-color-1"><u>Information supplém​e​ntaire</u></font>​<font style="font-size: 62px;"/><br/></h3>
+        </div>
+        <div class="container">
+    <!--      <form action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-pre-fill="true" data-success-mode="message" data-success-page="/contactus-thank-you" data-model_name="crm.lead">-->
+            <div class="s_website_form_rows row s_col_no_bgcolor">
+              <div class="form-group s_website_form_field col-12 s_website_form_required" data-type="char" data-name="Field" data-visibility-condition="" data-visibility-between="">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="oef8rg3y6upe">
+                    <span class="s_website_form_label_content">Nom/Prénom</span>
+                    <span class="s_website_form_mark"> *</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="contact_name" required="1" data-fill-with="name" id="oef8rg3y6upe" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;"/>
+                  </div>
+                </div>
+              </div>
+              <div data-visibility-condition="" data-visibility-between="" class="form-group s_website_form_field col-12" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="og6ctw8dltzu">
+                    <span class="s_website_form_label_content">Vini/Téléphone</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="phone" placeholder="" id="og6ctw8dltzu" data-fill-with="phone"/>
+                  </div>
+                </div>
+              </div>
+              <div data-visibility-condition="" data-visibility-between="" class="form-group s_website_form_field col-12 s_website_form_required" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="oskzuemlc51n">
+                    <span class="s_website_form_label_content">E-mail</span>
+                    <span class="s_website_form_mark"> *</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="email_from" required="1" placeholder="" id="oskzuemlc51n" data-fill-with="email"/>
+                  </div>
+                </div>
+              </div>
+              <div data-visibility-condition="" data-visibility-between="" class="form-group s_website_form_field col-12 s_website_form_required" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="ou5lvz91i5lf">
+                    <span class="s_website_form_label_content">Société</span>
+                    <span class="s_website_form_mark"> *</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="partner_name" required="1" placeholder="" id="ou5lvz91i5lf" data-fill-with="commercial_company_name"/>
+                  </div>
+                </div>
+              </div>
+              <div data-visibility-condition="" data-visibility-between="" class="form-group s_website_form_field col-12 col-lg-12 s_website_form_required" data-type="selection" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class=" col-sm-auto s_website_form_label " style="width: 200px" for="ol0gwxxq67m">
+                    <span class="s_website_form_label_content">Priorité de la commande</span>
+                    <span class="s_website_form_mark"> *</span>
+                  </label>
+                  <div class="col-sm">
+                    <div class="row s_col_no_resize s_col_no_bgcolor s_website_form_multiple" data-name="x_studio_priorit_de_la_commande" data-display="horizontal">
+                      <div class="radio col-12 col-lg-4 col-md-6">
+                        <div class="form-check">
+                          <input type="radio" class="s_website_form_input form-check-input" id="ol0gwxxq67m0" name="x_studio_priorit_de_la_commande" value="" data-fill-with="undefined" required=""/>
+                          <label class="form-check-label s_website_form_check_label" for="ol0gwxxq67m0">
+                    Normal
+                </label>
+                        </div>
+                      </div>
+                      <div class="radio col-12 col-lg-4 col-md-6">
+                        <div class="form-check">
+                          <input type="radio" class="s_website_form_input form-check-input" id="ol0gwxxq67m1" name="x_studio_priorit_de_la_commande" value="Carénage" required=""/>
+                          <label class="form-check-label s_website_form_check_label" for="ol0gwxxq67m1">
+                    Carénage
+                </label>
+                        </div>
+                      </div>
+                      <div class="radio col-12 col-lg-4 col-md-6">
+                        <div class="form-check">
+                          <input type="radio" class="s_website_form_input form-check-input" id="ol0gwxxq67m2" name="x_studio_priorit_de_la_commande" value="Sécurité" required=""/>
+                          <label class="form-check-label s_website_form_check_label" for="ol0gwxxq67m2">
+                    Sécurité
+                </label>
+                        </div>
+                      </div>
+                      <div class="radio col-12 col-lg-4 col-md-6">
+                        <div class="form-check">
+                          <input type="radio" class="s_website_form_input form-check-input" id="ol0gwxxq67m3" name="x_studio_priorit_de_la_commande" value="Urgent" required=""/>
+                          <label class="form-check-label s_website_form_check_label" for="ol0gwxxq67m3">
+                    Urgent
+                </label>
+                        </div>
+                      </div>
+                      <div class="radio col-12 col-lg-4 col-md-6">
+                        <div class="form-check">
+                          <input type="radio" class="s_website_form_input form-check-input" id="ol0gwxxq67m4" name="x_studio_priorit_de_la_commande" value="Très urgent" required=""/>
+                          <label class="form-check-label s_website_form_check_label" for="ol0gwxxq67m4">
+                    Très urgent
+                </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div data-visibility-condition="" data-visibility-between="" class="form-group s_website_form_field col-12 col-lg-12 s_website_form_required" data-type="date" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="ovl7zsov8c5d">
+                    <span class="s_website_form_label_content">Date de livraison souhaitée</span>
+                    <span class="s_website_form_mark"> *</span>
+                  </label>
+                  <div class="col-sm">
+                    <div class="s_website_form_date input-group date" id="datepicker07267671295064382" data-target-input="nearest">
+                      <input type="text" class="form-control datetimepicker-input s_website_form_input" data-target="#datepicker07267671295064382" name="x_studio_date_order" placeholder="" id="ovl7zsov8c5d" data-fill-with="undefined" required=""/>
+                      <div class="input-group-append" data-target="#datepicker07267671295064382" data-toggle="datetimepicker">
+                        <div class="input-group-text">
+                          <i class="fa fa-calendar"/>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div data-visibility-condition="" data-visibility-between="" class="form-group s_website_form_field col-12 col-lg-12 s_website_form_required" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="oaqz4umdabbo">
+                    <span class="s_website_form_label_content">Référence Client</span>
+                    <span class="s_website_form_mark"> *</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="pe_bc" required="1" value="" placeholder="" id="oaqz4umdabbo" data-fill-with="undefined"/>
+                  </div>
+                </div>
+              </div>
+              <div data-visibility-condition="" data-visibility-between="" class="form-group s_website_form_field col-12 col-lg-12 s_website_form_required" data-type="many2one" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="o5mqu9de5dhx">
+                    <span class="s_website_form_label_content">Lieu de livraison</span>
+                    <span class="s_website_form_mark">  *</span>
+                  </label>
+                  <div class="col-sm">
+                    <select class="form-control s_website_form_input" name="pe_destination" required="1" id="o5mqu9de5dhx" style="">
+                      <option value="28" selected="selected">SNACK AREMITI FERRY 2</option>
+                      <option value="29">SNACK AREMITI 6</option>
+                      <option value="30">SNACK APETAHI</option>
+                      <option value="31">GUICHET TRANSPORT</option>
+                      <option value="32">GUICHET PAPEETE</option>
+                      <option value="33">GUICHET MOOREA</option>
+                      <option value="34">BUREAU TG</option>
+                      <option value="35">BUREAU INTERSPORT</option>
+                      <option value="36">BUREAU RATERE PPT</option>
+                      <option value="37">BUREAU TMM</option>
+                      <option value="38">BUREAU TMH</option>
+                      <option value="39">AREMITI 6</option>
+                      <option value="40">AREMITI FERRY 2</option>
+                      <option value="41">APETAHI</option>
+                      <option value="42">MACHINE AREMITI FERRY 2</option>
+                      <option value="43">MACHINE AREMITI 6</option>
+                      <option value="44">MACHINE APETAHI</option>
+                      <option value="45">PONT AREMITI FERRY 2</option>
+                      <option value="46">PONT AREMITI 6</option>
+                      <option value="47">PONT APETAHI</option>
+                      <option value="48">BUREAU DORY</option>
+                      <option value="49">TAC RAIATEA</option>
+                      <option value="50">TERRAIN TAUNOA</option>
+                      <option value="51">BUREAU EUGENE</option>
+                      <option value="52">ENTREPOT EUGENE</option>
+                      <option value="53">ENTREPOT TLS</option>
+                      <option value="54">ENTREPOT DORY</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div data-visibility-condition="" data-visibility-between="" class="form-group s_website_form_field col-12 col-lg-12 s_website_form_custom s_website_form_required" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="o7wzp97jynls">
+                    <span class="s_website_form_label_content">Société demandeuse</span>
+                    <span class="s_website_form_mark"> *</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="Société demandeuse" required="1" value="" placeholder="" id="o7wzp97jynls" data-fill-with="undefined"/>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group s_website_form_field col-12 s_website_form_model_required s_website_form_field_hidden" data-type="char" data-name="Field" data-visibility-condition="" data-visibility-between="">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="o4d2ptl9pjot">
+                    <span class="s_website_form_label_content">Sujet</span>
+                    <span class="s_website_form_mark"> *</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="name" required="true" value="Demande de devis" placeholder="" id="o4d2ptl9pjot" data-fill-with="undefined"/>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group s_website_form_field col-12 s_website_form_dnone" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px">
+                    <span class="s_website_form_label_content"/>
+                  </label>
+                  <div class="col-sm">
+                    <input type="hidden" class="form-control s_website_form_input" name="team_id" value="2"/>
+                  </div>
+                </div>
+              </div>
+              <!--<div class="form-group col-12 s_website_form_submit col-lg-12 text-right s_website_form_no_submit_label" data-name="Submit Button" data-original-title="" title="" aria-describedby="tooltip303625">-->
+              <!--  <div style="width: 200px;" class="s_website_form_label"/>-->
+              <!--  <a href="#" role="button" class="btn btn-primary btn-lg s_website_form_send o_default_snippet_text">Soumettre</a>-->
+              <!--  <span id="s_website_form_result" class="text-success ml8"/>-->
+              <!--</div>-->
+            </div>
+    <!--      </form>-->
+    <!--      <div class="s_website_form_end_message d-none">-->
+    <!--        <div class="oe_structure">-->
+    <!--          <section class="s_text_block pt64 pb64 o_colored_level o_cc o_cc2" data-snippet="s_text_block" style="background-image: none;" data-name="Text">-->
+    <!--            <div class="container">-->
+    <!--              <h2 class="text-center"><span class="fa fa-check-circle"/>Information récupéré</h2>-->
+    <!--              <p class="text-center" data-original-title="" title="" aria-describedby="tooltip161095">-->
+    <!--                        Notre équipe vous renverra un message dès que possible.-->
+    <!--                    </p>-->
+    <!--            </div>-->
+    <!--          </section>-->
+    <!--        </div>-->
+    <!--      </div>-->
+        </div>
+      </section>
+    </xpath>
+    </template>
+
+</data></odoo>

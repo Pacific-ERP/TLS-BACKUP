@@ -168,11 +168,15 @@ class SaleOrderLineInherit(models.Model):
             param mini_amount : Minimum que la part peut prendre
         """
         res = 0.0
+        _logger.error('rem : %s | qty:%s | base:%s | mini_amount:%s' % (discount,qty,base,mini_amount))
         # Si minimum et Si part inférieur minimum alors res = minimum
         if mini_amount and ((base * discount) * qty) < mini_amount:
+            _logger.error('if')
             res = mini_amount
         else :
+            _logger.error('else')
             res = (base * discount) * qty
+        _logger.error('remise : %s' % res)
         return res
         
     # Calcul des part terrestre et maritime selon la quantité et la remise
@@ -185,9 +189,9 @@ class SaleOrderLineInherit(models.Model):
                 quantity = line.product_uom_qty
                 line.tarif_terrestre = line._compute_amount_base_revatua(line.base_terrestre, quantity, discount, line.tarif_minimum_terrestre)
                 line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, discount, line.tarif_minimum_maritime)
-                line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, discount, line.tarif_minimum_rpa)
+                line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, 1, line.tarif_minimum_rpa)
                 # Tarif RPA = Tarif RPA HT = Tartif RPA TTC - 5% - 1%
-                line.tarif_rpa = line.tarif_rpa_ttc - (line.tarif_rpa_ttc * 0.05 + line.tarif_rpa_ttc * 0.01)
+                line.tarif_rpa = round(line.tarif_rpa_ttc / 1.06,0)
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _compute_revatua_part')
         

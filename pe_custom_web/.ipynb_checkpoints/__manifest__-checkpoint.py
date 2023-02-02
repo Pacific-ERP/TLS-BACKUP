@@ -25,5 +25,6 @@
         "report/products_item.xml",
         "report/product_price.xml",
         "report/sale_order_portal_template.xml",
+        # "report/payment_checkout.xml",
         ],
 }

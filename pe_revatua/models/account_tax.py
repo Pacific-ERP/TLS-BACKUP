@@ -28,14 +28,13 @@ class AccountTaxInherit(models.Model):
                 # --- Check if revatua is activate ---#
                 # self.env.company.revatua_ck test si l'article à une part terrestre car lors d'un calcul fait par odoo il calcul sur TLS et renvoie unen fausse taxe
                 if product.tarif_terrestre and self.name == 'RPA' and product.tarif_rpa:
-                    remise = 1-(discount/100)
-                    rpa = product.tarif_rpa*remise
+                    # remise = 1-(discount/100)
+                    # rpa = product.tarif_rpa*remise
                     # Si un coût minimum RPA est configuré et que le total RPA(qty*rpa) et inférieur au minimum RPA
                     if product.tarif_minimum_rpa and (math.copysign(quantity, base_amount) * rpa) < product.tarif_minimum_rpa:
                         return product.tarif_minimum_rpa
                     else:
-                        total_rpa = math.copysign(quantity, base_amount) * rpa 
-                        return total_rpa - (total_rpa * 0.05 + total_rpa * 0.01)
+                        return rpa
                 else:
                     return math.copysign(quantity, base_amount) * self.amount
                 #========================================================================#
@@ -58,7 +57,7 @@ class AccountTaxInherit(models.Model):
             # Soucis sur la récupe de la coche société car calcul fait sur les deux société
             if terrestre or rpa: # and self.env.company.revatua_ck
                 # _logger.error('if rpa or terrestre')
-                remise = 1-(discount/100)
+                # remise = 1-(discount/100)
                 base_amount = terrestre
                 # Arrondis down pour la CPS uniquement
                 if 'CPS' in self.name:
@@ -66,13 +65,13 @@ class AccountTaxInherit(models.Model):
                     terrestre = math.ceil(base_amount * self.amount / 100)
                     if rpa:
                         # _logger.error('if rpa')
-                        rpa_amount = round((math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)) * self.amount / 100,1)
+                        rpa_amount = round((math.copysign(quantity, base_amount) * rpa) * self.amount / 100,1)
                         # _logger.error('ter :%s | rpa:%s' % (terrestre,rpa_amount))
                         return terrestre + rpa_amount
                     else:
                         return terrestre
                 elif 'TVA 5%' in self.name and product.tarif_rpa:
-                    return (math.copysign(quantity, base_amount) * (product.tarif_rpa * remise)) * self.amount / 100
+                    return (math.copysign(quantity, base_amount) * rpa) * self.amount / 100
                 else:
                     return base_amount * self.amount / 100
             else:
