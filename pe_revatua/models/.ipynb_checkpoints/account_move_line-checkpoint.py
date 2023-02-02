@@ -109,18 +109,18 @@ class AccountMoveLine(models.Model):
                 if not line.move_id.is_adm_invoice:
                     line.tarif_terrestre = line._compute_amount_base_revatua(line.base_terrestre, quantity, discount, line.tarif_minimum_terrestre)
                     line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, discount, line.tarif_minimum_maritime)
-                    line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, discount, line.tarif_minimum_rpa)
+                    line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, 1, line.tarif_minimum_rpa)
                     # Tarif RPA = Tarif RPA HT = Tartif RPA TTC - 5% - 1%
-                    line.tarif_rpa = line.tarif_rpa_ttc - (line.tarif_rpa_ttc * 0.05 + line.tarif_rpa_ttc * 0.01)
+                    line.tarif_rpa = line.tarif_rpa_ttc / 1.06
                 # Facture ADM
                 else:
                     # Partie administration
                     rpa = self.env['account.tax'].sudo().search([('name','=','RPA')])
                     if line.check_adm:
                         line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, discount, line.tarif_minimum_maritime)
-                        line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, discount, line.tarif_minimum_rpa)
+                        line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, 1, line.tarif_minimum_rpa)
                         # Tarif RPA = Tarif RPA HT = Tartif RPA TTC - 5% - 1%
-                        line.tarif_rpa = line.tarif_rpa_ttc - (line.tarif_rpa_ttc * 0.05 + line.tarif_rpa_ttc * 0.01)
+                        line.tarif_rpa = line.tarif_rpa_ttc / 1.06
                         line.tarif_terrestre = 0.0
                         line.tax_ids = [(6,0,[rpa.id])]
         else:
