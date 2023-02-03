@@ -126,7 +126,8 @@ class SaleOrderLineInherit(models.Model):
                 'tarif_maritime' : self.product_id.tarif_maritime,
                 'tarif_minimum_maritime' : self.product_id.tarif_minimum_maritime,
                 'base_rpa' : self.product_id.tarif_rpa,
-                'tarif_rpa' : self.product_id.tarif_rpa,
+                'tarif_rpa_ttc' : self.product_id.tarif_rpa,
+                'tarif_rpa' : round(self.product_id.tarif_rpa / 1.06,0) if self.product_id.tarif_rpa else 0.0,
                 'tarif_minimum_rpa' : self.product_id.tarif_minimum_rpa,
             }
             self.write(vals)
