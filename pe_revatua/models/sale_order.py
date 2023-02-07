@@ -46,7 +46,7 @@ class SaleOrderInherit(models.Model):
                         sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
                         sum_customer += line.tarif_terrestre * (1+(taxe/100))
                     else:
-                        sum_customer += line.price_subtotal
+                        sum_customer += line.price_total
                 # Write fields values car les champs sont en readonly
                 order.write({'sum_adm' : sum_adm, 'sum_customer' : sum_customer})
         else:

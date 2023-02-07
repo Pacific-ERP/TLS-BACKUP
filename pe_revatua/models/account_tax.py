@@ -61,21 +61,9 @@ class AccountTaxInherit(models.Model):
                 base_amount = terrestre
                 # Arrondis down pour la CPS uniquement
                 if 'CPS' in self.name:
-                    # _logger.error('if cps')
+                    # _logger.error('if cps') arrondi haut cps
                     terrestre = math.ceil(base_amount * self.amount / 100)
-                    if rpa:
-                        # _logger.error('if rpa')
-                        rpa_amount = round(rpa * self.amount / 100,1)
-                        # _logger.error('ter :%s | rpa:%s' % (terrestre,rpa_amount))
-                        return terrestre + rpa_amount
-                    else:
-                        return terrestre
-                elif 'TVA 5%' in self.name and product.tarif_rpa:
-                    tva_5 = rpa * self.amount / 100
-                    _logger.error(self.amount / 100)
-                    _logger.error(rpa)
-                    _logger.error(tva_5)
-                    return tva_5
+                    return terrestre
                 else:
                     return base_amount * self.amount / 100
             else:

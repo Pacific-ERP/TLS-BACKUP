@@ -127,7 +127,7 @@ class SaleOrderLineInherit(models.Model):
                 'tarif_minimum_maritime' : self.product_id.tarif_minimum_maritime,
                 'base_rpa' : self.product_id.tarif_rpa,
                 'tarif_rpa_ttc' : self.product_id.tarif_rpa,
-                'tarif_rpa' : round(self.product_id.tarif_rpa / 1.06,0) if self.product_id.tarif_rpa else 0.0,
+                'tarif_rpa' : self.product_id.tarif_rpa, #round(self.product_id.tarif_rpa / 1.06,0) if self.product_id.tarif_rpa else 0.0,
                 'tarif_minimum_rpa' : self.product_id.tarif_minimum_rpa,
             }
             self.write(vals)
@@ -192,7 +192,7 @@ class SaleOrderLineInherit(models.Model):
                 line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, discount, line.tarif_minimum_maritime)
                 line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, 1, line.tarif_minimum_rpa)
                 # Tarif RPA = Tarif RPA HT = Tartif RPA TTC - 5% - 1%
-                line.tarif_rpa = round(line.tarif_rpa_ttc / 1.06,0)
+                line.tarif_rpa = line._compute_amount_base_revatua(line.base_rpa, quantity, 1, line.tarif_minimum_rpa) #round(line.tarif_rpa_ttc / 1.06,0)
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _compute_revatua_part')
         
