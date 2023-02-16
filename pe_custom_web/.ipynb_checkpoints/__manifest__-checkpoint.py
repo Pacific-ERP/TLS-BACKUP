@@ -15,7 +15,7 @@
     "license": "LGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["sale","website_crm_partner_assign"],
+    "depends": ["sale","website_crm_partner_assign","payment"],
     "data": [
         "views/portal_my_home_menu_lead.xml",
         "report/portal_my_orders.xml",
