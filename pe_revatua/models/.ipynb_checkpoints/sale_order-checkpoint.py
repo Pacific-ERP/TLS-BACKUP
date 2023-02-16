@@ -125,26 +125,6 @@ class SaleOrderInherit(models.Model):
             
             invoice_vals = order._prepare_invoice()
             invoiceable_lines = order._get_invoiceable_lines(final)
-            
-            #############################################################################################################################
-            #==================================#
-            #=============OVERRIDE=============#
-            #========================================================================#
-            # --- Check if revatua is activate ---#
-            if self.env.company.revatua_ck:
-                journal = self.env['account.journal'].sudo().search([('name','=','Facture ADM')])
-                # {} : Dictionnaire des valeur pour la création d'une facture
-                invoice_vals_adm = order._prepare_invoice()
-                invoice_vals_adm.update({
-                    'is_adm_invoice':True,
-                    'journal_id':journal.id,
-                })
-            else:
-                _logger.error('Revatua not activate : sale_order.py -> _create_invoices 1')
-            #========================================================================#
-            #=============OVERRIDE=============#
-            #==================================#
-            #############################################################################################################################
 
             if not any(not line.display_type for line in invoiceable_lines):
                 continue
@@ -181,6 +161,7 @@ class SaleOrderInherit(models.Model):
                 # --- Check if revatua is activate ---#
                 # Si Fonctionnalité Revatua
                 if self.env.company.revatua_ck:
+                    journal_adm = self.env['account.journal'].sudo().search([('name','=','Facture ADM'),('company_id','=', order.company_id.id)])
                     # Si article ADM
                     if line.check_adm:
                         # _logger.error('IS ADM')
@@ -200,7 +181,7 @@ class SaleOrderInherit(models.Model):
                                     'partner_id': line.product_id.contact_adm,
                                     'partner_shipping_id': line.product_id.contact_adm,
                                     'is_adm_invoice':True,
-                                    'journal_id':journal.id,
+                                    'journal_id':journal_adm.id,
                                 })
                                 invoice_sub['invoice_line_ids'].append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
                                 invoice_vals_list_adm.append(invoice_sub)

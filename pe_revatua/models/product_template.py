@@ -100,19 +100,19 @@ class ProductTemplateInherit(models.Model):
         if self.env.company.revatua_ck:
             rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
             tva_5 = self.env['account.tax'].sudo().search([('name','=','TVA 5%'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
-            if rpa and tva_5:
+            if rpa:
                 for record in self:
-                    # Ajout de la taxe RPA et tva 5% si le montant RPA existe
+                    # Ajout de la taxe RPA et tva 5% si le montant RPA existe modification taxe 5% retiré
                     if record.tarif_rpa:
                         # Taxe RPA
                         record.taxes_id = [(4, rpa.id)]
                         # Taxe 5%
-                        record.taxes_id = [(4, tva_5.id)]
+                        # record.taxes_id = [(4, tva_5.id)]
                     # Retire la RPA et tva 5% si montant 0
                     else:
                         if any(str(rpa.id) == str(taxe.id) for taxe in record.taxes_id):
                             record.taxes_id = [(3,rpa.id)]
-                            record.taxes_id = [(3,tva_5.id)]
+                            # record.taxes_id = [(3,tva_5.id)]
             else:
                 raise UserError("La taxe 'RPA' ou la taxe 'TVA 5%' n'est pas existant, la créer manuellement")
         else:
