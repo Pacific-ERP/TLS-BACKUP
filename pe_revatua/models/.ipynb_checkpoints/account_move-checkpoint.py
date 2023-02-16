@@ -65,9 +65,9 @@ class AccountMoveInherit(models.Model):
             sum_adm = 0
             for move in self:
                 # Sum tarif_terrestre and maritime
-                for line in move.order_line:
+                for line in move.invoice_line_ids:
                     taxe = 0.0
-                    for tax in line.tax_id.filtered(lambda tax_line: tax_line.amount in (1,13)):
+                    for tax in line.tax_ids.filtered(lambda tax_line: tax_line.amount in (1,13)):
                         taxe += tax.amount
                     # _logger.error(taxe)
                     if line.check_adm:
