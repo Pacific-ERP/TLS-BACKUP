@@ -77,6 +77,8 @@ class AccountMoveInherit(models.Model):
                         sum_customer += line.price_total
                 # Write fields values car les champs sont en readonly
                 move.write({'sum_adm' : sum_adm, 'sum_customer' : sum_customer})
+                if any(line.check_adm for line in move.invoice_line_ids):
+                    move.is_adm_invoice = True
         else:
             _logger.error('Revatua not activate : sale_order.py -> _total_tarif')
     

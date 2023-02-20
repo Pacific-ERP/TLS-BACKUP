@@ -435,6 +435,9 @@ class AccountTaxInherit(models.Model):
 
         base_rep_lines = base_taxes_for_tags.mapped(is_refund and 'refund_repartition_line_ids' or 'invoice_repartition_line_ids').filtered(lambda x: x.repartition_type == 'base')
         
+        # _logger.error(' HT : %s ' % (sign * total_excluded))
+        # _logger.error(' TTC : %s ' % (sign * total_included))
+        
         return {
             'base_tags': base_rep_lines.tag_ids.ids + product_tag_ids,
             'taxes': taxes_vals,

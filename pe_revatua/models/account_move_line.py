@@ -60,15 +60,24 @@ class AccountMoveLine(models.Model):
 
 # --------------------------------- Calcules des lignes  --------------------------------- #
     @api.onchange('product_id')
-    def _onchange_product_id(self):
+    def pe_onchange_product_id(self):
         # Override #
         # --- Check if revatua is activate ---#
-        res = super(AccountMoveLine,self)._onchange_product_id()
+        # res = super(AccountMoveLine,self)._onchange_product_id()
         if self.env.company.revatua_ck:
+            # _logger.error('TAXES')
+            # tva_16 = self.env['account.tax'].sudo().search([('name','=','TVA 16%'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
+            # _logger.error(tva_16)
+            # tva_13 = self.env['account.tax'].sudo().search([('name','=','TVA 13%'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
+            # _logger.error(tva_13)
+            # rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
+            # _logger.error(rpa)
+            # tva_cps = self.env['account.tax'].sudo().search([('name','=','TVA CPS 1%'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
+            # _logger.error(tva_cps)
             for line in self:
                 if line.product_id:
-                    line.tarif_minimum = line.product_id.tarif_minimum
                     line.check_adm = line.product_id.check_adm
+                    line.tarif_minimum = line.product_id.tarif_minimum
                     line.base_terrestre = line.product_id.tarif_terrestre
                     line.tarif_terrestre = line.product_id.tarif_terrestre
                     line.tarif_minimum_terrestre = line.product_id.tarif_minimum_terrestre
@@ -78,7 +87,28 @@ class AccountMoveLine(models.Model):
                     line.base_rpa = line.product_id.tarif_rpa
                     line.tarif_rpa = line.product_id.tarif_rpa
                     line.tarif_minimum_rpa = line.product_id.tarif_minimum_rpa
-        return res
+                    # Facture ADM
+                    if line.move_id.journal_id.id == 27:
+                        _logger.error('Facture ADM')
+                        # Ligne ADM pas de terrestre
+                        if line.product_id.check_adm:
+                            _logger.error('Ligne ADM')
+                            line.price_unit = line.product_id.tarif_maritime
+                            line.move_id.is_adm_invoice = True
+                            line.base_terrestre = 0.0
+                            line.tarif_terrestre = 0.0
+                            line.tarif_minimum_terrestre = 0.0
+                    # Facture Client 
+                    else:
+                        _logger.error('Facture Client')
+                        # Ligne ADM pas de maritime
+                        if line.product_id.check_adm:
+                            _logger.error('Ligne ADM')
+                            line.price_unit = line.product_id.tarif_terrestre
+                            line.move_id.is_adm_invoice = True
+                            line.base_maritime = 0.0
+                            line.tarif_maritime = 0.0
+                            line.tarif_minimum_maritime = 0.0
    
     # Méthode de calcule pour les tarifs par lignes
     def _compute_amount_base_revatua(self, base, qty, discount, mini_amount=0):
@@ -95,11 +125,13 @@ class AccountMoveLine(models.Model):
             res = mini_amount
         else :
             res = (base * discount) * qty
+        _logger.error(res)
         return res
         
     # Calcul des part terrestre et maritime selon la quantité et la remise
     @api.onchange('quantity','discount')
     def _compute_revatua_part(self):
+        _logger.error('_compute_revatua_part')
         if self.env.company.revatua_ck:
             for line in self:
                 # Remise si existant : remise < 1 sinon = 1
@@ -115,7 +147,7 @@ class AccountMoveLine(models.Model):
                 # Facture ADM
                 else:
                     # Partie administration
-                    rpa = self.env['account.tax'].sudo().search([('name','=','RPA')])
+                    rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
                     if line.check_adm:
                         line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, discount, line.tarif_minimum_maritime)
                         line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, 1, line.tarif_minimum_rpa)
