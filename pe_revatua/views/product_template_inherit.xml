@@ -20,7 +20,7 @@
                     <field name="famille_produit"/>
                 </xpath>
                 <xpath expr="//field[@name='uom_po_id']" position="after">
-                    <field name="contact_adm" attrs="{'invisible': [['check_adm','=',False]], 'required': [['check_adm','!=',False]]}" string="Département (ADM)" domain="[['id_adm','=',True]]"/>
+                    <field name="contact_adm" attrs="{'invisible': [['check_adm','=',False]], 'required': [['check_adm','!=',False]]}" string="Département (ADM)" domain="[['id_adm','=',True]]" context="{'default_id_adm': True}"/>
                 </xpath>
                 <!-- Champs tarif Revatua -->
                 <xpath expr="//notebook/page[1]/group[1]" position="after">

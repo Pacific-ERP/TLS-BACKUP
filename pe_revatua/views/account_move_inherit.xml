@@ -69,6 +69,7 @@
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/group[1]/group[1]/field[@name='narration']" position="after">
                 <field name="sum_customer"/>
                 <field name="sum_adm"/>
+                <field name="is_adm_invoice"/>
             </xpath>
              <!-- champs custom revatua -->
             <xpath expr="//group[@id='header_right_group']" position="after">
