@@ -273,11 +273,11 @@ class SaleOrderLineInherit(models.Model):
                 'base_terrestre':self.base_terrestre,
                 'base_total':self.price_total,
             })
-            # tax_list=[]
-            # for tax in self.tax_id:
-            #     if not tax.name == 'TVA 13%':
-            #         tax_list.append(tax.id)
-            values.update({'tax_ids' : []})
+            tax_list=[]
+            for tax in self.tax_id:
+                if tax.name == 'RPA':
+                    tax_list.append(tax.id)
+            values.update({'tax_ids' : tax_list})
         else:
             _logger.error('Revatua not activate : sale_order_line.py -> _prepare_invoice_line_adm_part')
         return values

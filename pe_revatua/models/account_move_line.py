@@ -38,23 +38,23 @@ class AccountMoveLine(models.Model):
     tarif_minimum = fields.Float(string='Prix Minimum', default=0, required=True, store=True)
     
 # --------------------------------- Calcul de l'udm à utiliser  --------------------------------- #
-    @api.onchange('r_volume','r_weight')
+    @api.onchange('product_uom','r_volume','r_weight')
     def _onchange_update_qty(self):
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
             # Poid volumétrique
-            if self.product_uom.name == 'T/m³' and self.r_volume and self.r_weight:
+            if self.product_uom_id.name == 'T/m³' and self.r_volume and self.r_weight:
                 self.quantity = round((self.r_volume + self.r_weight) / 2,3)
             # Tonne
-            elif self.product_uom.name == 'T' and self.r_weight:
+            elif self.product_uom_id.name == 'T' and self.r_weight:
                 self.quantity = self.r_weight
             # Métre cube
-            elif self.product_uom.name == 'm3' and self.r_volume:
+            elif self.product_uom_id.name == 'm3' and self.r_volume:
                 self.quantity = self.r_volume
             # Autres 
             else:
                 self.quantity = 1
-                self.product_uom = self.product_id.uom_id
+                self.product_uom_id = self.product_id.uom_id
         else:
             _logger.error('Revatua not activate : account_move_line.py -> _onchange_update_qty')
 
@@ -67,17 +67,17 @@ class AccountMoveLine(models.Model):
         if self.env.company.revatua_ck:
             for line in self:
                 if line.product_id:
-                    line.tarif_minimum = self.product_id.tarif_minimum
-                    line.check_adm = self.product_id.check_adm
-                    line.base_terrestre = self.product_id.tarif_terrestre
-                    line.tarif_terrestre = self.product_id.tarif_terrestre
-                    line.tarif_minimum_terrestre = self.product_id.tarif_minimum_terrestre
-                    line.base_maritime = self.product_id.tarif_maritime
-                    line.tarif_maritime = self.product_id.tarif_maritime
-                    line.tarif_minimum_maritime = self.product_id.tarif_minimum_maritime
-                    line.base_rpa = self.product_id.tarif_rpa
-                    line.tarif_rpa = self.product_id.tarif_rpa
-                    line.tarif_minimum_rpa = self.product_id.tarif_minimum_rpa
+                    line.tarif_minimum = line.product_id.tarif_minimum
+                    line.check_adm = line.product_id.check_adm
+                    line.base_terrestre = line.product_id.tarif_terrestre
+                    line.tarif_terrestre = line.product_id.tarif_terrestre
+                    line.tarif_minimum_terrestre = line.product_id.tarif_minimum_terrestre
+                    line.base_maritime = line.product_id.tarif_maritime
+                    line.tarif_maritime = line.product_id.tarif_maritime
+                    line.tarif_minimum_maritime = line.product_id.tarif_minimum_maritime
+                    line.base_rpa = line.product_id.tarif_rpa
+                    line.tarif_rpa = line.product_id.tarif_rpa
+                    line.tarif_minimum_rpa = line.product_id.tarif_minimum_rpa
         return res
    
     # Méthode de calcule pour les tarifs par lignes
