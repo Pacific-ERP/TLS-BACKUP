@@ -19,7 +19,7 @@
                 </xpath>
                 <!-- Client unituqment aremiti -->
                 <xpath expr="//field[@name='partner_id']" position="replace">
-                    <field name="partner_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" domain="[('company_id','=',allowed_company_ids[0])]" options='{"always_reload":true}'/>
+                    <field name="partner_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" domain="['|',('company_id','=',allowed_company_ids[0]),('company_id','=',False)]" options='{"always_reload":true}'/>
                 </xpath>
                 <!-- champs custom revatua -->
                 <xpath expr="//group[@name='sale_header']" position="after">
