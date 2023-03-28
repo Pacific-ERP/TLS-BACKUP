@@ -107,7 +107,6 @@ class AccountMoveLine(models.Model):
         """
         # Effectue une condition ternaire plutôt qu'une instruction if / else 
         res = mini_amount if (mini_amount and ((base * discount) * qty) < mini_amount) else (base * discount) * qty
-        _logger.error(res)
         return res
         
     # Recalcul des part terrestre et maritime selon la quantité et la remise
@@ -148,7 +147,6 @@ class AccountMoveLine(models.Model):
     # Recalcul des Totaux pour les lignes ADM (Client et Administration)
     def _get_revatua_totals(self, type, terrestre, maritime, adm, rpa, product):
         _logger.error('----------------------- _get_revatua_totals -----------------------')
-        ('ter:%s mar:%s adm:%s rpa:%s' % (terrestre, maritime, adm, rpa))
         total_excluded = sum(filter(None, [terrestre, maritime]))
         if adm and maritime:
             total_included = maritime + rpa if rpa else 0.0
@@ -157,7 +155,6 @@ class AccountMoveLine(models.Model):
         else:
             total_included = total_excluded + sum([(total_excluded * (tax.amount/100)) for tax in product.taxes_id]) if product.taxes_id else 0.0  
 
-        _logger.error('Inclu : %s | Exclu : %s' % (total_included, total_excluded))
         return total_excluded if type == 'excluded' else total_included
         
     def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None, terrestre=None, maritime=None, adm=None, rpa=None, type=None):
@@ -195,7 +192,6 @@ class AccountMoveLine(models.Model):
         :return:            A dictionary containing 'price_subtotal' & 'price_total'.
         '''
         res = {}
-        
         # OVERRIDE >>>
         # ----- Modification du prix unitaire pour chaque état possible d'une facture Aremiti ----- #
         if self.env.company.revatua_ck:
@@ -219,13 +215,9 @@ class AccountMoveLine(models.Model):
 
         # Compute 'price_total'.
         if taxes:
-            
         # OVERRIDE >>>
         # ----- Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre) ----- #
             if self.env.company.revatua_ck:
-                # _logger.error('test')
-                # _logger.error('taxes_res rpa :%s' % rpa)
-                # _logger.error('ter:%s mar:%s adm:%s rpa:%s' % (terrestre, maritime, adm, rpa))
                 taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
                 quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'), terrestre=terrestre, maritime=maritime, adm=adm, discount=discount, rpa=rpa)
                 taxes_res['total_excluded'] = self._get_revatua_totals('excluded', terrestre, maritime, adm, rpa, product)
@@ -233,24 +225,21 @@ class AccountMoveLine(models.Model):
             else:
                 taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
                 quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'))
-            # _logger.error('Inclus : %s | exclus : %s' %(taxes_res['total_excluded'], taxes_res['total_included']))
             res['price_subtotal'] = taxes_res['total_excluded']
             res['price_total'] = taxes_res['total_included']
         else:
-            # _logger.error('Res : %s' % res)
             res['price_total'] = res['price_subtotal'] = subtotal
         # <<< OVERRIDE
         
         #In case of multi currency, round before it's use for computing debit credit
         if currency:
             res = {k: currency.round(v) for k, v in res.items()}
-        _logger.error('Res : %s' % res)
         return res
-    
+        
     # Méthode de récupération des champs du model : account.admg
     def _prepare_line_admg(self, sequence=1):
         self.ensure_one()
-        rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
+        rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=', self.env.company.id),('type_tax_use','=','sale')])
         vals = {
             'sequence': sequence,
             'display_type': self.display_type,

@@ -178,7 +178,7 @@ class ProductTemplateInherit(models.Model):
         # Override #
         currency = self.currency_id
         if self.tarif_terrestre:
-            res = self.taxes_id.compute_all(price, product=self, partner=self.env['res.partner'], terrestre=self.tarif_terrestre)
+            res = self.taxes_id.compute_all(price, product=self, partner=self.env['res.partner'], terrestre=self.tarif_terrestre, rpa=self.tarif_rpa, maritime=self.tarif_maritime)
         else:
             res = self.taxes_id.compute_all(price, product=self, partner=self.env['res.partner'])
         joined = []

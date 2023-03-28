@@ -40,7 +40,7 @@ class SaleOrderInherit(models.Model):
                 taxes = sum(tax.amount/100 for tax in line.tax_id)
                 if line.check_adm:
                     sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
-                    sum_customer += line.tarif_terrestre * (1+(taxes))
+                    sum_customer += line.tarif_terrestre + (line.price_tax - line.tarif_rpa_ttc) 
                 else:
                     sum_customer += line.price_total
 
@@ -259,20 +259,6 @@ class SaleOrderInherit(models.Model):
                     line[2]['sequence'] = SaleOrderLine._get_invoice_line_sequence(new=sequence, old=line[2]['sequence'])
                     sequence += 1
                     
-        # # OVERRIDE >>>
-        # # --- Check if revatua is activate ---#
-        # if self.env.company.revatua_ck:
-        #     if len(invoice_vals_list_adm) < len(self):
-        #         SaleOrderLine = self.env['sale.order.line']
-        #         for invoice in invoice_vals_list_adm:
-        #             sequence = 1
-        #             for line in invoice['invoice_line_ids']:
-        #                 line[2]['sequence'] = SaleOrderLine._get_invoice_line_sequence(new=sequence, old=line[2]['sequence'])
-        #                 sequence += 1
-        # else:
-        #     _logger.error('Revatua not activate : sale_order_line.py -> product_id_change')
-        # # <<< OVERRIDE
-        
         # Manage the creation of invoices in sudo because a salesperson must be able to generate an invoice from a
         # sale order without "billing" access rights. However, he should not be able to create an invoice from scratch.
         moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list)
@@ -289,9 +275,11 @@ class SaleOrderInherit(models.Model):
             )
             # OVERRIDE >>>
             # --- Check if revatua is activate ---#
+            # Recalculer les totaux car utilisation d'une méthode à la création qui foire les totaux à la création
             if self.env.company.revatua_ck:
-                _logger.error('############ MEGA ##########')
                 for line in move.invoice_line_ids:
                     line._get_price_total_and_subtotal()
+                    line['price_subtotal'] = line._get_revatua_totals('excluded', line.tarif_terrestre, line.tarif_maritime, line.check_adm, line.tarif_rpa, line.product_id)
+                    line['price_total'] = line._get_revatua_totals('included', line.tarif_terrestre, line.tarif_maritime, line.check_adm, line.tarif_rpa, line.product_id)
             # <<< OVERRIDE
         return moves
