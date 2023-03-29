@@ -10,6 +10,9 @@ _logger = logging.getLogger(__name__)
 class SaleOrderInherit(models.Model):
     _inherit = "sale.order"
     
+    # Vérification si la coche Revatua est activé
+    revatua_ck = fields.Boolean(string="Mode Revatua", related="company_id.revatua_ck")
+    
     #Lieu Livraison
     commune_recup = fields.Many2one(string='Commune de récupération',comodel_name='res.commune')
     ile_recup = fields.Char(string='Île de récupération', related='commune_recup.ile_id.name', store=True)

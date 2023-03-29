@@ -9,6 +9,9 @@ _logger = logging.getLogger(__name__)
 class ProductTemplateInherit(models.Model):
     _inherit = "product.template"
     
+    # Vérification si la coche Revatua est activé
+    revatua_ck = fields.Boolean(string="Mode Revatua", related="company_id.revatua_ck")
+    
     #Fields Autres
     check_adm = fields.Boolean(string='Payé par ADM',
                                default=False)
@@ -59,8 +62,6 @@ class ProductTemplateInherit(models.Model):
     
     def _compute_ratio_ter_mer(self, tarif_ter , tarif_normal):
         if tarif_ter and tarif_normal:
-            # Ratio terrestre = tarif terrestre / tarif normal
-            # Ratio maritime = 1 - ratio terrestre
             self.write({'ratio_terrestre': tarif_ter/tarif_normal,
                         'ratio_maritime' : 1 - (tarif_ter/tarif_normal) })
     

@@ -2,7 +2,7 @@
 <odoo><data>
     <!-- list -->
         <record model="ir.ui.view" id="revatua_account_move_adm_list">
-            <field name="name">revatua.account.move.adm.list</field>
+            <field name="name">Pacific-ERP account.move.adm : pe_revatua (list)</field>
             <field name="model">account.move.adm</field>
             <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
             <field name="arch" type="xml">
@@ -17,7 +17,7 @@
         </record>
     <!-- form -->
         <record model="ir.ui.view" id="revatua_account_move_adm_form">
-            <field name="name">revatua.account.move.adm.form</field>
+            <field name="name">Pacific-ERP account.move.adm : pe_revatua (form)</field>
             <field name="model">account.move.adm</field>
             <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
             <field name="arch" type="xml">
@@ -56,9 +56,9 @@
                                         <field name="quantity" optional="show" string="Qté"/>
                                         <field name="price_subtotal" optional="show" string="Total HT"/>
                                         <field name="tax_id" widget="many2many_tags" readonly="1" optional="hide" string="Taxes"/>
-                                        <field name="tarif_terrestre" optional="hide" string="Terrestre" sum="Terrestre"/>
-                                        <field name="tarif_maritime" optional="show" string="Maritime" sum="Maritime"/>
-                                        <field name="tarif_rpa" optional="show" string="RPA" sum="RPA"/>
+                                        <field name="tarif_terrestre" digits="[42,0]" optional="hide" string="Terrestre" sum="Terrestre"/>
+                                        <field name="tarif_maritime" digits="[42,0]" optional="show" string="Maritime" sum="Maritime"/>
+                                        <field name="tarif_rpa" digits="[42,0]" optional="show" string="RPA" sum="RPA"/>
                                         <field name="price_total" optional="show" string="Total TTC"/>
                                     </tree>
                                 </field>
@@ -67,18 +67,18 @@
                                         <field name="note_adm" class="oe-bordered-editor" nolabel="1" placeholder="Notes..."/>
                                     </group>
                                     <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
-                                        <field name='total_ht' />
-                                        <field name='total_rpa' />
-                                        <field name='total_ttc' style="font-weight: bold;"/>
+                                        <field name="total_ht" widget="monetary"/>
+                                        <field name="total_rpa" widget="monetary"/>
+                                        <field name="total_ttc" widget="monetary" style="font-weight: bold;"/>
                                     </group>
                                     <div class="oe_clear"/>
                                 </group>
                             </page>
                             <page string="Factures">
-                                <field name="invoice_line_ids" context="{'search_default_posted':1}" domain="[('is_adm_invoice','=',True),('adm_group_id','=',False)]"  attrs="{'readonly':[('state','=','done')]}">
-                                    <tree default_order='invoice_date asc'>
+                                <field name="invoice_line_ids" context="{'search_default_posted':1}" domain="[('is_adm_invoice','=',True),('adm_group_id','=',False)]" attrs="{'readonly':[('state','=','done')]}">
+                                    <tree default_order="invoice_date asc">
                                         <field name="name" decoration-bf="1" optional="show"/>
-                                        <field name="invoice_partner_display_name" string='Administration' optional="show"/>
+                                        <field name="invoice_partner_display_name" string="Administration" optional="show"/>
                                         <field name="invoice_date" optional="show"/>
                                         <field name="amount_untaxed_signed" string="Total HT" sum="Total HT" optional="show"/>
                                         <field name="amount_tax_signed" string="Tax" sum="Total" optional="hide"/>
@@ -90,7 +90,7 @@
                                     </tree>
                                 </field>
                             </page>
-                            <page string='MT' groups="base.group_no_one">
+                            <page string="MT" groups="base.group_no_one">
                                 <field name="invoice_ids"/>
                             </page>
                         </notebook>
