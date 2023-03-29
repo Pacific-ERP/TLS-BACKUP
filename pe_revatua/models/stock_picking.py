@@ -4,6 +4,8 @@ from odoo import fields, models, api
 class StockPickingInherit(models.Model):
     _inherit = "stock.picking"
     
+    # Vérification si la coche Revatua est activé
+    revatua_ck = fields.Boolean(string="Mode Revatua", related="company_id.revatua_ck")
     travel_date = fields.Datetime(string='Date de voyage')
     
     #Lieu Livraison
