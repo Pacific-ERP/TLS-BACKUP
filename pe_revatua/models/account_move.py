@@ -74,7 +74,7 @@ class AccountMoveInherit(models.Model):
                         taxe += tax.amount
                     # _logger.error(taxe)
                     if line.check_adm:
-                        sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
+                        sum_adm += round(line.tarif_maritime, 0) + round(line.tarif_rpa_ttc, 0)
                         sum_customer += line.tarif_terrestre * (1+(taxe/100))
                     else:
                         sum_customer += line.price_total

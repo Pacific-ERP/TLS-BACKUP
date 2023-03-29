@@ -107,7 +107,7 @@ class AccountMoveLine(models.Model):
         """
         # Effectue une condition ternaire plutôt qu'une instruction if / else 
         res = mini_amount if (mini_amount and ((base * discount) * qty) < mini_amount) else (base * discount) * qty
-        return res
+        return round(res, 0)
         
     # Recalcul des part terrestre et maritime selon la quantité et la remise
     @api.onchange('quantity','discount')
@@ -147,7 +147,10 @@ class AccountMoveLine(models.Model):
     # Recalcul des Totaux pour les lignes ADM (Client et Administration)
     def _get_revatua_totals(self, type, terrestre, maritime, adm, rpa, product):
         _logger.error('----------------------- _get_revatua_totals -----------------------')
+        terrestre = round(terrestre, 0) if terrestre else None
+        maritime = round(maritime, 0) if maritime else None
         total_excluded = sum(filter(None, [terrestre, maritime]))
+        
         if adm and maritime:
             total_included = maritime + rpa if rpa else 0.0
         elif product.check_adm and terrestre:
@@ -155,7 +158,7 @@ class AccountMoveLine(models.Model):
         else:
             total_included = total_excluded + sum([(total_excluded * (tax.amount/100)) for tax in product.taxes_id]) if product.taxes_id else 0.0  
 
-        return total_excluded if type == 'excluded' else total_included
+        return round(total_excluded, 0) if type == 'excluded' else round(total_included, 0)
         
     def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None, terrestre=None, maritime=None, adm=None, rpa=None, type=None):
         # OVERRIDE

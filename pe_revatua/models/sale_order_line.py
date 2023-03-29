@@ -295,7 +295,7 @@ class SaleOrderLineInherit(models.Model):
             else: # Ligne normal non ADM
                 values.update({
                     'tarif_rpa': self.tarif_rpa,
-                    'tarif_maritime': self.tarif_rpa_ttc,
+                    'tarif_maritime': self.tarif_maritime,
                     'tarif_rpa_ttc' : self.tarif_rpa_ttc,
                     'tarif_terrestre': self.tarif_terrestre,
                 })
