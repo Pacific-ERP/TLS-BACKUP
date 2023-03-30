@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import math
 from odoo import fields, models, api
 from odoo.addons.account.models.account_move import AccountMoveLine as AMoveLine
 
@@ -150,13 +151,21 @@ class AccountMoveLine(models.Model):
         terrestre = round(terrestre, 0) if terrestre else None
         maritime = round(maritime, 0) if maritime else None
         total_excluded = sum(filter(None, [terrestre, maritime]))
-        
+        totals_tax = 0.0
+        # Calcul des taxes
+        if product.taxes_id:
+            for tax in product.taxes_id:
+                if not 'CPS' in tax.name:
+                    totals_tax += round(total_excluded * (tax.amount/100), 0)
+                else:
+                    totals_tax += math.ceil(total_excluded * (tax.amount/100))
+                        
         if adm and maritime:
             total_included = maritime + rpa if rpa else 0.0
         elif product.check_adm and terrestre:
-            total_included = total_excluded + sum([(total_excluded * (tax.amount/100)) for tax in product.taxes_id])
+            total_included = total_excluded + totals_tax
         else:
-            total_included = total_excluded + sum([(total_excluded * (tax.amount/100)) for tax in product.taxes_id]) if product.taxes_id else total_excluded  
+            total_included = total_excluded + totals_tax
 
         return round(total_excluded, 0) if type == 'excluded' else round(total_included, 0)
         
@@ -220,7 +229,7 @@ class AccountMoveLine(models.Model):
         if taxes:
         # OVERRIDE >>>
         # ----- Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre) ----- #
-            if self.env.company.revatua_ck:
+            if self.env.company.revatua_ck and self.move_id.move_type in ('out_invoice','out_refund'):
                 taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
                 quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'), terrestre=terrestre, maritime=maritime, adm=adm, discount=discount, rpa=rpa)
                 taxes_res['total_excluded'] = self._get_revatua_totals('excluded', terrestre, maritime, adm, rpa, product)
