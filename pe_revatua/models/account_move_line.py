@@ -155,10 +155,12 @@ class AccountMoveLine(models.Model):
         # Calcul des taxes
         if product.taxes_id:
             for tax in product.taxes_id:
-                if not 'CPS' in tax.name:
-                    totals_tax += round(total_excluded * (tax.amount/100), 0)
+                if 'CPS' in tax.name:
+                    totals_tax += math.ceil(terrestre * (tax.amount/100))
+                elif 'RPA' in tax.name:
+                    totals_tax += rpa
                 else:
-                    totals_tax += math.ceil(total_excluded * (tax.amount/100))
+                    totals_tax += round(terrestre * (tax.amount/100), 0)
                         
         if adm and maritime:
             total_included = maritime + rpa if rpa else 0.0
@@ -166,7 +168,8 @@ class AccountMoveLine(models.Model):
             total_included = total_excluded + totals_tax
         else:
             total_included = total_excluded + totals_tax
-
+        
+        _logger.error('HT : %s' % total_excluded if type == 'excluded' else 'TTC : %s' % total_included)
         return round(total_excluded, 0) if type == 'excluded' else round(total_included, 0)
         
     def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None, terrestre=None, maritime=None, adm=None, rpa=None, type=None):

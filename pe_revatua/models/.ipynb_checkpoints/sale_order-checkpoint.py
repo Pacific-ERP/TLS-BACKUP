@@ -282,6 +282,7 @@ class SaleOrderInherit(models.Model):
             if self.env.company.revatua_ck:
                 for line in move.invoice_line_ids:
                     line._get_price_total_and_subtotal()
+                    _logger.error('RPA %s'% line.tarif_rpa)
                     line['price_subtotal'] = line._get_revatua_totals('excluded', line.tarif_terrestre, line.tarif_maritime, line.check_adm, line.tarif_rpa, line.product_id)
                     line['price_total'] = line._get_revatua_totals('included', line.tarif_terrestre, line.tarif_maritime, line.check_adm, line.tarif_rpa, line.product_id)
             # <<< OVERRIDE
