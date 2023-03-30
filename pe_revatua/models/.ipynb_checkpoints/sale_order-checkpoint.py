@@ -10,6 +10,9 @@ _logger = logging.getLogger(__name__)
 class SaleOrderInherit(models.Model):
     _inherit = "sale.order"
     
+    # Vérification si la coche Revatua est activé
+    revatua_ck = fields.Boolean(string="Mode Revatua", related="company_id.revatua_ck")
+    
     #Lieu Livraison
     commune_recup = fields.Many2one(string='Commune de récupération',comodel_name='res.commune')
     ile_recup = fields.Char(string='Île de récupération', related='commune_recup.ile_id.name', store=True)
@@ -31,33 +34,30 @@ class SaleOrderInherit(models.Model):
     # Calcul des parts client et ADM
     @api.onchange('order_line')
     def _total_tarif(self):
-        # --- Check if revatua is activate ---#
+        # --- Check if revatua is activated ---#
         if self.env.company.revatua_ck:
             sum_customer = 0
             sum_adm = 0
-            for order in self:
-                # Sum tarif_terrestre and maritime
-                for line in order.order_line:
-                    taxe = 0.0
-                    for tax in line.tax_id.filtered(lambda tax_line: tax_line.amount in (1,13)):
-                        taxe += tax.amount
-                    # _logger.error(taxe)
-                    if line.check_adm:
-                        sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
-                        sum_customer += line.tarif_terrestre * (1+(taxe/100))
-                    else:
-                        sum_customer += line.price_total
-                # Write fields values car les champs sont en readonly
-                order.write({'sum_adm' : sum_adm, 'sum_customer' : sum_customer})
+            
+            for line in self.order_line:
+                taxes = sum(tax.amount/100 for tax in line.tax_id)
+                if line.check_adm:
+                    sum_adm += round(line.tarif_maritime, 0) + round(line.tarif_rpa_ttc, 0)
+                    sum_customer += line.tarif_terrestre + (line.price_tax - line.tarif_rpa_ttc) 
+                else:
+                    sum_customer += line.price_total
+
+            self.write({'sum_adm': sum_adm, 'sum_customer' : sum_customer})
         else:
             _logger.error('Revatua not activate : sale_order.py -> _total_tarif')
             
-    # Override de l'affichage des totals taxes en ajoutant la part terrestre
     @api.depends('order_line.tax_id', 'order_line.price_unit', 'amount_total', 'amount_untaxed')
     def _compute_tax_totals_json(self):
+        # OVERRIDE
         def compute_taxes(order_line):
             price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             order = order_line.order_id
+            # Ajout des champs Revatua au compute_all pour récupéré les bon totaux
             return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre, maritime=order_line.tarif_maritime, rpa=order_line.tarif_rpa)
 
         account_move = self.env['account.move']
@@ -67,11 +67,12 @@ class SaleOrderInherit(models.Model):
             order.tax_totals_json = json.dumps(tax_totals)
     
     #------------------------------------------------------------------------------------------------------------------------------------------#
-    #                                                    Modification Création d'une Facture(Override)                                         #
+    #                                                    Modification Création d'une Facture (Override)                                        #
     #------------------------------------------------------------------------------------------------------------------------------------------#
     
+    # Méthode de préparation des champs pour la facture
     def _prepare_invoice(self):
-        #### OVERRIDE ####
+        # OVERRIDE
         invoice_vals = super(SaleOrderInherit,self)._prepare_invoice()
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
@@ -89,6 +90,7 @@ class SaleOrderInherit(models.Model):
         return invoice_vals
 
     def _create_invoices(self, grouped=False, final=False, date=None):
+        # OVERRIDE
         """
         Create the invoice associated to the SO.
         :param grouped: if True, invoices are grouped by SO id. If False, invoices are grouped by
@@ -105,20 +107,15 @@ class SaleOrderInherit(models.Model):
                 return self.env['account.move']
 
         # 1) Create invoices.
-        #############################################################################################################################
-        #==================================#
-        #=============OVERRIDE=============#
-        #========================================================================#
+        # OVERRIDE >>>
         # [] : Variable qui regroupe la liste des factures adm
         invoice_vals_list_adm = []
-        #========================================================================#
-        #=============OVERRIDE=============#
-        #==================================#
-        #############################################################################################################################
+        # <<< OVERRIDE
         
         invoice_vals_list = []
         invoice_item_sequence = 0 # Incremental sequencing to keep the lines order on the invoice.
         for order in self:
+            
             order = order.with_company(order.company_id)
             current_section_vals = None
             down_payments = order.env['sale.order.line']
@@ -131,16 +128,12 @@ class SaleOrderInherit(models.Model):
             invoice_line_vals = []
             down_payment_section_added = False
             
-            #############################################################################################################################
-            #==================================#
-            #=============OVERRIDE=============#
-            #========================================================================#
+            # OVERRIDE >>>
+            # Variable Revatua
+            journal_adm = self.env['account.journal'].sudo().search([('name','=','Facture ADM'),('company_id','=', order.company_id.id)])
             invoice_line_vals_adm = []
             invoice_line_vals_no_adm = []
-            #========================================================================#
-            #=============OVERRIDE=============#
-            #==================================#
-            #############################################################################################################################
+            # <<< OVERRIDE
             
             for line in invoiceable_lines:
                 if not down_payment_section_added and line.is_downpayment:
@@ -154,67 +147,59 @@ class SaleOrderInherit(models.Model):
                     down_payment_section_added = True
                     invoice_item_sequence += 1
                     
-                #############################################################################################################################
-                #==================================#
-                #=============OVERRIDE=============#
-                #========================================================================#
+                # OVERRIDE >>>
                 # --- Check if revatua is activate ---#
-                # Si Fonctionnalité Revatua
                 if self.env.company.revatua_ck:
-                    journal_adm = self.env['account.journal'].sudo().search([('name','=','Facture ADM'),('company_id','=', order.company_id.id)])
                     # Si article ADM
                     if line.check_adm:
-                        # _logger.error('IS ADM')
-                        invoice_line_vals_no_adm.append((0, 0, line._prepare_invoice_line_non_adm(sequence=invoice_item_sequence,)),)
-                        invoice_line_vals_adm.append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
+                        invoice_line_vals_no_adm.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence, type="custo_part")),)
+                        invoice_line_vals_adm.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence, type="adm_part")),)
                         if line.product_id.contact_adm:
-                            # _logger.error('IS contact adm configure')
                             # Si une facture adm existe déjà pour ce département rajouter la ligne à la liste
                             if any(adm_invoice.get('partner_id') == line.product_id.contact_adm for adm_invoice in invoice_vals_list_adm):
                                 # ajouter la ligne d'article au liste d'articles et cumulé à la liste des facture adm
                                 adm_invoice = list(filter(lambda x: x['partner_id'].id == line.product_id.contact_adm.id, invoice_vals_list_adm))[1]
-                                adm_invoice['invoice_line_ids'].append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
+                                adm_invoice['invoice_line_ids'].append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence, type="adm_part")),)
                             # Sinon ajouter une facture à la liste avec le bon client
                             else:
                                 invoice_sub = order._prepare_invoice()
                                 invoice_sub.update({
-                                    'partner_id': line.product_id.contact_adm,
+                                    'partner_id': line.product_id.contact_adm.id,
                                     'partner_shipping_id': line.product_id.contact_adm,
                                     'is_adm_invoice':True,
                                     'journal_id':journal_adm.id,
                                 })
-                                invoice_sub['invoice_line_ids'].append((0, 0, line._prepare_invoice_line_adm_part(sequence=invoice_item_sequence,)),)
+                                invoice_sub['invoice_line_ids'].append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence, type="adm_part")),)
                                 invoice_vals_list_adm.append(invoice_sub)
                     else:
                         invoice_line_vals.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence,)),)
                 else:
                     _logger.error('Revatua not activate : sale_order.py -> _create_invoices 2')
                     invoice_line_vals.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence,)),)
-                #========================================================================#
-                #=============OVERRIDE=============#
-                #==================================#
-                #############################################################################################################################
+                # <<< OVERRIDE
                 
                 invoice_item_sequence += 1
             
             invoice_vals['invoice_line_ids'] += invoice_line_vals
             
-            #############################################################################################################################
-            #==================================#
-            #=============OVERRIDE=============#
-            #========================================================================#
+            # OVERRIDE >>>
             # --- Check if revatua is activate ---#
             if self.env.company.revatua_ck:
                 # Facture adm partie client
                 invoice_vals['invoice_line_ids'] += invoice_line_vals_no_adm
             else:
                 _logger.error('Revatua not activate : sale_order.py -> _create_invoices 3')
-            #========================================================================#
-            #=============OVERRIDE=============#
-            #==================================#
-            #############################################################################################################################
+            # <<< OVERRIDE
             
             invoice_vals_list.append(invoice_vals)
+            # OVERRIDE >>>
+            # --- Check if revatua is activate ---#
+            if self.env.company.revatua_ck:
+                # Facture adm partie client
+                invoice_vals_list += invoice_vals_list_adm
+            else:
+                _logger.error('Revatua not activate : sale_order.py -> _create_invoices 4')
+            # <<< OVERRIDE
         if not invoice_vals_list:
             raise self._nothing_to_invoice_error()
 
@@ -249,41 +234,6 @@ class SaleOrderInherit(models.Model):
                 new_invoice_vals_list.append(ref_invoice_vals)
             invoice_vals_list = new_invoice_vals_list
             
-            #############################################################################################################################
-            #==================================#
-            #=============OVERRIDE=============#
-            #========================================================================#
-            # --- Check if revatua is activate ---#
-            if self.env.company.revatua_ck:
-                new_invoice_vals_list_adm = []
-                invoice_vals_list_adm = sorted(invoice_vals_list_adm,key=lambda x: [x.get(grouping_key) for grouping_key in invoice_grouping_keys])
-                for grouping_keys, invoices in groupby(invoice_vals_list_adm, key=lambda x: [x.get(grouping_key) for grouping_key in invoice_grouping_keys]):
-                    origins = set()
-                    payment_refs = set()
-                    refs = set()
-                    ref_invoice_vals = None
-                    for invoice_vals in invoices:
-                        if not ref_invoice_vals:
-                            ref_invoice_vals = invoice_vals
-                        else:
-                            ref_invoice_vals['invoice_line_ids'] += invoice_vals['invoice_line_ids']
-                        origins.add(invoice_vals['invoice_origin'])
-                        payment_refs.add(invoice_vals['payment_reference'])
-                        refs.add(invoice_vals['ref'])
-                    ref_invoice_vals.update({
-                        'ref': ', '.join(refs)[:2000],
-                        'invoice_origin': ', '.join(origins),
-                        'payment_reference': len(payment_refs) == 1 and payment_refs.pop() or False,
-                    })
-                    new_invoice_vals_list_adm.append(ref_invoice_vals)
-                invoice_vals_list_adm = new_invoice_vals_list_adm
-            else:
-                _logger.error('Revatua not activate : sale_order.py -> _create_invoices 4')
-            #========================================================================#
-            #=============OVERRIDE=============#
-            #==================================#
-            #############################################################################################################################
-
         # 3) Create invoices.
 
         # As part of the invoice creation, we make sure the sequence of multiple SO do not interfere
@@ -312,48 +262,9 @@ class SaleOrderInherit(models.Model):
                     line[2]['sequence'] = SaleOrderLine._get_invoice_line_sequence(new=sequence, old=line[2]['sequence'])
                     sequence += 1
                     
-        #############################################################################################################################
-        #==================================#
-        #=============OVERRIDE=============#
-        #========================================================================#
-        # --- Check if revatua is activate ---#
-        if self.env.company.revatua_ck:
-            if len(invoice_vals_list_adm) < len(self):
-                SaleOrderLine = self.env['sale.order.line']
-                for invoice in invoice_vals_list_adm:
-                    sequence = 1
-                    for line in invoice['invoice_line_ids']:
-                        line[2]['sequence'] = SaleOrderLine._get_invoice_line_sequence(new=sequence, old=line[2]['sequence'])
-                        sequence += 1
-        else:
-            _logger.error('Revatua not activate : sale_order_line.py -> product_id_change')
-        #========================================================================#
-        #=============OVERRIDE=============#
-        #==================================#
-        #############################################################################################################################
-        
         # Manage the creation of invoices in sudo because a salesperson must be able to generate an invoice from a
         # sale order without "billing" access rights. However, he should not be able to create an invoice from scratch.
         moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list)
-        
-        #############################################################################################################################
-        #==================================#
-        #=============OVERRIDE=============#
-        #========================================================================#
-        # --- Check if revatua is activate ---#
-        if self.env.company.revatua_ck:
-            #=============# Create an ADM invoices #=============#
-            if invoice_line_vals_adm:
-                moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list_adm)
-            if invoice_line_vals_adm:
-                for order in self:
-                    order.invoice_status = 'invoiced'
-        else:
-            _logger.error('Revatua not activate : sale_order.py -> _create_invoices 5')
-        #========================================================================#
-        #=============OVERRIDE=============#
-        #==================================#
-        #############################################################################################################################
         
         # 4) Some moves might actually be refunds: convert them if the total amount is negative
         # We do this after the moves have been created since we need taxes, etc. to know if the total
@@ -365,4 +276,13 @@ class SaleOrderInherit(models.Model):
                 values={'self': move, 'origin': move.line_ids.mapped('sale_line_ids.order_id')},
                 subtype_id=self.env.ref('mail.mt_note').id
             )
+            # OVERRIDE >>>
+            # --- Check if revatua is activate ---#
+            # Recalculer les totaux car utilisation d'une méthode à la création qui foire les totaux à la création
+            if self.env.company.revatua_ck:
+                for line in move.invoice_line_ids:
+                    line._get_price_total_and_subtotal()
+                    line['price_subtotal'] = line._get_revatua_totals('excluded', line.tarif_terrestre, line.tarif_maritime, line.check_adm, line.tarif_rpa, line.product_id)
+                    line['price_total'] = line._get_revatua_totals('included', line.tarif_terrestre, line.tarif_maritime, line.check_adm, line.tarif_rpa, line.product_id)
+            # <<< OVERRIDE
         return moves

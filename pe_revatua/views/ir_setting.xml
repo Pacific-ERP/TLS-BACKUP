@@ -2,7 +2,7 @@
 <odoo><data>
     
         <record id="res_config_settings_views_revatua" model="ir.ui.view">
-            <field name="name">res.config.settings.revatua</field>
+            <field name="name">Pacific-ERP res.config.settings : pe_revatua (form)</field>
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="sale.res_config_settings_view_form" />
             <field name="arch" type="xml">

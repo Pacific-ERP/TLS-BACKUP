@@ -7,6 +7,9 @@ _logger = logging.getLogger(__name__)
 class AccountMoveInherit(models.Model):
     _inherit = "account.move"
     
+    # Vérification si la coche Revatua est activé
+    revatua_ck = fields.Boolean(string="Mode Revatua", related="company_id.revatua_ck")
+    
     is_adm_invoice = fields.Boolean(string='Est pour ADM', store=True, default=False)
     adm_group_id = fields.Many2one(string='Facture globale ADM', store=True, comodel_name='account.move.adm')
     
@@ -34,7 +37,7 @@ class AccountMoveInherit(models.Model):
     # Récupération d'une ligne pour la facture global ADM
     def _add_move_line(self, sequence=1):
         self.ensure_one()
-        title = str(self.name)+' - '+str(self.invoice_partner_display_name)
+        title = str(self.name)
         if self.invoice_origin:
             order = self.env['sale.order'].search([('name','=',self.invoice_origin)])
             if order and len(order) == 1:
@@ -71,7 +74,7 @@ class AccountMoveInherit(models.Model):
                         taxe += tax.amount
                     # _logger.error(taxe)
                     if line.check_adm:
-                        sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
+                        sum_adm += round(line.tarif_maritime, 0) + round(line.tarif_rpa_ttc, 0)
                         sum_customer += line.tarif_terrestre * (1+(taxe/100))
                     else:
                         sum_customer += line.price_total

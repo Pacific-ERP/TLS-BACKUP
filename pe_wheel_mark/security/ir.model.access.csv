@@ -1,2 +1,0 @@
-id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
-pe_wheel_mark.access_purchase_wheelmark_wizard,access_purchase_wheelmark_wizard,pe_wheel_mark.model_purchase_wheelmark_wizard,,1,1,1,1
