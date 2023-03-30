@@ -156,7 +156,7 @@ class AccountMoveLine(models.Model):
         elif product.check_adm and terrestre:
             total_included = total_excluded + sum([(total_excluded * (tax.amount/100)) for tax in product.taxes_id])
         else:
-            total_included = total_excluded + sum([(total_excluded * (tax.amount/100)) for tax in product.taxes_id]) if product.taxes_id else 0.0  
+            total_included = total_excluded + sum([(total_excluded * (tax.amount/100)) for tax in product.taxes_id]) if product.taxes_id else total_excluded  
 
         return round(total_excluded, 0) if type == 'excluded' else round(total_included, 0)
         
