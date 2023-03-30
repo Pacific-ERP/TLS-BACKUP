@@ -402,6 +402,7 @@ class AccountTaxInherit(models.Model):
                     skip_checkpoint = True
             #('ici 3')
             total_included += factorized_tax_amount
+            # _logger.error('total_included %s : %s' % (i, total_included))
             i += 1
         
         base_taxes_for_tags = taxes
@@ -412,8 +413,8 @@ class AccountTaxInherit(models.Model):
 #########################################################################
 ###      3 -  Modification du calcul du Total TTC et HT               ###
 #########################################################################
-        _logger.error(' HT : %s ' % (sign * total_excluded))
-        _logger.error(' TTC : %s ' % (sign * currency.round(total_included)))
+        # _logger.error(' HT : %s ' % (sign * total_excluded))
+        # _logger.error(' TTC : %s ' % (sign * currency.round(total_included)))
         # Override
         vals = {
             'base_tags': base_rep_lines.tag_ids.ids + product_tag_ids,
