@@ -156,11 +156,11 @@ class AccountMoveLine(models.Model):
         if product.taxes_id:
             for tax in product.taxes_id:
                 if 'CPS' in tax.name:
-                    totals_tax += math.ceil(terrestre * (tax.amount/100))
+                    totals_tax += math.ceil(terrestre * (tax.amount/100)) if terrestre else 0
                 elif 'RPA' in tax.name:
                     totals_tax += rpa
                 else:
-                    totals_tax += round(terrestre * (tax.amount/100), 0)
+                    totals_tax += round(terrestre * (tax.amount/100), 0) if terrestre else 0
                         
         if adm and maritime:
             total_included = maritime + rpa if rpa else 0.0
