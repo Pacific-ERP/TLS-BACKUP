@@ -50,7 +50,7 @@ class CrmLead(models.Model):
             'default_opportunity_id': self.id,
         }
         action['domain'] = [('opportunity_id', '=', self.id), ('state', '!=', 'cancel')]
-        orders = self.mapped('order_ids').filtered(lambda l: l.state not in ('draft', 'sent', 'cancel'))
+        orders = self.mapped('order_ids').filtered(lambda l: l.state != 'cancel')
         if len(orders) == 1:
             action['views'] = [(self.env.ref('sale.view_order_form').id, 'form')]
             action['res_id'] = orders.id
