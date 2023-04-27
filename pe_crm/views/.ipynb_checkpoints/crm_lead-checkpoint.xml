@@ -54,7 +54,7 @@
             <xpath expr="//button[@name='action_view_sale_quotation']" position="replace"/>
             
             <xpath expr="//field[@name='sale_order_count']/../.." position="replace">
-                <button class="oe_stat_button" type="object" attrs="{'invisible': ['|', ('sale_order_count', '=', 0), ('type', '=', 'lead')]}" name="action_view_sale_order" icon="fa-usd">
+                <button class="oe_stat_button" type="object" attrs="{'invisible': ['|', ('pe_sale_counter', '=', 0), ('type', '=', 'lead')]}" name="action_view_sale_order" icon="fa-usd">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value"><field name="pe_sale_counter"/></span>
                         <span class="o_stat_text"> Devis</span>

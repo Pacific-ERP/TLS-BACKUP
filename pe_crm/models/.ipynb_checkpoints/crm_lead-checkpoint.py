@@ -41,6 +41,20 @@ class CrmLead(models.Model):
             record.pe_sale_counter = 0
             if record.order_ids:
                 record.pe_sale_counter = len(record.order_ids)
+                
+    def action_view_sale_order(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("sale.action_orders")
+        action['context'] = {
+            'search_default_partner_id': self.partner_id.id,
+            'default_partner_id': self.partner_id.id,
+            'default_opportunity_id': self.id,
+        }
+        action['domain'] = [('opportunity_id', '=', self.id), ('state', '!=', 'cancel')]
+        orders = self.mapped('order_ids').filtered(lambda l: l.state not in ('draft', 'sent', 'cancel'))
+        if len(orders) == 1:
+            action['views'] = [(self.env.ref('sale.view_order_form').id, 'form')]
+            action['res_id'] = orders.id
+        return action
 
 from odoo import fields, models
 
