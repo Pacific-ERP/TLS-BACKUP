@@ -257,28 +257,40 @@ class AccountTaxInherit(models.Model):
         # if self.env.company.revatua_ck:
         # Si Uniquement part terrestre alors 100% du prix de ventes
         remise = 1-(discount/100)
+        # _logger.error('calcul du HT')
+        # _logger.error('ter %s | mar %s | adm %s | rpa %s' % (terrestre, maritime, adm, rpa))
         if product and product.tarif_terrestre and not product.tarif_maritime:
+            # _logger.error('if 1')
             # Si un tarif terrestre minimum existe et que le terrestre actuelle est plus petit que le minmum alors pv = minimum terrestre
-            if product.tarif_minimum_terrestre and (product.tarif_terrestre * quantity) < product.tarif_minimum_terrestre:
+            # _logger.error('Tarif minimum terrestre %s | %s' % (product.tarif_minimum_terrestre, (product.tarif_terrestre * quantity)))
+            if product.tarif_minimum_terrestre and (remise * (product.tarif_terrestre * quantity)) < product.tarif_minimum_terrestre:
+                # _logger.error('if 1.1')
                 total_excluded = currency.round(product.tarif_minimum_terrestre)
             else:
+                # _logger.error('else 1.1')
                 total_excluded = currency.round((remise * product.tarif_terrestre) * quantity)
         # Si deux part bien repartager
         elif product and product.tarif_terrestre and product.tarif_maritime:
+            # _logger.error('elif 2')
             # Facture ADM client et administration
             if adm:
+                # _logger.error('if 2.1')
                 total_excluded = currency.round(maritime)
             elif terrestre and not maritime:
+                # _logger.error('elif 2.2')
                 total_excluded = currency.round(terrestre)
             # Vente/Facture aremiti normal
             else:
+                # _logger.error('else 2.2')
                 pv_terrestre = currency.round((remise * product.tarif_terrestre) * quantity)
                 pv_maritime = currency.round((remise * product.tarif_maritime) * quantity)
                 # Vérif du minimum maritime
                 if product.tarif_minimum_maritime and pv_maritime < product.tarif_minimum_maritime:
+                    # _logger.error('if 2.2.1')
                     pv_maritime = product.tarif_minimum_maritime
                 # Vérif du minimum terrestre
                 if product.tarif_minimum_terrestre and pv_terrestre < product.tarif_minimum_terrestre:
+                    # _logger.error('if 2.2.1')
                     pv_terrestre = product.tarif_minimum_terrestre
                 total_excluded = pv_terrestre + pv_maritime
         #========================================================================#
@@ -413,7 +425,7 @@ class AccountTaxInherit(models.Model):
 #########################################################################
 ###      3 -  Modification du calcul du Total TTC et HT               ###
 #########################################################################
-        # _logger.error(' HT : %s ' % (sign * total_excluded))
+        _logger.error(' HT : %s ' % (sign * total_excluded))
         # _logger.error(' TTC : %s ' % (sign * currency.round(total_included)))
         # Override
         vals = {

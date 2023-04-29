@@ -235,8 +235,9 @@ class AccountMoveLine(models.Model):
             if self.env.company.revatua_ck and self.move_id.move_type in ('out_invoice','out_refund'):
                 taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
                 quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'), terrestre=terrestre, maritime=maritime, adm=adm, discount=discount, rpa=rpa)
-                taxes_res['total_excluded'] = self._get_revatua_totals('excluded', terrestre, maritime, adm, rpa, product)
-                taxes_res['total_included'] = self._get_revatua_totals('included', terrestre, maritime, adm, rpa, product)
+                if terrestre or maritime:
+                    taxes_res['total_excluded'] = self._get_revatua_totals('excluded', terrestre, maritime, adm, rpa, product)
+                    taxes_res['total_included'] = self._get_revatua_totals('included', terrestre, maritime, adm, rpa, product)
             else:
                 taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
                 quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'))
