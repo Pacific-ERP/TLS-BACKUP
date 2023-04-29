@@ -20,7 +20,7 @@ class AccountMoveInherit(models.Model):
     tel_expediteur = fields.Char(string='Téléphone expéditeur', related='contact_expediteur.phone', store=True)
     mobil_expediteur = fields.Char(string='Mobile expéditeur', related='contact_expediteur.mobile', store=True)
     
-    # Lieu destinataire
+    # Lieu destinatair
     commune_dest = fields.Many2one(string='Commune de destination',comodel_name='res.commune')
     ile_dest = fields.Char(string='Île de destination', related='commune_dest.ile_id.name', store=True)
     contact_dest = fields.Many2one(string='Contact de destination',comodel_name='res.partner')
