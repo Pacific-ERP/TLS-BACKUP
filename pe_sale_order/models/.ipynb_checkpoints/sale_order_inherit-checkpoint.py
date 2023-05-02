@@ -35,7 +35,7 @@ class SaleOrderInherit(models.Model):
                 continue
             if any(line.state not in ('done','cancel') for line in sale.delivery_line):
                 sale.delivery_status = 'in_delivery'
-            elif (all(line.state in ('done','cancel') for line in sale.delivery_line) and sale.delivery_line) or (all(line.product_id.detailed_type == 'service' and line.product_id.company_id.id != 2 for line in sale.order_line)) or sale.is_deliver:
+            elif (all(line.state in ('done','cancel') for line in sale.delivery_line) and sale.delivery_line) or (all(line.product_id.detailed_type == 'service' and line.product_id.company_id.id != 2 for line in sale.order_line)): #  or sale.is_deliver
                 sale.delivery_status = 'all_delivered'
             else:
                 sale.delivery_status = 'no'
