@@ -2,7 +2,7 @@
 <odoo>
     <!-- Form -->
     <record id="pe_crm_sale_order_form" model="ir.ui.view">
-        <field name="name">pe_crm.sale_order.form</field>
+        <field name="name">Pacific-ERP pe_crm : sale.order(form)</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name="arch" type="xml">

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="pe_crm_stage_form" model="ir.ui.view" >
-        <field name="name">pe_crm.crm.stage.form</field>
+        <field name="name">Pacific-ERP pe_crm : crm.stage(form)</field>
         <field name="model">crm.stage</field>
         <field name="inherit_id" ref="crm.crm_stage_form"/>
         <field name="arch" type="xml">
             <field name="team_id" position="before">
                 <field name="company_id" options="{'no_open': True, 'no_create': True}" groups="base.group_multi_company"/>
+                <field name="is_default_stage" groups="base.group_no_one"/>
             </field>
         </field>
     </record>
