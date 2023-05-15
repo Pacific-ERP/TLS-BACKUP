@@ -2,7 +2,7 @@
 {
     "name": "Customisation module CRM (Pacifi-ERP)",
     "summary": "Custom modules regroupant les customisations apporté au modules CRM",
-    "version": "15.0.0.0.7",
+    "version": "15.0.0.0.8",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",

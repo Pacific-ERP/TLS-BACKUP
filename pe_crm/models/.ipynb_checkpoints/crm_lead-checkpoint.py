@@ -2,6 +2,7 @@
 
 import logging
 from odoo import fields, models, api
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -23,6 +24,13 @@ class CrmLead(models.Model):
             else:
                 crm.crm_status = ''
     
+    @api.onchange('stage_id')
+    def _onchange_stage_id(self):
+        if not self.name:
+            default_stage = self.env['crm.stage'].sudo().search([('company_id','=', self.company_id.id),('is_default_stage','=', True)])
+            if default_stage:
+                self.stage_id = default_stage.id
+    
     # Permet d'auto assigner le client à l'opportunité
     @api.model_create_multi
     def create(self, vals_list):
@@ -32,7 +40,19 @@ class CrmLead(models.Model):
             if crm.partner_id.grade_id:
                 crm.partner_assigned_id = crm.partner_id
             if not crm.company_id:
-                crm.company_id = self.env.company.id
+                crm.company_id = self.env.company.id            
+            if crm.company_id:
+                default_stage = self.env['crm.stage'].sudo().search([('company_id','=', crm.company_id.id),('is_default_stage','=', True)])
+                if default_stage:
+                    res.stage_id = default_stage.id
+        return res
+    
+    def copy(self, default=None):
+        # OVERRIDE
+        res = super(CrmLead, self).copy(default)
+        default_stage = self.env['crm.stage'].sudo().search([('company_id','=', self.company_id.id),('is_default_stage','=', True)])
+        if default_stage:
+            res.stage_id = default_stage.id
         return res
     
     # Compteur pour les devis
@@ -64,3 +84,13 @@ class CrmStage(models.Model):
     _inherit = "crm.stage"
 
     company_id = fields.Many2one(string="Company", comodel_name="res.company", default=lambda self: self.env.company.id, index=True)
+    is_default_stage = fields.Boolean(string="Etape par défaut", default=False)
+    
+    @api.onchange('is_default_stage')
+    def _onchange_is_default_stage(self):
+        # Il peut y avoir qu'une seule étape par défaut
+        another_onchange = self.env['crm.stage'].search([('company_id','=', self.company_id.id),('is_default_stage','=', True),('id','!=', self._origin.id)])
+        if another_onchange:
+            another_onchange.is_default_stage = False
+        elif not self.is_default_stage and not another_onchange:
+            raise UserError('Vous devez définir au moins une étape par défaut si vous voulez retirez')

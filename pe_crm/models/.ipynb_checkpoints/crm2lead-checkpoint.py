@@ -13,6 +13,6 @@ class Lead2OpportunityPartner(models.TransientModel):
         # Override #
         res = super(Lead2OpportunityPartner, self)._action_convert()
         if res.company_id:
-            stage = self.env['crm.stage'].search([('company_id','=',res.company_id.id)])
-            res.stage_id = stage[0]
+            stage = self.env['crm.stage'].search([('company_id','=', res.company_id.id),('is_default_stage','=', True)]).id
+            res.stage_id = stage if stage else self.env['crm.stage'].search([('company_id','=', company.id)])[0].id
         return res
