@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+        <!-- Template code barre -->
+        <template id="pe_at_pdf_report_saleorder_document">
+            <t t-call="pe_at_pdf.pe_at_pdf_custom_layout">
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+                <!-- ajustement du code barre pour qu'il rentre dans le cadre -->
+                <span>TEST MT <t t-esc="doc.company_id.id"/></span>
+            </t>
+        </template>
+
+</data></odoo>

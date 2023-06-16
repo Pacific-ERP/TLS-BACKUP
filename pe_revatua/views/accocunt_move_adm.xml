@@ -24,6 +24,7 @@
                 <form string="Facture ADM">
                     <header>
                         <button name="action_confirm_adm" id="action_confirm" string="Confirmé" class="btn-primary" type="object" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <button name="cancel" id="action_cancel" string="Annulé" class="btn-primary" type="object" attrs="{'invisible': [('state', '!=', 'done')]}"/>
                         <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
                     </header>
                     <sheet>
