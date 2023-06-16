@@ -20,7 +20,8 @@ class AccountMoveAdm(models.Model):
     state = fields.Selection(string='État de facturation', selection=[('draft','Brouillons'),
                                                                       ('done','Confirmé'),
                                                                       ('in_payment','Paiement Partiel'),
-                                                                      ('payed','Paiement complet')]
+                                                                      ('payed','Paiement complet'),
+                                                                      ('cancel', 'Annué')]
                              ,store=True, default='draft', copy=False, tracking=True)
     
     # M2m/O2m
@@ -32,6 +33,15 @@ class AccountMoveAdm(models.Model):
     total_ht = fields.Float(string='Total HT', store=True, copy=False)
     total_rpa = fields.Float(string='Total RPA', store=True, copy=False)
     total_ttc = fields.Float(string='Total TTC', store=True, copy=False, help='Total RPA + Total HT')
+
+    # Lie définitivement la facture ADM à la facture ADMG pour éviter la réutilisation
+    def cancel(self):
+        # _logger.error('action_confirm_adm')
+        for admg in self:
+            for line in admg.invoice_line_ids:
+                if line.adm_group_id:
+                    line.write({'adm_group_id': False})
+            admg.write({'state':'cancel'})
     
     # Nom séquencer automatiquement
     @api.model_create_multi
