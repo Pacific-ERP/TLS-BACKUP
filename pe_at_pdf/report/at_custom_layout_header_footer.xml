@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+        <template id="pe_at_pdf_custom_layout_header_footer">
+        <!-- HEADER -->
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style" style="background-color:invisible;">
+            <style>
+                .pe_header_bloc {
+                    text-align:center;
+                }
+                
+                .pe_header_bloc img {
+                    max-height: 160px;
+                }
+                
+                .pe_header_bloc .detail {
+                    line-height: 0.9;
+                    padding-top: 15px;
+                }
+                
+                .pe_header_bloc .slogan {
+                    line-height: 0.8;
+                    padding-top: 5px;
+                    font-size: 22px;
+                }
+            </style>
+            <div class="row" style="padding-top:20px; background-color:invisible;">
+                <div class="col-3 mb4 pe_header_bloc" style="background-color: invisible;">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
+                </div>
+                <div class="col-6 mb4 pe_header_bloc" style="background-color: invisible; border:1px solid black">
+                    <div t-if="company.company_details" t-field="company.company_details" class="detail"/>
+                    <div t-field="company.report_header" class="slogan" name="moto"/>
+                </div>
+                <div class="col-3 mb4 pe_header_bloc" style="background-color: invisible;">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
+                </div>
+            </div>
+        </div>
+
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div class="pt-5">
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-out="0"/>
+        </div>
+        
+        <style>
+            .pe_standard_footer {
+                margin-top: 30px;
+                background-color: invisible;
+            }
+        </style>
+        <!-- FOOTER -->
+        <div t-attf-class="footer row pe_standard_footer o_company_#{company.id}_layout" style="text-align:center">
+            <style>
+                .pe_detail_bloc {
+                        border : 1px solid black;
+                        text-align: center !important;
+                        line-height: 1.05;
+                        height: 200px;
+                        padding-top:6%;
+                }
+                
+                .pe_detail_bloc strong {
+                    color: #BC0D1B;
+                }
+            </style>
+            <div class="col-5 pe_detail_bloc">
+                <p>
+                    <strong><u>CONTACTS</u></strong><br/>
+                        TINOMOE Vaimiti | 87 77 25 04 <br/>
+                        LAI KOUN SING Tommy | 87 29 98 70 <br/>
+                        TEIRI Turia | 87 20 14 97 <br/>
+                        LI TSEAU MANARII | 87 30 00 41 <br/>
+                    <b>Adresse mail : transport@aremiti.net</b>
+                </p>
+            </div>
+            <div class="col-2"/>
+            <div class="col-5 pe_detail_bloc">
+                <p>
+                    <strong><u style="font-size:14px">CONDITION ET MODALITES DE PAIEMENT</u></strong><br/>
+                        Coordonées bancaires <br/>
+                        Banque : Banque de Polynésie <br/>
+                        Code banque : 17469<br/>
+                        Code Guichet : 00001 <br/>
+                        N° Compte : 21728480001 <br/>
+                        Clé RIB : 19 <br/>
+                </p>
+            </div>
+        </div>
+    </template>
+
+</data></odoo>

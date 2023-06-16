@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+        <!-- Template code barre -->
+        <template id="pe_at_pdf_report_sale_order" inherit_id="sale.report_saleorder">
+            <!-- ajustement du code barre pour qu'il rentre dans le cadre -->
+            <xpath expr="//t/t/t/t" position="replace">
+                <t t-if="doc.company_id.id == 1" t-call="sale.report_saleorder_document" t-lang="doc.partner_id.lang"/>
+                <t t-if="doc.company_id.id == 2" t-call="pe_at_pdf.pe_at_pdf_report_saleorder_document" t-lang="doc.partner_id.lang"/>
+            </xpath>
+        </template>
+
+</data></odoo>
