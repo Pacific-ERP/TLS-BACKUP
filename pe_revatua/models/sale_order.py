@@ -32,7 +32,7 @@ class SaleOrderInherit(models.Model):
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
     
     # Calcul des parts client et ADM
-    @api.onchange('order_line')
+    @api.onchange('order_line','tax_totals_json')
     def _total_tarif(self):
         # --- Check if revatua is activated ---#
         if self.env.company.revatua_ck:
