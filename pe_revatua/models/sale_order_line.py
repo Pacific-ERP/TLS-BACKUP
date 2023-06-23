@@ -255,15 +255,19 @@ class SaleOrderLineInherit(models.Model):
         # OVERRIDE
         values = super(SaleOrderLineInherit, self)._prepare_invoice_line(**optional_values)
         type = optional_values.get("type", False)
+        # Retire le type utiliser pour récupérer le type de lignes à formatté
+        # [TO DO] Modifier utiliser le système de contexte plus propre.
         if type:
             values.pop('type')
 
+        values.update({
+            'r_volume': self.r_volume,
+            'r_weight': self.r_weight,
+        })
         # --- Check if revatua is activate ---#
         if self.env.company.revatua_ck:
             values.update({
                 'check_adm': self.check_adm,
-                'r_volume': self.r_volume,
-                'r_weight': self.r_weight,
                 'base_qty': self.product_uom_qty,
                 'base_unit_price':self.price_unit,
                 'base_subtotal':self.price_subtotal,
