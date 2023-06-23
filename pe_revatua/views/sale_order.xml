@@ -6,12 +6,12 @@
             <field name="name">Pacific-ERP sale.order : pe_revatua (form)</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form" />
-            <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/>
+            <!-- <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/> -->
             <field name="arch" type="xml">
             <!-- Formulaire -->
                 <!-- Coche Revatua -->
                 <xpath expr="//page[@name='other_information']//field[@name='company_id']" position="after">
-                    <field name="revatua_ck" groups="base.group_no_one"/>
+                    <field name="revatua_ck" invisible="1"/>
                 </xpath>
                 <!-- déplacer condition de livraison -->
                 <xpath expr="//field[@name='validity_date']" position="before">
@@ -81,8 +81,8 @@
                 
                 <!-- Remplacer l'uom de base par un fictif pour information -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="after">
-                  <field name="r_volume" string="Vol(m³)" optional="show" attrs="{'column_invisible': [('parent.revatua_ck', '=', False)]}"/>
-                  <field name="r_weight" string="Poids(T)" optional="show" attrs="{'column_invisible': [('parent.revatua_ck', '=', False)]}"/>
+                  <field name="r_volume" string="Vol(m³)" optional="show"/>
+                  <field name="r_weight" string="Poids(T)" optional="show"/>
                 </xpath>
                 
                 <!-- Modification de prix unitaire en prix U -->
