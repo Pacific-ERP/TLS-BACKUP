@@ -50,17 +50,22 @@ class PurchaseOrderInherit(models.Model):
         return res
 
     # Vérification de l'avancement des factures     
-    @api.depends('order_line.qty_to_invoice')
+    @api.depends('order_line.qty_to_invoice', 'delivery_status')
     def _get_invoices_state(self):
         for purchase in self:
-            if purchase.state not in ('sale', 'done'):
+            # Si encore en brouillons
+            if purchase.state not in ('purchase', 'done'):
                 purchase.invoices_status = 'no'
                 continue
-            if purchase.delivery_status == 'all_delivered' and not purchase.invoice_ids:
-                purchase.invoices_status = 'to_invoice'
+            # Factures existantes et tous facturé => Complétement facturé
+            if (all(invoice.state == 'posted' for invoice in purchase.invoice_ids) and purchase.invoice_ids):
+                purchase.invoices_status = 'invoiced'
+            # Factures existantes et certains non facturé => Partiellement facturé 
             elif any(invoice.state != 'posted' for invoice in purchase.invoice_ids):
                 purchase.invoices_status = 'partial_invoiced'
-            elif (all(invoice.state == 'posted' for invoice in purchase.invoice_ids) and purchase.invoice_ids):
-                purchase.invoices_status = 'invoiced'
+            # Aucune Factures + Réceptions complète => A facturé
+            elif purchase.delivery_status == 'all_delivered' and not purchase.invoice_ids:
+                purchase.invoices_status = 'to_invoice'
+            # Aucune Factures + Aucune Réception => Rien à facturé
             else:
                 purchase.invoices_status = 'no'
