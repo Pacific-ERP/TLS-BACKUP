@@ -34,8 +34,9 @@ class SaleOrderInherit(models.Model):
     # Calcul des parts client et ADM
     @api.onchange('order_line','tax_totals_json')
     def _total_tarif(self):
+        _logger.error('_total_tarif')
         # --- Check if revatua is activated ---#
-        if self.env.company.revatua_ck:
+        if self.revatua_ck:
             sum_customer = 0
             sum_adm = 0
             
@@ -54,6 +55,8 @@ class SaleOrderInherit(models.Model):
     @api.depends('order_line.tax_id', 'order_line.price_unit', 'amount_total', 'amount_untaxed')
     def _compute_tax_totals_json(self):
         # OVERRIDE
+        self._total_tarif()
+        _logger.error('_compute_tax_totals_json')
         def compute_taxes(order_line):
             price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             order = order_line.order_id
@@ -75,7 +78,7 @@ class SaleOrderInherit(models.Model):
         # OVERRIDE
         invoice_vals = super(SaleOrderInherit,self)._prepare_invoice()
         # --- Check if revatua is activate ---#
-        if self.env.company.revatua_ck:
+        if self.revatua_ck:
             invoice_vals.update({
                 'sum_adm': self.sum_adm,
                 'sum_customer': self.sum_customer,
@@ -149,7 +152,7 @@ class SaleOrderInherit(models.Model):
                     
                 # OVERRIDE >>>
                 # --- Check if revatua is activate ---#
-                if self.env.company.revatua_ck:
+                if self.revatua_ck:
                     # Si article ADM
                     if line.check_adm:
                         invoice_line_vals_no_adm.append((0, 0, line._prepare_invoice_line(sequence=invoice_item_sequence, type="custo_part")),)
@@ -184,7 +187,7 @@ class SaleOrderInherit(models.Model):
             
             # OVERRIDE >>>
             # --- Check if revatua is activate ---#
-            if self.env.company.revatua_ck:
+            if self.revatua_ck:
                 # Facture adm partie client
                 invoice_vals['invoice_line_ids'] += invoice_line_vals_no_adm
             else:
@@ -194,7 +197,7 @@ class SaleOrderInherit(models.Model):
             invoice_vals_list.append(invoice_vals)
             # OVERRIDE >>>
             # --- Check if revatua is activate ---#
-            if self.env.company.revatua_ck:
+            if self.revatua_ck:
                 # Facture adm partie client
                 invoice_vals_list += invoice_vals_list_adm
             else:
@@ -279,7 +282,7 @@ class SaleOrderInherit(models.Model):
             # OVERRIDE >>>
             # --- Check if revatua is activate ---#
             # Recalculer les totaux car utilisation d'une méthode à la création qui foire les totaux à la création
-            if self.env.company.revatua_ck:
+            if self.revatua_ck:
                 for line in move.invoice_line_ids:
                     line._get_price_total_and_subtotal()
                     _logger.error('RPA %s'% line.tarif_rpa)
