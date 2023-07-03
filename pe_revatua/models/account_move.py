@@ -6,34 +6,34 @@ _logger = logging.getLogger(__name__)
 
 class AccountMoveInherit(models.Model):
     _inherit = "account.move"
-    
+
     # Vérification si la coche Revatua est activé
     revatua_ck = fields.Boolean(string="Mode Revatua", related="company_id.revatua_ck")
-    
+
     is_adm_invoice = fields.Boolean(string='Est pour ADM', store=True, default=False)
     adm_group_id = fields.Many2one(string='Facture globale ADM', store=True, comodel_name='account.move.adm')
-    
-    #Lieu Livraison
+
+    # Lieu Livraison
     commune_recup = fields.Many2one(string='Commune de récupération',comodel_name='res.commune')
     ile_recup = fields.Char(string='Île de récupération', related='commune_recup.ile_id.name', store=True)
     contact_expediteur = fields.Many2one(string='Contact expéditeur',comodel_name='res.partner')
     tel_expediteur = fields.Char(string='Téléphone expéditeur', related='contact_expediteur.phone', store=True)
     mobil_expediteur = fields.Char(string='Mobile expéditeur', related='contact_expediteur.mobile', store=True)
-    
-    # Lieu destinatair
+
+    # Lieu destinataire
     commune_dest = fields.Many2one(string='Commune de destination',comodel_name='res.commune')
     ile_dest = fields.Char(string='Île de destination', related='commune_dest.ile_id.name', store=True)
     contact_dest = fields.Many2one(string='Contact de destination',comodel_name='res.partner')
     tel_dest = fields.Char(string='Téléphone destinataire', related='contact_dest.phone', store=True)
     mobil_dest = fields.Char(string='Mobile destinataire', related='contact_dest.mobile', store=True)
-                
-    # Maritime & terrestre
+
+    # Maritime & Terrestre
     sum_maritime = fields.Monetary(string="Maritime", store=True, help="La part maritime correspond à 40% du prix HT")
     sum_terrestre = fields.Monetary(string="Terrestre", store=True, help="La part terrestre correspond à 60% du prix HT")
     sum_mar_ter = fields.Monetary(string="Total Maritime & Terrestre", store=True)
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
-    
+
     # Récupération d'une ligne pour la facture global ADM
     def _add_move_line(self, sequence=1):
         self.ensure_one()
@@ -58,12 +58,12 @@ class AccountMoveInherit(models.Model):
             'price_total': 0,
         }
         return vals
-    
+
     # Calcul des parts client et ADM
     @api.onchange('invoice_line_ids')
     def _total_tarif(self):
         # --- Check if revatua is activate ---#
-        if self.env.company.revatua_ck:
+        if self.revatua_ck:
             sum_customer = 0
             sum_adm = 0
             for move in self:
@@ -84,7 +84,7 @@ class AccountMoveInherit(models.Model):
                     move.is_adm_invoice = True
         else:
             _logger.error('Revatua not activate : sale_order.py -> _total_tarif')
-    
+
     # Calculs de taxes au chargement du documents
     def _recompute_tax_lines(self, recompute_tax_base_amount=False, tax_rep_lines_to_recompute=None):
         """ Compute the dynamic tax lines of the journal entry.
@@ -124,7 +124,7 @@ class AccountMoveInherit(models.Model):
                 price_unit_wo_discount = base_line.amount_currency
             
 # -----Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre)
-            if self.env.company.revatua_ck:
+            if self.revatua_ck:
                 return base_line.tax_ids._origin.with_context(force_sign=move._get_tax_force_sign()).compute_all(
                     price_unit_wo_discount,
                     currency=base_line.currency_id,
