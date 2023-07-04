@@ -29,7 +29,13 @@
                         margin-bottom: 15px;
                     }
                     
-                    .pe_information_bloc {
+                    .pe_sale_detail_bloc .montant_adm_custo{
+                        position: absolute;
+                        bottom: 10px;
+                        left: 10px;
+                    }
+                    
+                    div.pe_information_bloc {
                         margin-top: 20px;
                         border : 1px solid black;
                         background-color: invisible;
@@ -44,6 +50,13 @@
                         color : #bc0d1b;
                         font-size: 14px;
                     }
+                    
+                    #pe_sale_informations{
+                        <!--background-color:red;-->
+                        font-size:16px;
+                        height:65px;
+                    }
+                    
                 </style>
                 
                 <div class="row" style="padding-bottom:20px">
@@ -208,12 +221,8 @@
                             </div>
                             <!-- Totaux -->
                             <div class="row pe_separate_bloc">
-                                <!-- Totaux Montant Client/ADM -->
-                                <div class="col-5">
-                                    <strong> MONTANT CLIENT : </strong> <b><span t-field="doc.sum_customer"/></b> <br/>
-                                    <strong t-if="doc.sum_adm"> MONTANT ADMINISTRATION : </strong> <b><span t-if="doc.sum_adm" t-field="doc.sum_adm"/> </b>
-                                </div>
                                 <!-- Totaux Devis (taxes, HT/TTC) -->
+                                <div class="col-5"/>
                                 <div class="col-7">
                                     <div class="clearfix" name="so_total_summary">
                                         <div id="total" class="row" name="total">
@@ -228,17 +237,20 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Totaux Montant Client/ADM -->
+                            <div class="montant_adm_custo">
+                                <strong> MONTANT CLIENT : </strong> <b><span t-field="doc.sum_customer"/></b> <br/>
+                                <strong t-if="doc.sum_adm"> MONTANT ADMINISTRATION : </strong> <b><span t-if="doc.sum_adm" t-field="doc.sum_adm"/> </b>
+                            </div>
                         </div>
                         
                     </div>
                     <!-- Bloc informations additionnelles -->
                     <div class="row pe_information_bloc">
-                        <p>
-                        <strong><u> INFORMATION ADDITIONNELLES : </u></strong>Ce devis est SOUS RESERVES de la vérification de l'état, du volume et du poids des marchandises.<br/>
-                           Toutes prestations est payable d'avance.<br/>
-                           La réservation se fera uniquement au paiement ou à la réception d'un bon de commande.<br/>
-                           La TVA sur la part maritime est de 0% alors que sur la part terrestre, elle est de 13%.
-                        </p>
+                        <div class="col-12">
+                            <strong><u> INFORMATION ADDITIONNELLES :</u></strong><br/>
+                            <div t-field="doc.company_id.other_information_bloc"/>
+                        </div>
                     </div>
                     
                 </div>

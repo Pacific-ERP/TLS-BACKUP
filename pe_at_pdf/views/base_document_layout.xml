@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <record id="pe_at_pdf_base_document_layout_form" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_at_pdf : base.document.layout(form)</field>
+        <field name="model">base.document.layout</field>
+        <field name="inherit_id" ref="web.view_base_document_layout" />
+        <field name="arch" type="xml">
+            <!-- modification avec xpath  // recherche sur tout le documents -->
+            <xpath expr="//field[@name='report_footer']" position="after">
+                <field attrs="{'invisible': [('company_id','=', 1)]}" name="contact_bloc" string="Contacts" options="{'resizable': false}"/>
+                <field attrs="{'invisible': [('company_id','=', 1)]}" name="payment_mode_bloc" string="Modalité de paiement" options="{'resizable': false}"/>
+                <field attrs="{'invisible': [('company_id','=', 1)]}" name="other_information_bloc" string="Information additionnelles" options="{'resizable': false}"/>
+            </xpath>
+        </field>
+    </record>
+
+</data></odoo>
