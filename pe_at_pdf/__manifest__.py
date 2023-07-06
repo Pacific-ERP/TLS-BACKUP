@@ -2,7 +2,7 @@
 {
     "name": "Pacific-ERP: Aremiti custom PDF",
     "summary": "PDF société aremiti uniquement",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "category": "Uncategorized",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",
@@ -16,6 +16,8 @@
         "report/at_custom_layout_header_footer.xml",
         "report/at_custom_layout.xml",
         "report/at_report_saleorder_document.xml",
+        "report/at_report_invoice_document.xml",
+        "report/report_invoice_with_payments.xml",
         "report/report_saleorder.xml",
     ],
 }
