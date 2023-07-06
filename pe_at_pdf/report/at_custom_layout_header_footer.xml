@@ -9,8 +9,19 @@
                     text-align:center;
                 }
                 
-                .pe_header_bloc img {
-                    max-height: 160px;
+                .pe_header_bloc.image_bloc{
+                    text-align: center;
+                    width: 285px;
+                    height: 150px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                
+                .image_bloc img {
+                    padding-top:20%;
+                    width:100%;
+                    object-fit: cover;
                 }
                 
                 .pe_header_bloc .detail {
@@ -25,14 +36,14 @@
                 }
             </style>
             <div class="row" style="padding-top:20px; background-color:invisible;">
-                <div class="col-3 mb4 pe_header_bloc" style="background-color: invisible;">
+                <div class="col-3 mb4 pe_header_bloc image_bloc" style="background-color: invisible;">
                     <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
                 </div>
                 <div class="col-6 mb4 pe_header_bloc" style="background-color: invisible; border:1px solid black">
                     <div t-if="company.company_details" t-field="company.company_details" class="detail"/>
                     <div t-field="company.report_header" class="slogan" name="moto"/>
                 </div>
-                <div class="col-3 mb4 pe_header_bloc" style="background-color: invisible;">
+                <div class="col-3 mb4 pe_header_bloc image_bloc" style="background-color: invisible;">
                     <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
                 </div>
             </div>
@@ -67,26 +78,13 @@
                 }
             </style>
             <div class="col-5 pe_detail_bloc">
-                <p>
-                    <strong><u>CONTACTS</u></strong><br/>
-                        TINOMOE Vaimiti | 87 77 25 04 <br/>
-                        LAI KOUN SING Tommy | 87 29 98 70 <br/>
-                        TEIRI Turia | 87 20 14 97 <br/>
-                        LI TSEAU MANARII | 87 30 00 41 <br/>
-                    <b>Adresse mail : transport@aremiti.net</b>
-                </p>
+                <strong><u>CONTACTS</u></strong><br/>
+                <div t-field="company.contact_bloc"/>
             </div>
             <div class="col-2"/>
             <div class="col-5 pe_detail_bloc">
-                <p>
-                    <strong><u style="font-size:14px">CONDITION ET MODALITES DE PAIEMENT</u></strong><br/>
-                        Coordonées bancaires <br/>
-                        Banque : Banque de Polynésie <br/>
-                        Code banque : 17469<br/>
-                        Code Guichet : 00001 <br/>
-                        N° Compte : 21728480001 <br/>
-                        Clé RIB : 19 <br/>
-                </p>
+                <strong><u style="font-size:14px">CONDITION ET MODALITES DE PAIEMENT</u></strong><br/>
+                <div t-field="company.payment_mode_bloc"/>
             </div>
         </div>
     </template>
