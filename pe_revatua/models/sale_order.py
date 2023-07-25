@@ -31,31 +31,37 @@ class SaleOrderInherit(models.Model):
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
     
-    # Calcul des parts client et ADM
     @api.onchange('order_line','tax_totals_json')
-    def _total_tarif(self):
-        _logger.error('_total_tarif')
+    def _compute_total_custo_adm(self):
+        """
+            Calcul les totaux ADM et clients
+        """
+        _logger.warning('[1] _compute_total_custo_adm')
         # --- Check if revatua is activated ---#
         if self.revatua_ck:
             sum_customer = 0
             sum_adm = 0
             
             for line in self.order_line:
-                taxes = sum(tax.amount/100 for tax in line.tax_id)
+                # Si ligne ADM (Partage des montants entre ADM/CUSTO
                 if line.check_adm:
+                    # ADM = Maritime + RPA
                     sum_adm += round(line.tarif_maritime, 0) + round(line.tarif_rpa_ttc, 0)
-                    sum_customer += line.tarif_terrestre + (line.price_tax - line.tarif_rpa_ttc) 
+                    # CUSTO = Terrestre + (Taxes - RPA) -> car RPA compter comme une taxe
+                    sum_customer += line.tarif_terrestre + (line.price_tax - line.tarif_rpa_ttc)
+                # Sinon Full CUSTO
                 else:
                     sum_customer += line.price_total
 
             self.write({'sum_adm': sum_adm, 'sum_customer' : sum_customer})
+            _logger.warning(f"Adm = {sum_adm} | Custo = {sum_customer}")
         else:
-            _logger.error('Revatua not activate : sale_order.py -> _total_tarif')
+            _logger.info('Revatua not activate : sale_order.py -> _total_tarif')
             
     @api.depends('order_line.tax_id', 'order_line.price_unit', 'amount_total', 'amount_untaxed')
     def _compute_tax_totals_json(self):
         # OVERRIDE
-        self._total_tarif()
+        self._compute_total_custo_adm()
         _logger.error('_compute_tax_totals_json')
         def compute_taxes(order_line):
             price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
@@ -69,8 +75,25 @@ class SaleOrderInherit(models.Model):
             tax_totals = account_move._get_tax_totals(order.partner_id, tax_lines_data, order.amount_total, order.amount_untaxed, order.currency_id)
             order.tax_totals_json = json.dumps(tax_totals)
     
+    def open_wizard_sale_line_full_detail(self):
+        # Récupérer l'ID de la vue wizard que vous souhaitez ouvrir
+        wizard_view_id = self.env.ref('pe_revatua.pe_revatua_sale_line_detail_wizard_form').id
+        
+        return {
+            'name': 'Détails des lignes de commandes',
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.line.detail.wizard',
+            'view_mode': 'form',
+            'view_id': wizard_view_id,
+            'target': 'new',  # Ouvrir le wizard dans une nouvelle fenêtre
+            'context': {
+                'default_sale_order_id': self.id,
+                'default_order_line': self.order_line.ids,
+            },
+        }
+        
     #------------------------------------------------------------------------------------------------------------------------------------------#
-    #                                                    Modification Création d'une Facture (Override)                                        #
+    #                                                    OVERRIDE : Création d'une Facture                                                     #
     #------------------------------------------------------------------------------------------------------------------------------------------#
     
     # Méthode de préparation des champs pour la facture

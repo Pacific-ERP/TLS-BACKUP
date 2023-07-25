@@ -1,3 +1,5 @@
 id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
-revatua_account_move_adm,ADM move access,pe_revatua.model_account_move_adm,group_revatua_users,1,1,1,1
-revatua_account_move_adm_line,ADM line access,pe_revatua.model_account_move_adm_line,group_revatua_users,1,1,1,1
+revatua_account_move_adm,ADM move access,pe_revatua.model_account_move_adm,,1,1,1,1
+revatua_account_move_adm_line,ADM line access,pe_revatua.model_account_move_adm_line,,1,1,1,1
+revatua_sale_line_detail_wizard,Wizard sale line detail,pe_revatua.model_sale_line_detail_wizard,,1,1,1,1
+revatua_sale_line_detail_wizard_lines,Wizard sale line detail lines,pe_revatua.model_sale_line_detail_wizard_line,,1,1,1,1

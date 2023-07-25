@@ -32,6 +32,10 @@ class SaleOrderLineInherit(models.Model):
     r_weight = fields.Float(string='Volume weight (T)', store=True, digits=(12, 3))
     check_adm = fields.Boolean(string='Payé par ADM', store=True)
     
+    def _compute_line_detail(self):
+        vals = {}
+        return vals
+    
     # Calcul des lignes à facturer vu que la quantité est séparer entre
     # facture ADM et Client ne prendre en compte que celle du Client
     @api.depends('invoice_lines.move_id.state', 'invoice_lines.quantity', 'untaxed_amount_to_invoice')
