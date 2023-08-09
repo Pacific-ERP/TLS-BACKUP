@@ -67,7 +67,7 @@ class SaleOrderInherit(models.Model):
             price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             order = order_line.order_id
             # Ajout des champs Revatua au compute_all pour récupéré les bon totaux
-            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre, maritime=order_line.tarif_maritime, rpa=order_line.tarif_rpa)
+            return order_line.tax_id._origin.compute_all(price, order.currency_id, order_line.product_uom_qty, product=order_line.product_id, partner=order.partner_shipping_id, discount=order_line.discount,terrestre=order_line.tarif_terrestre, maritime=order_line.tarif_maritime, rpa=order_line.tarif_rpa, line=order_line)
 
         account_move = self.env['account.move']
         for order in self:
@@ -75,22 +75,22 @@ class SaleOrderInherit(models.Model):
             tax_totals = account_move._get_tax_totals(order.partner_id, tax_lines_data, order.amount_total, order.amount_untaxed, order.currency_id)
             order.tax_totals_json = json.dumps(tax_totals)
     
-    def open_wizard_sale_line_full_detail(self):
-        # Récupérer l'ID de la vue wizard que vous souhaitez ouvrir
-        wizard_view_id = self.env.ref('pe_revatua.pe_revatua_sale_line_detail_wizard_form').id
+    # def open_wizard_sale_line_full_detail(self): [Wizard] à voir si utile
+    #     # Récupérer l'ID de la vue wizard que vous souhaitez ouvrir
+    #     wizard_view_id = self.env.ref('pe_revatua.pe_revatua_sale_line_detail_wizard_form').id
         
-        return {
-            'name': 'Détails des lignes de commandes',
-            'type': 'ir.actions.act_window',
-            'res_model': 'sale.line.detail.wizard',
-            'view_mode': 'form',
-            'view_id': wizard_view_id,
-            'target': 'new',  # Ouvrir le wizard dans une nouvelle fenêtre
-            'context': {
-                'default_sale_order_id': self.id,
-                'default_order_line': self.order_line.ids,
-            },
-        }
+    #     return {
+    #         'name': 'Détails des lignes de commandes',
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'sale.line.detail.wizard',
+    #         'view_mode': 'form',
+    #         'view_id': wizard_view_id,
+    #         'target': 'new',  # Ouvrir le wizard dans une nouvelle fenêtre
+    #         'context': {
+    #             'default_sale_order_id': self.id,
+    #             'default_order_line': self.order_line.ids,
+    #         },
+    #     }
         
     #------------------------------------------------------------------------------------------------------------------------------------------#
     #                                                    OVERRIDE : Création d'une Facture                                                     #

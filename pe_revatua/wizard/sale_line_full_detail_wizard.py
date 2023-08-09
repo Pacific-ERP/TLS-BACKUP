@@ -19,7 +19,7 @@ class SaleLineDetailWizard(models.TransientModel):
 
     sale_order_id = fields.Many2one(string="Ventes", comodel_name="sale.order")
     order_line = fields.Many2many(string="Ligne de vente", comodel_name="sale.order.line")
-    order_line_details = fields.Many2many(string="Détails ligne de vente", comodel_name="sale.line.detail.wizard.line")
+    order_line_details = fields.Many2many(string="Détails ligne de vente", comodel_name="sale.line.detail.wizard.line", compute="_compute_detail_wizard_line")
 
 class SaleLineDetailWizardLine(models.TransientModel):
     _name = "sale.line.detail.wizard.line"

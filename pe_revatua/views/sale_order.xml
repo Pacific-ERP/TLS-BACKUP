@@ -8,12 +8,12 @@
             <field name="inherit_id" ref="sale.view_order_form" />
             <field name="arch" type="xml">
             <!-- Détails -->
-                <!-- Boutton : Détails des lignes -->
-                <xpath expr="//header" position="inside">
+                <!-- Boutton : Détails des lignes  [Wizard] à voir si utile-->
+                <!-- <xpath expr="//header" position="inside">
                     <button name="open_wizard_sale_line_full_detail" type="object"
                         string="Détails des lignes" class="oe_highlight"
                         attrs="{'invisible': [('revatua_ck', '=', False)]}"/>
-                </xpath>
+                </xpath> -->
                 
                 <!-- Champs : Coche Revatua -->
                 <xpath expr="//page[@name='other_information']//field[@name='company_id']" position="after">

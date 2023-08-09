@@ -39,26 +39,26 @@ class AccountMoveLine(models.Model):
     tarif_minimum = fields.Float(string='Prix Minimum', default=0, required=True, store=True)
     
     # Définie la quantité selon l'unité de mesure utilisé
-    @api.onchange('product_uom', 'r_volume', 'r_weight')
+    @api.onchange('product_uom_id', 'r_volume', 'r_weight')
     def _onchange_update_qty(self):
         # --- Check if revatua is activated ---#
         if self.env.company.revatua_ck:
             quantity = 1
-            
-            # Volume weight
-            if self.product_uom_id.name == 'T/m³' and self.r_volume and self.r_weight:
-                quantity = round((self.r_volume + self.r_weight) / 2, 3)
-            # Tonne
-            elif self.product_uom_id.name == 'T' and self.r_weight:
-                quantity = self.r_weight
-            # Cubic meter
-            elif self.product_uom_id.name == 'm3' and self.r_volume:
-                quantity = self.r_volume
-
-            self.write({
-                'quantity': quantity,
-                'product_uom_id': self.product_id.uom_id if quantity == 1 else self.product_uom_id,
-            })
+            if self.product_id:
+                # Volume weight
+                if self.product_uom_id.name == 'T/m³' and self.r_volume and self.r_weight:
+                    quantity = round((self.r_volume + self.r_weight) / 2, 3)
+                # Tonne
+                elif self.product_uom_id.name == 'T' and self.r_weight:
+                    quantity = self.r_weight
+                # Cubic meter
+                elif self.product_uom_id.name == 'm3' and self.r_volume:
+                    quantity = self.r_volume
+    
+                self.with_context(check_move_validity=False).write({
+                    'quantity': quantity,
+                    'product_uom_id': self.product_id.uom_id if quantity == 1 else self.product_uom_id,
+                })
 
         else:
             _logger.error('Revatua not activated: account_move_line.py -> _onchange_update_qty')
@@ -81,7 +81,7 @@ class AccountMoveLine(models.Model):
 
             # Facture ADM ligne adm
             if self.move_id.journal_id.id == 27 and self.product_id.check_adm:
-                vals.write({'price_unit': self.product_id.tarif_maritime,
+                vals.update({'price_unit': self.product_id.tarif_maritime,
                             'base_terrestre': 0.0,
                             'tarif_terrestre': 0.0,
                             'tarif_minimum_terrestre': 0.0})
@@ -89,13 +89,13 @@ class AccountMoveLine(models.Model):
             
             # Facture Client ligne adm
             elif self.product_id.check_adm:
-                vals.write({'price_unit': self.product_id.tarif_terrestre,
+                vals.update({'price_unit': self.product_id.tarif_terrestre,
                             'base_maritime': 0.0,
                             'tarif_maritime': 0.0,
                             'tarif_minimum_maritime': 0.0})
                 self.move_id.is_adm_invoice = False
-
-            self.write(vals)
+            
+            self.with_context(check_move_validity=False).write(vals)
    
     # Méthode de calcule pour les tarifs par lignes
     def _compute_amount_base_revatua(self, base=0.0, qty=0.0, mini_amount=0.0, discount=1):
@@ -234,7 +234,7 @@ class AccountMoveLine(models.Model):
         # ----- Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre) ----- #
             if self.env.company.revatua_ck and self.move_id.move_type in ('out_invoice','out_refund'):
                 taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
-                quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'), terrestre=terrestre, maritime=maritime, adm=adm, discount=discount, rpa=rpa)
+                quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'), terrestre=terrestre, maritime=maritime, adm=adm, discount=discount, rpa=rpa, line=self)
                 if terrestre or maritime:
                     taxes_res['total_excluded'] = self._get_revatua_totals('excluded', terrestre, maritime, adm, rpa, product)
                     taxes_res['total_included'] = self._get_revatua_totals('included', terrestre, maritime, adm, rpa, product)

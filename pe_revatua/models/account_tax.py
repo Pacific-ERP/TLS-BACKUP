@@ -11,15 +11,15 @@ class AccountTaxInherit(models.Model):
     _inherit = "account.tax"
     
     # Ajout du paramètre terrestre pour le calcul de la taxe
-    def _compute_amount(self, base_amount, price_unit, quantity=1.0, product=None, partner=None, invoice=None, terrestre=0, discount=0, rpa=0):
+    def _compute_amount(self, base_amount, price_unit, quantity=1.0, product=None, partner=None, invoice=None, terrestre=0, discount=0, rpa=0, line=None):
         # OVERRIDE
-        # _logger.error("######################## - compute_amount - ########################")
+        _logger.warning("[2] account_tax : _compute_amount")
+        _logger.warning(f"T:{terrestre} | Disc:{discount} | rpa:{rpa} | line:{line}")
         self.ensure_one()
         if self.amount_type == 'fixed':
             if base_amount:
                 # OVERRIDE >>>
                 # --- Check if revatua is activate ---#
-                # self.env.company.revatua_ck test si l'article à une part terrestre car lors d'un calcul fait par odoo il calcul sur TLS et renvoie unen fausse taxe
                 if product.tarif_terrestre and self.name == 'RPA' and product.tarif_rpa:
                     # remise = 1-(discount/100)
                     # rpa = product.tarif_rpa*remise
@@ -75,7 +75,7 @@ class AccountTaxInherit(models.Model):
 # --------------------------------- Modification des méthode de calculs des taxes et sous totaux  --------------------------------- #
 
     # Ajout du paramètre discount pour le calcul de la taxe uniquement sur terrestre
-    def compute_all(self, price_unit, currency=None, quantity=1.0, product=None, partner=None, is_refund=False, handle_price_include=True, include_caba_tags=False, discount=0.0, terrestre=0, maritime=0, adm=False, rpa=0):
+    def compute_all(self, price_unit, currency=None, quantity=1.0, product=None, partner=None, is_refund=False, handle_price_include=True, include_caba_tags=False, discount=0.0, terrestre=0, maritime=0, adm=False, rpa=0, line=None):
         """ Returns all information required to apply taxes (in self + their children in case of a tax group).
             We consider the sequence of the parent for group of taxes.
                 Eg. considering letters as taxes and alphabetic order as sequence :
@@ -98,6 +98,14 @@ class AccountTaxInherit(models.Model):
                 'analytic': boolean,
             }],
         } """
+        if line:
+            _logger.warning(f"### Article : {line.product_id.name} ###")
+            if hasattr(line, 'order_id'):
+                _logger.warning(f"### Devis : {line.order_id.name} | Company : {line.order_id.company_id.name} ###")
+            if hasattr(line, 'move_id'):
+                _logger.warning(f"### Facture : {line.move_id.name} | Company : {line.move_id.company_id.name} ###")
+        _logger.warning("[1] account_tax : compute_all")
+        _logger.warning(f"Lines : {line} | T : {terrestre} | M : {maritime} | ADM : {adm} | RPA : {rpa} | Disc : {discount}")
         if not self:
             company = self.env.company
         else:
