@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+    <!-- Action pour ouvrir le modèle Shipping Management -->
+    <record model="ir.actions.act_window" id="customer_stock_action">
+            <field name="name">Customer Stock Action</field>
+            <field name="res_model">customer.stock</field>
+            <field name="views">kanban,tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Aucun stock client
+                </p>
+            </field>
+    </record>
+
+    <!-- Sous menu du menu parent avec action-->
+    <menuitem id="pe_customer_stock_menu" name="Stock client" action="customer_stock_action" sequence="31" parent="stock.menu_stock_warehouse_mgmt"/>
+      
+</data></odoo>

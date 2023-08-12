@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    <!-- Kanban -->
+    <record id="pe_customer_stock_kanban" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_customer_stock : customer.stock(kanban)</field>
+        <field name="model">customer.stock</field>
+        <field name="arch" type="xml">
+            <kanban string="Stock Clients" create="0">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_content">
+                                <field name="name" modifiers="{'readonly': true}"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List -->
+    <record id="pe_customer_stock_tree" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_customer_stock : customer.stock(tree)</field>
+        <field name="model">customer.stock</field>
+        <field name="arch" type="xml">
+            <tree string="Stock Clients" edit="0" create="0" default_order="partner_id">
+                    <field name="name" optional="hide"/>
+                    <field name="partner_id" optional="show"/>
+                    <field name="is_invoiceable" optional="show"/>
+                    <field name="opportunity_ids" widget="many2many_tags" optional="show"/>
+                    <field name="invoice_ids" widget="many2many_tags" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form -->
+    <record id="pe_customer_stock_form" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_customer_stock : customer.stock(form)</field>
+        <field name="model">customer.stock</field>
+        <field name="arch" type="xml">
+            <form string="Stock Client">
+                <sheet>
+                    <h1><field name="name" readonly="1"/></h1>
+                    <group>
+                        <group string="Information">
+                            <field name="partner_id"/>
+                            <field name="is_invoiceable"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="En stock">
+                            <field name="stock_lines" domain="[('to_show','=', True)]">
+                                <tree create="0" edit="0" delete="0">
+                                    <field name="product_id" optional="show"/>
+                                    <field name="location_id" optional="show"/>
+                                    <field name="entry_date" optional="show"/>
+                                    <field name="entry_quantity" optional="show"/>
+                                    <field name="to_invoice" optional="show"/>
+                                    <field name="exit_dates" widget="many2many_tags" optional="show"/>
+                                    <!-- Invisible-->
+                                    <field name="is_invoiceable" optional="show"/>
+                                    <field name="available_quantity" optional="show"/>
+                                    <field name="to_show" optional="show"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Historique">
+                            <field name="stock_lines" domain="[('to_show','=', False)]">
+                                <tree create="0" edit="0" delete="0">
+                                    <field name="product_id" optional="show"/>
+                                    <field name="entry_date" optional="show"/>
+                                    <field name="entry_quantity" optional="show"/>
+                                    <field name="to_invoice" optional="show"/>
+                                    <field name="exit_dates" widget="many2many_tags" optional="show"/>
+                                    <!-- Invisible-->
+                                    <field name="is_invoiceable" optional="show"/>
+                                    <field name="available_quantity" optional="show"/>
+                                    <field name="to_show" optional="show"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Opportunités">
+                            <field name="opportunity_ids" readonly="1"/>
+                        </page>
+                        <page string="Factures">
+                            <field name="invoice_ids" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</data></odoo>

@@ -1,3 +1,6 @@
 id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
 access_wizard_customer_stock,Wizard Customer Stock,model_customer_stock_wizard,,1,1,1,1
 access_wizard_customer_stock_line,Wizard Customer Stock Line,model_customer_stock_wizard_line,,1,1,1,1
+access_customer_stock,Customer Stock,model_customer_stock,,1,1,1,1
+access_customer_stock_line,Customer Stock Line,model_customer_stock_line,,1,1,1,1
+access_customer_stock_line_exit_dates,Customer Stock Line Exit Dates,model_customer_stock_line_exit_dates,,1,1,1,1

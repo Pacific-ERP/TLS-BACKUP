@@ -8,6 +8,9 @@ _logger = logging.getLogger(__name__)
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
+    is_customer_delivered = fields.Boolean(string="Transfert Client fait", default=False)
+    customer_stock_id = fields.Many2one(string="Stock Clients", comodel_name="customer.stock")
+    
     def _prepare_wizard_lines(self):
         lines = []
         for move in self.move_lines:
@@ -43,5 +46,6 @@ class StockPicking(models.Model):
                 'context': {
                     'default_wizard_lines': self._prepare_wizard_lines(),
                     'default_origin': self.origin,
-                    'default_picking_id': self.id},
+                    'default_picking_id': self.id,
+                    'default_company_id': self.company_id.id}
             }

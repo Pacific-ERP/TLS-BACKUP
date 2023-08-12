@@ -9,10 +9,12 @@
     "license": "LGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["stock","crm", "pe_crm_purchase", "pe_crm"],
+    "depends": ["stock","crm","account","pe_crm_purchase", "pe_crm"],
     "data": [
         "security/ir.model.access.csv",
         "views/stock_picking.xml",
+        "views/menuitem.xml",
+        "views/customer_stock.xml",
         "wizard/customer_stock_wizard_view.xml"
         ],
 }

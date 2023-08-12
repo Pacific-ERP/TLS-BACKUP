@@ -6,10 +6,16 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
+            
+            <!-- Champs : is_customer_delivered -->
+            <xpath expr="//header/button[@name='button_validate'][1]" position="after">
+                <field name="is_customer_delivered" invisible="1"/>
+            </xpath>
+            
             <!-- Button : Ouverture Wizard [customer.stock.wizard] -->
             <xpath expr="//header/button[@name='button_validate'][1]" position="after">
                 <button name="button_customer_stock" type="object"
-                    attrs="{'invisible': [('state', '!=', 'done')]}" 
+                    attrs="{'invisible': ['|','|',('state', '!=', 'done'),('is_customer_delivered','=', True),('picking_type_code','!=','incoming')]}" 
                     string="Transfert Client" class="oe_highlight"/>
             </xpath>
             
