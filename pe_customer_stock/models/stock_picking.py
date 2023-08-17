@@ -37,6 +37,7 @@ class StockPicking(models.Model):
         '''
         if self.state == 'done':
             view = self.env.ref('pe_customer_stock.pe_customer_stock_wizard_form')
+            lines = self._prepare_wizard_lines()
             return {
                 'name': ('Transfert Client'),
                 'type': 'ir.actions.act_window',
@@ -44,7 +45,7 @@ class StockPicking(models.Model):
                 'views': [(view.id, 'form')],
                 'target': 'new',
                 'context': {
-                    'default_wizard_lines': self._prepare_wizard_lines(),
+                    'default_wizard_lines': lines,
                     'default_origin': self.origin,
                     'default_picking_id': self.id,
                     'default_company_id': self.company_id.id}

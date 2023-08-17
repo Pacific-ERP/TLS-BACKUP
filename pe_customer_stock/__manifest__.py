@@ -2,7 +2,7 @@
 {
     "name": "Pacific-ERP: Gestion internes des stocks clients",
     "summary": "Permet la gestion du stock clients, jusqu'a la récupération imédiate ou différé des produits suivis d'une facture",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "category": "Uncategorized",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",
