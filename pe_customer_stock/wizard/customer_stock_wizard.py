@@ -51,6 +51,7 @@ class CustomerStockWizard(models.TransientModel):
             'picking_type_id': internal_picking_type.id,
             'location_dest_id': location_dest.id if location_dest else internal_picking_type.default_location_dest_id.id,
             'location_id': internal_picking_type.default_location_dest_id.id,
+            'is_customer_picking' : True,
         }
 
         if self.direct_delivery:
@@ -68,14 +69,14 @@ class CustomerStockWizard(models.TransientModel):
 
     def _post_message_link(self, picking_ids):
         if picking_ids:
-            actual_msg = "Transfert vers stock client créer:"
+            actual_msg = "Transfert vers stock client créer:<br/>"
             created_msg = "Transfert créer à partir de %s" % self._get_custom_link(self.picking_id)
             # Livraison -> 1
             if self.direct_delivery:
                 actual_msg = "Livraison %s créer " % self._get_custom_link(picking_ids)
             # Transfert interne -> 1 or X
             else:
-                actual_msg = actual_msg + '<br/>'.join(self._get_custom_link(self.picking) for picking in picking_ids)
+                actual_msg = actual_msg + '<br/>'.join(self._get_custom_link(picking) for picking in picking_ids)
 
             # Message sur transfert créer
             for picking in picking_ids:
@@ -104,24 +105,46 @@ class CustomerStockWizard(models.TransientModel):
                 action = {'type': 'ir.actions.act_window_close'}
             _logger.warning(f"Action : {action}")
             return action            
+
+    def _get_origin_id(self):
+        '''
+            Renvoie l'opportunité lié à l'achat
+        '''
+        if self.origin:
+            purchase = self.env['purchase.order'].sudo().search([('name','=', self.origin)])
+            if purchase and purchase.opportunity_ids:
+                return purchase.opportunity_ids[0]
+        return False
     
-    def _process_customer_stock(self, go_to_record):
+    def _create_internal_picking(self, go_to_record):
         '''
             Prépare le transfert dans le stock clients des articles réceptionner
-            
-            1 - Vérifie si le client à déjà un stock
-                1A - Si oui rajoute les lignes de la réception à sont stock
-                1B - Sinon Créer le un stock pour le client
+
+            1 - Créer le ou les transfert interne
             2 - Si bouton [Confirmer et voir] est séléctionner renvoie au transfert interne pour validation
             3 - Sinon reste sur la réception
         '''
-        if not any(line.destination_id for line in self.wizard_lines):
-            raise UserError("Un lieu de destination est nécessaire pour chaque articles")
+        if any(not line.destination_id for line in self.wizard_lines):
+            raise UserError("Un lieu de destination est nécessaire pour chaque ligne d'article")
             
         destination_ids = self.wizard_lines.mapped('destination_id')
         _logger.warning(f"Destinations : {destination_ids}")
-        pass
         
+        pickging_ids = []
+        origin = self._get_origin_id()
+        for destination in destination_ids:
+            # Création du transfert
+            res = self._prepare_picking(destination)
+            picking = self.env['stock.picking'].create(res)
+            pickging_ids.append(picking)
+
+            move_line_to_add = self.wizard_lines.filtered(lambda l : l.destination_id.id == destination.id)
+            move_line_to_add._create_stock_moves(picking, origin)
+            picking.action_confirm()
+
+        # Message chatter pour followup
+        self._post_message_link(pickging_ids)
+        self._picking_is_delivered()
     
     def _create_delivery(self, go_to_record):
         '''
@@ -134,9 +157,10 @@ class CustomerStockWizard(models.TransientModel):
         # Création du transfert
         res = self._prepare_picking()
         picking = self.env['stock.picking'].create(res)
-        # Création des lignes de mouvement de stock et link avec transfert
         
-        self.wizard_lines._create_stock_moves(picking)
+        # Création des lignes de mouvement de stock et link avec transfert
+        origin = self._get_origin_id()
+        self.wizard_lines._create_stock_moves(picking, origin)
         picking.action_confirm()
 
         # Message chatter pour followup
@@ -158,7 +182,7 @@ class CustomerStockWizard(models.TransientModel):
 
         if not self.direct_delivery:
             _logger.warning(f"[1] Transfert Stock client : {self.partner_id} | Go To {go_to_record}")
-            return self._process_customer_stock(go_to_record)
+            return self._create_internal_picking(go_to_record)
         else:
             _logger.warning(f"[2] Livraison direct client : {self.partner_id} | Go To {go_to_record}")
             return self._create_delivery(go_to_record)
@@ -181,7 +205,7 @@ class CustomerStockWizardLine(models.TransientModel):
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id')
     quantity = fields.Float(string="Quantité", default=1, required=True)
 
-    def _create_stock_moves(self, picking_id):
+    def _create_stock_moves(self, picking_id, origin):
         _logger.warning(f'[Lines]_create_stock_moves')
         for line in self:
             if picking_id:
@@ -198,5 +222,6 @@ class CustomerStockWizardLine(models.TransientModel):
                     'product_uom_qty': line.quantity,
                     'picking_type_id': picking_id.picking_type_id.id,
                     'warehouse_id': picking_id.picking_type_id.warehouse_id.id,
+                    'crm_lead_id': origin.id if origin else False,
                 }
                 move = self.env['stock.move'].create(template)

@@ -2,36 +2,33 @@
 <odoo>
     <data>
         <!-- form -->
-        <record id="pe_customer_stock_wizard_form" model="ir.ui.view">
-            <field name="name">Pacific-ERP pe_customer_stock : customer.stock.wizard(form)</field>
-            <field name="model">customer.stock.wizard</field>
+        <record id="pe_customer_stock_deliver_wizard_form" model="ir.ui.view">
+            <field name="name">Pacific-ERP pe_customer_stock : customer.stock.deliver.wizard(form)</field>
+            <field name="model">customer.stock.deliver.wizard</field>
             <field name="arch" type="xml">
                 <form>
                     <sheet>
                         <group>
                             <group>
-                                <field name="direct_delivery"/>
-                                <field name="partner_id" required="1"/>
-                                <field name="destination_id" attrs="{'invisible' : [('direct_delivery','=', True)]}" context="{'default_location_id': 5, 'shortname': True}"/>
-                                <field name="origin"/>
-                                <field name="picking_id" invisible="0"/>
+                                <field name="customer_stock_id" readonly="1"/>
+                                <field name="origin" readonly="1"/>
+                                <field name="company_id" readonly="1"/>
                             </group>
                         </group>
                         <notebook>
                             <page string="Opérations">
                                 <field name="wizard_lines" mode="tree">
-                                    <tree create="0" delete="0" editable="top" edit="1">
+                                    <tree create="0" delete="1" editable="top" edit="1">
                                         <field name="product_id" readonly="1" force_save="1"/>
-                                        <field name="destination_id" 
-                                            attrs="{'required': [('direct_delivery','=', False)], 'column_invisible' : [('parent.direct_delivery','=', True)]}" 
-                                            context="{'default_location_id': 5, 'shortname': True}"/>
-                                        <field name="quantity" readonly="1" force_save="1"/>
+                                        <field name="entry_date" readonly="1" force_save="1"/>
+                                        <field name="exit_date" readonly="0" force_save="1"/>
+                                        
+                                        <field name="quantity" readonly="0" force_save="1"/>
                                         <field name="product_uom_id" readonly="1" force_save="1"/>
                                         <!-- Invisible -->
-                                        <field name="direct_delivery" optional="hide"/>
                                         <field name="product_uom_category_id" optional="hide"/>
                                         <field name="wizard_id" optional="hide"/>
-                                        <field name="move_id" optional="hide"/>
+                                        <field name="customer_stock_line_id" optional="hide"/>
                                     </tree>
                                 </field>
                             </page>

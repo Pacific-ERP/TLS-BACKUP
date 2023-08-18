@@ -40,6 +40,10 @@
         <field name="model">customer.stock</field>
         <field name="arch" type="xml">
             <form string="Stock Client">
+                <header>
+                    <button name="button_to_deliver" type="object"
+                        string="Livraison Client" class="oe_highlight"/>
+                </header>
                 <sheet>
                     <h1><field name="name" readonly="1"/></h1>
                     <group>
@@ -50,18 +54,20 @@
                     </group>
                     <notebook>
                         <page string="En stock">
-                            <field name="stock_lines" domain="[('to_show','=', True)]">
+                            <field name="stock_lines" domain="[('to_show','=', True)]" context="{'shortname': True}">
                                 <tree create="0" edit="0" delete="0">
                                     <field name="product_id" optional="show"/>
                                     <field name="location_id" optional="show"/>
                                     <field name="entry_date" optional="show"/>
                                     <field name="entry_quantity" optional="show"/>
+                                    <field name="product_uom_id" optional="show"/>
                                     <field name="to_invoice" optional="show"/>
                                     <field name="exit_dates" widget="many2many_tags" optional="show"/>
                                     <!-- Invisible-->
-                                    <field name="is_invoiceable" optional="show"/>
-                                    <field name="available_quantity" optional="show"/>
-                                    <field name="to_show" optional="show"/>
+                                    <field name="product_uom_id" optional="hide"/>
+                                    <field name="is_invoiceable" optional="hide"/>
+                                    <field name="available_quantity" optional="hide"/>
+                                    <field name="to_show" optional="hide"/>
                                 </tree>
                             </field>
                         </page>
@@ -69,14 +75,17 @@
                             <field name="stock_lines" domain="[('to_show','=', False)]">
                                 <tree create="0" edit="0" delete="0">
                                     <field name="product_id" optional="show"/>
+                                    <field name="location_id" optional="show"/>
                                     <field name="entry_date" optional="show"/>
                                     <field name="entry_quantity" optional="show"/>
+                                    <field name="product_uom_id" optional="show"/>
                                     <field name="to_invoice" optional="show"/>
                                     <field name="exit_dates" widget="many2many_tags" optional="show"/>
                                     <!-- Invisible-->
-                                    <field name="is_invoiceable" optional="show"/>
-                                    <field name="available_quantity" optional="show"/>
-                                    <field name="to_show" optional="show"/>
+                                    <field name="product_uom_id" optional="hide"/>
+                                    <field name="is_invoiceable" optional="hide"/>
+                                    <field name="available_quantity" optional="hide"/>
+                                    <field name="to_show" optional="hide"/>
                                 </tree>
                             </field>
                         </page>
