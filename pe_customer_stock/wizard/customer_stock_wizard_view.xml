@@ -26,6 +26,7 @@
                                             attrs="{'required': [('direct_delivery','=', False)], 'column_invisible' : [('parent.direct_delivery','=', True)]}" 
                                             context="{'default_location_id': 5, 'shortname': True}"/>
                                         <field name="quantity" readonly="1" force_save="1"/>
+                                        <field name="volume" readonly="0" force_save="1"/>
                                         <field name="product_uom_id" readonly="1" force_save="1"/>
                                         <!-- Invisible -->
                                         <field name="direct_delivery" optional="hide"/>

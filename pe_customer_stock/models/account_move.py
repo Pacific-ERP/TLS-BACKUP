@@ -12,5 +12,6 @@ class AccountMove(models.Model):
     customer_stock_id = fields.Many2one(string="Stock Clients", comodel_name="customer.stock")
 
     def _get_custom_link(self):
+        name = "Facture brouillon" if self.state == 'draft' else self.name
         return Markup("<a href=# data-oe-model='%s' data-oe-id='%s'>%s</a>") % (
-            self._name, self.id, self.name)
+            self._name, self.id, name)

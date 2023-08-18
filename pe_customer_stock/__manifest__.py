@@ -12,6 +12,7 @@
     "depends": ["stock","crm","account","pe_crm_purchase", "pe_crm"],
     "data": [
         "security/ir.model.access.csv",
+        "data/product_template.xml",
         "views/stock_picking.xml",
         "views/menuitem.xml",
         "views/customer_stock.xml",

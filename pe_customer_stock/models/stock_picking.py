@@ -33,8 +33,8 @@ class StockPicking(models.Model):
         invoice_vals = {
             'move_type': 'out_invoice',
             'partner_id': self.partner_id.id,
-            'invoice_date': fields.Datetime.today(),
-            'date': fields.Datetime.today(),
+            'invoice_date': fields.Datetime.now(),
+            'date': fields.Datetime.now(),
             'customer_stock_id': self.customer_stock_id if self.customer_stock_id else False,
         }
         return invoice_vals
@@ -65,7 +65,14 @@ class StockPicking(models.Model):
         return invoice if invoice else False
     
     def _populate_invoice(self, invoice):
-        pass
+        line_to_add = []
+        # Valeur des ligns de la facture (account.move.line)
+        for line in self.move_lines:
+            line_to_add.append((0,0,line._prepare_invoice_line_vals()))
+
+        invoice.with_context(check_move_validity=False).write({'invoice_line_ids': line_to_add})
+        invoice._recompute_dynamic_lines()
+        self.message_post(body=f"Facture client alimenter : {invoice._get_custom_link()}")
     
     def _process_create_invoice(self):
         invoice = self._get_invoice()

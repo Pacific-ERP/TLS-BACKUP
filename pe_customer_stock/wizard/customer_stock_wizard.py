@@ -130,13 +130,13 @@ class CustomerStockWizard(models.TransientModel):
         destination_ids = self.wizard_lines.mapped('destination_id')
         _logger.warning(f"Destinations : {destination_ids}")
         
-        pickging_ids = []
+        pickging_ids = self.env['stock.picking']
         origin = self._get_origin_id()
         for destination in destination_ids:
             # Création du transfert
             res = self._prepare_picking(destination)
             picking = self.env['stock.picking'].create(res)
-            pickging_ids.append(picking)
+            pickging_ids += picking
 
             move_line_to_add = self.wizard_lines.filtered(lambda l : l.destination_id.id == destination.id)
             move_line_to_add._create_stock_moves(picking, origin)
@@ -145,6 +145,10 @@ class CustomerStockWizard(models.TransientModel):
         # Message chatter pour followup
         self._post_message_link(pickging_ids)
         self._picking_is_delivered()
+
+        if pickging_ids and go_to_record:
+            return self._go_to_records(pickging_ids)
+        return {'type': 'ir.actions.act_window_close'}
     
     def _create_delivery(self, go_to_record):
         '''
@@ -180,6 +184,9 @@ class CustomerStockWizard(models.TransientModel):
     def button_confirm(self):
         go_to_record = self._context.get('view_customer_picking', False)
 
+        if any(not line.volume for line in self.wizard_lines):
+            raise UserError("Un volume est nécessaire pour chaque ligne")
+
         if not self.direct_delivery:
             _logger.warning(f"[1] Transfert Stock client : {self.partner_id} | Go To {go_to_record}")
             return self._create_internal_picking(go_to_record)
@@ -203,7 +210,8 @@ class CustomerStockWizardLine(models.TransientModel):
     destination_id = fields.Many2one(string="Emplacement client", comodel_name="stock.location", domain=_get_destination_domain)
     product_uom_id = fields.Many2one('uom.uom', 'UdM', domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id')
-    quantity = fields.Float(string="Quantité", default=1, required=True)
+    quantity = fields.Float(string="Quantité", default=1.0, required=True)
+    volume = fields.Float(string="Volume", default=0 ,required=True)
 
     def _create_stock_moves(self, picking_id, origin):
         _logger.warning(f'[Lines]_create_stock_moves')
@@ -223,5 +231,6 @@ class CustomerStockWizardLine(models.TransientModel):
                     'picking_type_id': picking_id.picking_type_id.id,
                     'warehouse_id': picking_id.picking_type_id.warehouse_id.id,
                     'crm_lead_id': origin.id if origin else False,
+                    'pe_volume_exit' : line.volume,
                 }
                 move = self.env['stock.move'].create(template)

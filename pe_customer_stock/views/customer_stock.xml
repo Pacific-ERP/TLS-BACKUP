@@ -54,37 +54,39 @@
                     </group>
                     <notebook>
                         <page string="En stock">
-                            <field name="stock_lines" domain="[('to_show','=', True)]" context="{'shortname': True}">
+                            <field name="stock_lines">
                                 <tree create="0" edit="0" delete="0">
                                     <field name="product_id" optional="show"/>
                                     <field name="location_id" optional="show"/>
                                     <field name="entry_date" optional="show"/>
                                     <field name="entry_quantity" optional="show"/>
                                     <field name="product_uom_id" optional="show"/>
+                                    <field name="entry_volume" optional="show"/>
                                     <field name="to_invoice" optional="show"/>
                                     <field name="exit_dates" widget="many2many_tags" optional="show"/>
+                                    <field name="available_volume" optional="show"/>
+                                    <field name="available_quantity" optional="show"/>
                                     <!-- Invisible-->
-                                    <field name="product_uom_id" optional="hide"/>
                                     <field name="is_invoiceable" optional="hide"/>
-                                    <field name="available_quantity" optional="hide"/>
                                     <field name="to_show" optional="hide"/>
                                 </tree>
                             </field>
                         </page>
                         <page string="Historique">
-                            <field name="stock_lines" domain="[('to_show','=', False)]">
+                            <field name="history_lines">
                                 <tree create="0" edit="0" delete="0">
                                     <field name="product_id" optional="show"/>
                                     <field name="location_id" optional="show"/>
                                     <field name="entry_date" optional="show"/>
                                     <field name="entry_quantity" optional="show"/>
                                     <field name="product_uom_id" optional="show"/>
+                                    <field name="entry_volume" optional="show"/>
                                     <field name="to_invoice" optional="show"/>
                                     <field name="exit_dates" widget="many2many_tags" optional="show"/>
+                                    <field name="available_volume" optional="show"/>
+                                    <field name="available_quantity" optional="show"/>
                                     <!-- Invisible-->
-                                    <field name="product_uom_id" optional="hide"/>
                                     <field name="is_invoiceable" optional="hide"/>
-                                    <field name="available_quantity" optional="hide"/>
                                     <field name="to_show" optional="hide"/>
                                 </tree>
                             </field>
