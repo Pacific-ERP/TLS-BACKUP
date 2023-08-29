@@ -9,12 +9,12 @@
                 <field name="delivery_status"/>
                 <field name="invoices_status"/>
             </xpath>
-            <xpath expr="//button[@name='action_create_invoice'][1]" position="attributes">
+            <!-- <xpath expr="//button[@name='action_create_invoice'][1]" position="attributes">
                 <attribute name="attrs">{'invisible': ['|','|', ('state', 'not in', ('purchase', 'done')),('delivery_status', '!=', 'all_delivered'), ('invoice_status', 'in', ('no', 'invoiced'))]}</attribute>
             </xpath>
             <xpath expr="//button[@name='action_create_invoice'][2]" position="attributes">
                 <attribute name="attrs">{'invisible': ['|','|','|', ('state', 'not in', ('purchase', 'done')),('delivery_status', '!=', 'all_delivered'), ('invoice_status', 'not in', ('no', 'invoiced')), ('order_line', '=', [])]}</attribute>
-            </xpath>
+            </xpath> -->
         </field>
     </record>
 </odoo>
