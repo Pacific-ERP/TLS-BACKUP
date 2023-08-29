@@ -9,9 +9,9 @@
                 <field name="delivery_status"/>
                 <field name="invoices_status"/>
             </xpath>
-            <xpath expr="//button[@name='449'][1]" position="attributes">
+            <!-- <xpath expr="//button[@name='449'][1]" position="attributes">
                 <attribute name="attrs">{'invisible': [('delivery_status', '!=', 'all_delivered')]}</attribute>
-            </xpath>
+            </xpath> -->
         </field>
     </record>
 </odoo>

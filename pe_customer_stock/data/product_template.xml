@@ -1,0 +1,10 @@
+<odoo><data>
+    <!-- Les fichiers data permettent de créer des records -->
+        <record id="pe_customer_stock_default_articles" model="product.template">
+            <field name="name">Frais de stockage</field>
+            <field name="sale_ok">1</field>
+            <field name="purchase_ok">0</field>
+            <field name="detailed_type">service</field>
+        </record>
+
+</data></odoo>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- form -->
+        <record id="pe_customer_stock_deliver_wizard_form" model="ir.ui.view">
+            <field name="name">Pacific-ERP pe_customer_stock : customer.stock.deliver.wizard(form)</field>
+            <field name="model">customer.stock.deliver.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <p>
+                            Dans le cas de multiple emplacement, plusieurs livraison sera créer 1 pour chaque emplacements présent dans la liste
+                        </p>
+                        <group>
+                            <group>
+                                <field name="customer_stock_id" readonly="1"/>
+                                <field name="origin" readonly="1"/>
+                                <field name="company_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Opérations">
+                                <field name="wizard_lines" mode="tree" context="{'shortname':True}">
+                                    <tree create="0" delete="1" editable="top" edit="1">
+                                        <field name="product_id" readonly="1" force_save="1"/>
+                                        <field name="location_id" readonly="1" force_save="1" context="{'shortname': True}"/>
+                                        <field name="entry_date" readonly="1" force_save="1"/>
+                                        <field name="exit_date" readonly="0" force_save="1"/>
+                                        
+                                        <field name="volume" readonly="0" force_save="1"/>
+                                        <field name="max_volume" optional="hide" readonly="0" force_save="1"/>
+                                        <field name="quantity" readonly="0" force_save="1"/>
+                                        <field name="max_quantity" optional="hide" readonly="0" force_save="1"/>
+                                        <field name="delta_day" optional="hide" readonly="0" force_save="1"/>
+                                        <field name="product_uom_id" readonly="1" force_save="1"/>
+                                        <!-- Invisible -->
+                                        <field name="product_uom_category_id" optional="hide"/>
+                                        <field name="wizard_id" optional="hide"/>
+                                        <field name="customer_stock_line_id" optional="hide"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <footer>
+                        <button string="Confirmer et voir" name="button_confirm" context="{'view_customer_picking':True}" type="object" class="oe_highlight"/>
+                        <button string="Confirmer" name="button_confirm" type="object" class="oe_highlight"/>
+                        <button string="Annuler" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+       
+    </data>
+</odoo>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- form -->
+        <record id="pe_customer_stock_wizard_form" model="ir.ui.view">
+            <field name="name">Pacific-ERP pe_customer_stock : customer.stock.wizard(form)</field>
+            <field name="model">customer.stock.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="direct_delivery"/>
+                                <field name="partner_id" required="1"/>
+                                <field name="destination_id" attrs="{'invisible' : [('direct_delivery','=', True)]}" context="{'default_location_id': 5, 'shortname': True}"/>
+                                <field name="origin"/>
+                                <field name="picking_id" invisible="0"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Opérations">
+                                <field name="wizard_lines" mode="tree">
+                                    <tree create="0" delete="0" editable="top" edit="1">
+                                        <field name="product_id" readonly="1" force_save="1"/>
+                                        <field name="destination_id" 
+                                            attrs="{'required': [('direct_delivery','=', False)], 'column_invisible' : [('parent.direct_delivery','=', True)]}" 
+                                            context="{'default_location_id': 5, 'shortname': True}"/>
+                                        <field name="quantity" readonly="1" force_save="1"/>
+                                        <field name="volume" readonly="0" force_save="1"/>
+                                        <field name="product_uom_id" readonly="1" force_save="1"/>
+                                        <!-- Invisible -->
+                                        <field name="direct_delivery" optional="hide"/>
+                                        <field name="product_uom_category_id" optional="hide"/>
+                                        <field name="wizard_id" optional="hide"/>
+                                        <field name="move_id" optional="hide"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <footer>
+                        <button string="Confirmer et voir" name="button_confirm" context="{'view_customer_picking':True}" type="object" class="oe_highlight"/>
+                        <button string="Confirmer" name="button_confirm" type="object" class="oe_highlight"/>
+                        <button string="Annuler" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+       
+    </data>
+</odoo>

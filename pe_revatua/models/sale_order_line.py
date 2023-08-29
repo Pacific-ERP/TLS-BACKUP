@@ -32,16 +32,17 @@ class SaleOrderLineInherit(models.Model):
     r_weight = fields.Float(string='Volume weight (T)', store=True, digits=(12, 3))
     check_adm = fields.Boolean(string='Payé par ADM', store=True)
     
+    # def _compute_line_detail(self): Partie Wizard voir si utile
+    #     vals = {}
+    #     return vals
+    
     # Calcul des lignes à facturer vu que la quantité est séparer entre
     # facture ADM et Client ne prendre en compte que celle du Client
     @api.depends('invoice_lines.move_id.state', 'invoice_lines.quantity', 'untaxed_amount_to_invoice')
     def _compute_qty_invoiced(self):
         # OVERRIDE
         """
-        Compute the quantity invoiced. If case of a refund, the quantity invoiced is decreased. Note
-        that this is the case only if the refund is generated from the SO and that is intentional: if
-        a refund made would automatically decrease the invoiced quantity, then there is a risk of reinvoicing
-        it automatically, which may not be wanted at all. That's why the refund has to be created from the SO
+            OVERRIDE : Ne comptez uniquement les lignes des factures clients
         """
         for line in self:
             qty_invoiced = 0.0
@@ -53,7 +54,10 @@ class SaleOrderLineInherit(models.Model):
                             qty_invoiced += invoice_line.product_uom_id._compute_quantity(invoice_line.quantity, line.product_uom)
                         # <<< OVERRIDE
                     elif invoice_line.move_id.move_type == 'out_refund':
-                        qty_invoiced -= invoice_line.product_uom_id._compute_quantity(invoice_line.quantity, line.product_uom)
+                        # OVERRIDE >>>
+                        if not invoice_line.move_id.is_adm_invoice:
+                            qty_invoiced -= invoice_line.product_uom_id._compute_quantity(invoice_line.quantity, line.product_uom)
+                        # <<< OVERRIDE
             line.qty_invoiced = qty_invoiced
                 
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
@@ -66,7 +70,8 @@ class SaleOrderLineInherit(models.Model):
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
             # OVERRIDE >>>
             # Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre)
-            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_shipping_id, discount=line.discount, terrestre=line.tarif_terrestre, maritime=line.tarif_maritime,rpa = line.tarif_rpa)
+            # Modifier rajouter la ligne pour récupération
+            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_shipping_id, discount=line.discount, terrestre=line.tarif_terrestre, maritime=line.tarif_maritime,rpa = line.tarif_rpa, line=line)
             # <<< OVERRIDE
             line.update({
                 'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),

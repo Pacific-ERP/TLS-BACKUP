@@ -1,32 +1,36 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo><data>
     
-        <!-- rend visible champs pour groups donner -->
+        <!-- Form -->
         <record id="revatua_sale_order_form" model="ir.ui.view">
-            <field name="name">Pacific-ERP sale.order : pe_revatua (form)</field>
+            <field name="name">Pacific-ERP pe_revatua : sale.order (form)</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form" />
-            <!-- <field name="groups_id" eval="[(6, 0, [ref('pe_revatua.group_revatua_users') ])]"/> -->
             <field name="arch" type="xml">
-            <!-- Formulaire -->
-                <!-- Coche Revatua -->
+            <!-- Détails -->
+                <!-- Boutton : Détails des lignes  [Wizard] à voir si utile-->
+                <!-- <xpath expr="//header" position="inside">
+                    <button name="open_wizard_sale_line_full_detail" type="object"
+                        string="Détails des lignes" class="oe_highlight"
+                        attrs="{'invisible': [('revatua_ck', '=', False)]}"/>
+                </xpath> -->
+                
+                <!-- Champs : Coche Revatua -->
                 <xpath expr="//page[@name='other_information']//field[@name='company_id']" position="after">
                     <field name="revatua_ck" invisible="1"/>
                 </xpath>
-                <!-- déplacer condition de livraison -->
+                
+                <!-- Move(picking_policy) : before[validity_date] -->
                 <xpath expr="//field[@name='validity_date']" position="before">
                     <xpath expr="//field[@name='picking_policy']" position="move"/>
                 </xpath>
-                <!-- Ajout du bouton livré -->
+                
+                <!-- Champs : Coche Est livré -->
                 <xpath expr="//field[@name='pe_destination']" position="after">
                     <field name="is_deliver" widget="boolean_toggle" attrs="{'readonly': [('state', 'not in', ('sale','done'))], 'invisible': [('revatua_ck', '=', False)]}"/>
                 </xpath>
-                <!-- Client uniquement aremiti -->
-                <!-- <xpath expr="//field[@name='partner_id']" position="replace">
-                    <field name="partner_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}"
-                        domain="[('company_id','=',allowed_company_ids[0])]" options="{&quot;always_reload&quot;:true}"/>
-                </xpath> -->
-                <!-- champs custom revatua -->
+
+                <!-- Champs : Informations Expéditeur/Destinataire -->
                 <xpath expr="//group[@name='sale_header']" position="after">
                     <group name="detail_livraison" attrs="{'invisible': [('revatua_ck', '=', False)]}">
                         <group name="lieu_recuperation" string="Lieu de récupération">
@@ -45,34 +49,19 @@
                         </group>
                     </group>
                 </xpath>
+                
             <!-- Ligne d'articles -->
-                <!-- Articles uniquement Aremiti -->
-                <!-- <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_id']" position="replace">
-                    <field name="product_id" domain="[('sale_ok', '=', True),('company_id', '=', allowed_company_ids[0])]"
-                        context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
-                        attrs="{'readonly': [('product_updatable', '=', False)],'required': [('display_type', '=', False)],}" force_save="1"/>
-                </xpath> -->
-                <!-- Renommer Quantité -->
-                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="attributes">
-                    <attribute name="string">Qté</attribute>
-                    <attribute name="digits">[12,3]</attribute>
-                </xpath>
-                <!-- Renommer Prix unitaire -->
-                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_unit']" position="attributes">
-                    <attribute name="string">Prix unit.</attribute>
-                </xpath>
-
-                <!-- Champs tarif(terrestre/maritime/rpa) et total + invisible field-->
+                <!-- Sub-Tree(order_line) -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="after">
                     <!-- Invisible -->
-                    <field name="base_rpa" optional="hide"/>
-                    <field name="tarif_minimum_rpa" optional="hide"/>
-                    <field name="base_maritime" optional="hide"/>
-                    <field name="tarif_minimum_maritime" optional="hide"/>
-                    <field name="base_terrestre" optional="hide"/>
-                    <field name="tarif_minimum_terrestre" optional="hide"/>
-                    <field name="tarif_minimum" optional="hide"/>
-                    <field name="check_adm" optional="hide"/>
+                    <field name="base_rpa" invisible="1"/>
+                    <field name="tarif_minimum_rpa" invisible="1"/>
+                    <field name="base_maritime" invisible="1"/>
+                    <field name="tarif_minimum_maritime" invisible="1"/>
+                    <field name="base_terrestre" invisible="1"/>
+                    <field name="tarif_minimum_terrestre" invisible="1"/>
+                    <field name="tarif_minimum" invisible="1"/>
+                    <field name="check_adm" invisible="1"/>
                     <!-- Afficher -->
                     <field name="tarif_terrestre" sum="Terrestre" digits="[42,0]" optional="show" attrs="{'column_invisible': [('parent.revatua_ck', '=', False)]}"/>
                     <field name="tarif_maritime" sum="Maritime" digits="[42,0]" optional="show" attrs="{'column_invisible': [('parent.revatua_ck', '=', False)]}"/>
@@ -80,24 +69,70 @@
                     <field name="tarif_rpa_ttc" sum="RPA" digits="[42,0]" optional="hide" attrs="{'column_invisible': [('parent.revatua_ck', '=', False)]}"/>
                     <field name="price_total" optional="show" string="Total TTC" attrs="{'column_invisible': [('parent.revatua_ck', '=', False)]}"/>
                 </xpath>
+
+                <!-- Sub-Form(order_line) -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/form[1]" position="inside">
+                    <notebook>
+                        <page string="Aremiti">
+                            <group>
+                                <group string="Base">
+                                    <field name="base_terrestre"/>
+                                    <field name="base_maritime"/>
+                                    <field name="base_rpa"/>
+                                </group>
+                                <group string="Minimum">
+                                    <field name="tarif_minimum_terrestre"/>
+                                    <field name="tarif_minimum_maritime"/>
+                                    <field name="tarif_minimum_rpa"/>
+                                </group>
+                                <group string="Tarif">
+                                    <field name="tarif_terrestre"/>
+                                    <field name="tarif_maritime"/>
+                                    <field name="tarif_rpa"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Ligne de facture">
+                            <field name="invoice_lines" position="move"/>
+                        </page>
+                    </notebook>
+                </xpath>
                 
-                <!-- Remplacer l'uom de base par un fictif pour information -->
+                <!-- Champs : Volume, Poids -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom']" position="after">
-                  <field name="r_volume" string="Vol(m³)" optional="show"/>
-                  <field name="r_weight" string="Poids(T)" optional="show"/>
+                    <field name="r_volume" string="Vol(m³)" optional="show"/>
+                    <field name="r_weight" string="Poids(T)" optional="show"/>
                 </xpath>
                 
-                <!-- Modification de prix unitaire en prix U -->
+                <!-- Attribute(string) : order_line.product_uom_qty -->
+                <!-- Attribute(digits) : order_line.product_uom_qty -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="string">Qté</attribute>
+                    <attribute name="digits">[12,3]</attribute>
+                </xpath>
+                
+                <!-- Attribute(invisible) : div[@name='invoice_lines'] -->
+                <xpath expr="//div[@name='invoice_lines']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                
+                <!-- Attribute(string) : order_line.price_unit -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_unit']" position="attributes">
-                  <attribute name="string">Prix U</attribute>
+                    <attribute name="string">Prix U</attribute>
                 </xpath>
                 
-                <!-- Précision sur le sous total que c'est du HT -->
+                <!-- Attribute(string) : order_line.price_subtotal -->
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='price_subtotal']" position="attributes">
-                  <attribute name="string">Total HT</attribute>
+                    <attribute name="string">Total HT</attribute>
                 </xpath>
                 
-            <!-- Total maritime & terrestre -->
+                <!-- Attribute(no_create) : order_line.product_id -->
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_id']" position="attributes">
+                    <attribute name="options">{"no_create":true}</attribute>
+                </xpath>
+                
+            <!-- Totaux -->
+                <!-- Total Administration & Customer -->
                 <xpath expr="//field[@name='note']/../.." position="before">
                     <div class="oe_left" attrs="{'invisible': [('revatua_ck', '=', False)]}">
                         <table style="width:200px">
@@ -115,9 +150,5 @@
                     </div>
                 </xpath>
                 
-            <!-- retire la possibilité de créer un article directement du formualire de vente -->
-                <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_id']" position="attributes">
-                    <attribute name="options">{"no_create":true}</attribute>
-                </xpath>
             </field></record>
 </data></odoo>       

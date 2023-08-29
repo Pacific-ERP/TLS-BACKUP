@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pe_revatua_sale_line_detail_wizard_form" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_revatua : sale.line.detail.wizard (form)</field>
+        <field name="model">sale.line.detail.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Détails des lignes de commandes">
+                <group>
+                    <group>
+                        <field name="sale_order_id"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Détails des lignes">
+                    </page>
+                    <page string="Ligne de la commande">
+                        <field name="order_line"/>
+                    </page>
+                </notebook>
+                <footer>
+                    <button string="Annuler" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
