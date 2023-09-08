@@ -2,14 +2,14 @@
 {
     "name": "Pacific-ERP: Aremiti custom PDF",
     "summary": "PDF société aremiti uniquement",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "category": "Uncategorized",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",
     "license": "LGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["sale","account","stock","pe_revatua"],
+    "depends": ["sale","account","stock","pe_revatua","pe_devis_bc_destination"],
     "data": [
         "data/at_paperformat.xml",
         "views/base_document_layout.xml",

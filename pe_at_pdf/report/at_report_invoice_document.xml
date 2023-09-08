@@ -117,28 +117,33 @@
                             </h2>
                             <!-- Détails de la ventes -->
                             <div class="row mt32 mb32 pe_separate_bloc" id="pe_invoice_informations">
-                                <div class="col-auto col-3 mw-100 mb-2" t-if="o.invoice_date" name="invoice_date">
-                                    <t t-if="o.move_type == 'out_invoice'"><strong>DATE DE LA FACTURE:</strong></t>
-                                    <t t-elif="o.move_type == 'out_refund'"><strong>DATE DE L'AVOIR:</strong></t>
-                                    <t t-elif="o.move_type == 'out_receipt'"><strong>DATE DE RÉCEPTION:</strong></t>
-                                    <t t-else=""><strong>DATE:</strong></t>
+                                <div class="col-auto col-2 mw-100 mb-2" t-if="o.invoice_date" name="invoice_date">
+                                    <!--<t t-if="o.move_type == 'out_invoice'"><strong>DATE DE LA FACTURE:</strong></t>-->
+                                    <!--<t t-elif="o.move_type == 'out_refund'"><strong>DATE DE L'AVOIR:</strong></t>-->
+                                    <!--<t t-elif="o.move_type == 'out_receipt'"><strong>DATE DE RÉCEPTION:</strong></t>-->
+                                    <!--<t t-else=""><strong>DATE:</strong></t>-->
+                                    <strong>DATE:</strong>
                                     <p class="m-0" t-field="o.invoice_date"/>
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
-                                    <strong>DATE D'ÉCHÉANCE:</strong>
+                                <div class="col-auto col-2 mw-100 mb-2" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
+                                    <strong>ÉCHÉANCE</strong>
                                     <p class="m-0" t-field="o.invoice_date_due"/>
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2" t-if="o.invoice_origin" name="origin">
-                                    <strong>ORIGINE:</strong>
+                                <div class="col-auto col-2 mw-100 mb-2" t-if="o.invoice_origin" name="origin">
+                                    <strong>ORIGINE</strong>
                                     <p class="m-0" t-field="o.invoice_origin"/>
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2" t-if="o.partner_id.ref" name="customer_code">
-                                    <strong>RÉFÉRENCE CLIENT:</strong>
-                                    <p class="m-0" t-field="o.partner_id.ref"/>
+                                <div class="col-auto col-2 mw-100 mb-2" t-if="o.pe_bc" name="customer_code">
+                                    <strong>RÉF CLIENT</strong>
+                                    <p class="m-0" t-field="o.pe_bc"/>
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2" t-if="o.ref" name="reference">
-                                    <strong>RÉFÉRENCE:</strong>
+                                <div class="col-auto col-2 mw-100 mb-2" t-if="o.ref" name="reference">
+                                    <strong>RÉFÉRENCE</strong>
                                     <p class="m-0" t-field="o.ref"/>
+                                </div>
+                                <div class="col-auto col-2 mw-100 mb-2" t-if="o.user_id" name="reference">
+                                    <strong>VENDEUR</strong>
+                                    <p class="m-0" t-field="o.user_id"/>
                                 </div>
                             </div>
                             <!-- Lignes de ventes -->
@@ -147,25 +152,25 @@
                                 <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
                     
                                 <table class="table table-sm o_main_table">
-                                     <!--In case we want to repeat the header, remove "display: table-row-group" -->
+                                    <!--In case we want to repeat the header, remove "display: table-row-group" -->
                                     <thead style="display: table-row-group">
                                         <tr>
-                                            <th name="th_description" class="text-center">DESCRIPTION</th>
-                                            <th name="th_volume" class="text-center">VOL</th>
-                                            <th name="th_poid" class="text-center">POIDS</th>
-                                            <th name="th_quantity" class="text-center">QTE</th>
-                                            <th name="th_priceunit" class="text-center">PU</th>
-                                            <th name="th_taxes" class="text-center">TAXES</th>
-                                            <th name="th_discount" t-if="display_discount" class="text-center">
+                                            <th name="th_description" style="vertical-align: middle;" class="text-center">DESCRIPTION</th>
+                                            <th name="th_volume" style="vertical-align: middle;" class="text-center">VOL</th>
+                                            <th name="th_poid" style="vertical-align: middle;" class="text-center">POIDS</th>
+                                            <th name="th_quantity" style="vertical-align: middle;" class="text-center">QTE</th>
+                                            <th name="th_priceunit" style="vertical-align: middle;" class="text-center">PU</th>
+                                            <th name="th_taxes" style="vertical-align: middle;" class="text-center">TAXES</th>
+                                            <th name="th_discount" t-if="display_discount" style="vertical-align: middle;" class="text-center">
                                                 <span>REM.%</span>
                                             </th>
                                             
-                                            <th name="th_subtotal" class="text-center">
+                                            <th name="th_subtotal" style="vertical-align: middle;" class="text-center">
                                                 <span>TOTAL HT</span>
                                             </th>
-                                            <th name="th_terrestre" class="text-center">TERR</th>
-                                            <th name="th_maritime" class="text-center">MARIT</th>
-                                            <th name="th_rpa" class="text-center">RPA</th>
+                                            <th name="th_terrestre" style="vertical-align: middle;" class="text-center">TER</th>
+                                            <th name="th_maritime" style="vertical-align: middle;" class="text-center">MAR</th>
+                                            <th name="th_rpa" style="vertical-align: middle;" class="text-center">RPA</th>
                                         </tr>
                                     </thead>
                                     <tbody class="sale_tbody">

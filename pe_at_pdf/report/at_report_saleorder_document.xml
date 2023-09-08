@@ -108,17 +108,21 @@
                         <div class="col-12">
                             <!-- Détails de la ventes -->
                             <div class="row mt32 mb32 pe_separate_bloc" id="pe_sale_informations">
-                                <div t-if="doc.date_order" class="col-auto col-4 mw-100 mb-2">
-                                    <strong>DATE DE LA COMMANDE :</strong>
+                                <div t-if="doc.date_order" class="col-auto col-3 mw-100 mb-2">
+                                    <strong>DATE</strong>
                                     <p class="m-0" t-field="doc.date_order"/>
                                 </div>
-                                <div t-if="doc.name" class="col-auto col-4 mw-100 mb-2">
-                                    <strong>COMMANDE N° :</strong>
+                                <div t-if="doc.name" class="col-auto col-3 mw-100 mb-2">
+                                    <strong>COMMANDE N°</strong>
                                     <p class="m-0" t-field="doc.name"/>
                                 </div>
-                                <div t-if="doc.user_id.name" class="col-auto col-4 mw-100 mb-2">
-                                    <strong>VENDEUR :</strong>
+                                <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">
+                                    <strong>VENDEUR</strong>
                                     <p class="m-0" t-field="doc.user_id"/>
+                                </div>
+                                <div t-if="doc.pe_bc" class="col-auto col-3 mw-100 mb-2">
+                                    <strong>REFERENCE</strong>
+                                    <p class="m-0" t-field="doc.pe_bc"/>
                                 </div>
                             </div>
                             <!-- Lignes de ventes -->
@@ -130,22 +134,22 @@
                                     <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                                     <thead style="display: table-row-group">
                                         <tr>
-                                            <th name="th_description" class="text-center">DESCRIPTION</th>
-                                            <th name="th_volume" class="text-center">VOL</th>
-                                            <th name="th_poid" class="text-center">POIDS</th>
-                                            <th name="th_quantity" class="text-center">QTE</th>
-                                            <th name="th_priceunit" class="text-center">PU</th>
-                                            <th name="th_taxes" class="text-center">TAXES</th>
-                                            <th name="th_discount" t-if="display_discount" class="text-center">
+                                            <th name="th_description" style="vertical-align: middle;" class="text-center">DESCRIPTION</th>
+                                            <th name="th_volume" style="vertical-align: middle;" class="text-center">VOL</th>
+                                            <th name="th_poid" style="vertical-align: middle;" class="text-center">POIDS</th>
+                                            <th name="th_quantity" style="vertical-align: middle;" class="text-center">QTE</th>
+                                            <th name="th_priceunit" style="vertical-align: middle;" class="text-center">PU</th>
+                                            <th name="th_taxes" style="vertical-align: middle;" class="text-center">TAXES</th>
+                                            <th name="th_discount" t-if="display_discount" style="vertical-align: middle;" class="text-center">
                                                 <span>REM.%</span>
                                             </th>
                                             
-                                            <th name="th_subtotal" class="text-center">
+                                            <th name="th_subtotal" style="vertical-align: middle;" class="text-center">
                                                 <span>TOTAL HT</span>
                                             </th>
-                                            <th name="th_terrestre" class="text-center">TERR</th>
-                                            <th name="th_maritime" class="text-center">MARIT</th>
-                                            <th name="th_rpa" class="text-center">RPA</th>
+                                            <th name="th_terrestre" style="vertical-align: middle;" class="text-center">TERR</th>
+                                            <th name="th_maritime" style="vertical-align: middle;" class="text-center">MARIT</th>
+                                            <th name="th_rpa" style="vertical-align: middle;" class="text-center">RPA</th>
                                         </tr>
                                     </thead>
                                     <tbody class="sale_tbody">
