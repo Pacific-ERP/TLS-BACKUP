@@ -23,6 +23,8 @@
                         <t t-else="">
                             <span class="h5" style="color:red;">Prix sur devis</span>
                         </t>
+                        
+                        <span style="float: right; font-weight:bold" t-esc="'%s %s' % (combination_info['virtual_available'],combination_info['base_unit_name'])"/>
                     </div>
                 </div>
                 <div class="o_wsale_product_btn pl-2"/>

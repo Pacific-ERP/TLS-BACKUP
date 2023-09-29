@@ -18,10 +18,12 @@
     "depends": ["sale","website_crm_partner_assign","payment"],
     "data": [
         "views/portal_my_home_menu_lead.xml",
+        "views/product_template.xml",
         "report/portal_my_orders.xml",
         "report/portal_my_quotations.xml",
         "report/portal_my_opportunity.xml",
         "report/portal_my_opportunities.xml",
+        "report/product_share_buttons.xml",
         "report/products_item.xml",
         "report/product_price.xml",
         "report/sale_order_portal_template.xml",

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <template id="pe_custom_web_product_share_buttons" inherit_id="website_sale.product_share_buttons">
+        <xpath expr="//div[@id='o_product_terms_and_share']" position="after">
+            <div class="h4 fa-solid fa-file-pen" style="float:left" contenteditable="false">
+                <a t-if="combination_info['technical_data_id']" t-att-href="'/web/content/%i?download=true=' % combination_info['technical_data_id']">
+                    <i class="fa fa-file-text" aria-hidden="true"/>
+                    <span>Fiche Technique</span>
+                </a>
+            </div>
+        </xpath>
+    </template>
+
+</data></odoo>

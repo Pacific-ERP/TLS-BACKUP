@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <record id="pe_custom_web_product_template_form" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_custom_web : product.template(form)</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view" />
+        <field name="arch" type="xml">
+            <!-- modification avec xpath  // recherche sur tout le documents -->
+            <xpath expr="//field[@name='public_categ_ids']" position="after">
+                <!-- Put fields/attributes here   -->
+                <field name="technical_data_name" invisible="1"/>
+                <field name="old_website_sequence" invisible="1"/>
+                <field name="technical_data" context="{'default_public': True, 'mt_test':True}" widget="many2many_binary"/>
+            </xpath>
+        </field>
+    </record>
+
+</data></odoo>

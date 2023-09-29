@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <record id="pe_custom_account_move_form" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_custom : account.move(form)</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Formulaire -->
+            <xpath expr="//field[@name='payment_reference']" position="after">
+                <field name="transport_type"/>
+                <field name="provenance"/>
+                <field name="invoice_incoterm_id" position="move"/>
+            </xpath>
+            
+        </field>
+    </record>
+
+</data></odoo>

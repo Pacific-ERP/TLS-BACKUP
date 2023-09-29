@@ -2,5 +2,5 @@
 
 # from . import security
 # from . import wizard
-# from . import models
+from . import models
 # from . import controllers
