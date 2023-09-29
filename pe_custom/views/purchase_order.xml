@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <record id="pe_custom_purchase_order_form" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_custom : purchase.order(form)</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Formulaire -->
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="transport_type"/>
+                <field name="provenance"/>
+                <field name="incoterm_id" position="move"/>
+            </xpath>
+            
+            <!-- Lignes d'achat -->
+            <xpath expr="//page[@name='products']//field[@name='product_uom']" position="after">
+                <field name="pe_poid" optional="show"/>
+                <field name="pe_volume" optional="show"/>
+            </xpath>
+            
+        </field>
+    </record>
+
+</data></odoo>
