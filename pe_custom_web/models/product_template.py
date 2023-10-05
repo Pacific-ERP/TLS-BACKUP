@@ -64,10 +64,10 @@ class ProductTemplate(models.Model):
             parent_combination=parent_combination,
             only_template=only_template,
         )
-
+        
         # Quantité disponible
-        combination_info['virtual_available'] = self.virtual_available
+        combination_info['virtual_available'] = self.sudo().virtual_available
         # Id de la fiche technique
-        combination_info['technical_data_id'] = self.technical_data[0].id if self.technical_data else False
+        combination_info['technical_data_id'] = self.sudo().technical_data[0].id if self.technical_data else False
 
         return combination_info
