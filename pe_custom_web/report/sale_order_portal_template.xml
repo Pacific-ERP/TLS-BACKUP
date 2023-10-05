@@ -25,6 +25,12 @@
                       <span t-field="sale_order.opportunity_id.crm_status"/>
                     </t>
                   </div>
+                  <div class="mb-3 col-6">
+                    <strong>ETA :</strong>
+                    <t t-if="sale_order.opportunity_id">
+                      <span t-field="sale_order.opportunity_id.eta_date"/>
+                    </t>
+                  </div>
                 </div>
               </xpath>
         </template>
