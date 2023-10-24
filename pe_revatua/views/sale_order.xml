@@ -30,12 +30,6 @@
                     <field name="is_deliver" widget="boolean_toggle" attrs="{'readonly': [('state', 'not in', ('sale','done'))], 'invisible': [('revatua_ck', '=', False)]}"/>
                 </xpath>
 
-                
-                <!-- Champs : BL -->
-                <xpath expr="//field[@name='payment_term_id']" position="after">
-                    <field name="attachment_ids" widget="many2many_binary"/>
-                </xpath>
-
                 <!-- Champs : Informations Expéditeur/Destinataire -->
                 <xpath expr="//group[@name='sale_header']" position="after">
                     <group name="detail_livraison" attrs="{'invisible': [('revatua_ck', '=', False)]}">
