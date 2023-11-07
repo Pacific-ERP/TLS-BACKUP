@@ -25,6 +25,8 @@
         "report/facture_template.xml",
         "report/connaissement_template.xml",
         "report/admg_template.xml",
+        "report/sale_order_portal.xml",
+        "report/sale_order_portal_template.xml",
         "wizard/sale_line_full_detail_view.xml",
         "views/ir_setting.xml",
         "views/contact_partner.xml",

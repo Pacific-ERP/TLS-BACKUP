@@ -148,6 +148,14 @@
                             </tbody>
                         </table>
                     </div>
+                    <group>
+                        <!-- Champs : BL -->
+                        <group>
+                            <div>
+                                <field name="pe_attachment_ids" nolable="1" widget="many2many_binary"/>
+                            </div>
+                        </group>
+                    </group>
                 </xpath>
                 
             </field></record>

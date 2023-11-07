@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo><data>
+    
+    <record id="pe_customer_stock_res_partner_form" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_customer_stock : res.partner(form)</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//field[@name='property_stock_customer']" position="before">
+                <field name="customer_location_id"/>
+            </xpath>
+            
+        </field>
+    </record>
+
+</data></odoo>

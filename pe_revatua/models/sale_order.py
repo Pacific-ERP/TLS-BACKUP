@@ -26,10 +26,27 @@ class SaleOrderInherit(models.Model):
     contact_dest = fields.Many2one(string='Contact de destination',comodel_name='res.partner')
     tel_dest = fields.Char(string='Téléphone destinataire', related='contact_dest.phone', store=True)
     mobil_dest = fields.Char(string='Mobile destinataire', related='contact_dest.mobile', store=True)
-                
+
+    pe_attachment_ids = fields.Many2many(
+        string="Bon de livraison",
+        context={'default_public': True},
+        comodel_name='ir.attachment',
+        help="Bon de Livraison.",
+    )
+
     # Maritime
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
+    
+    def write(self, values):
+        # OVERRIDE
+        _logger.warning(f"Values : {values}")
+        res = super(SaleOrderInherit, self).write(values)
+        
+        # Context sur M2m non fonctionnel
+        if 'pe_attachment_ids' in values:
+            for data in self.pe_attachment_ids:
+                data.public = True
     
     @api.onchange('order_line','tax_totals_json')
     def _compute_total_custo_adm(self):
