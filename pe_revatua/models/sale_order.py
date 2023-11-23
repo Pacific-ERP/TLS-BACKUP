@@ -47,6 +47,16 @@ class SaleOrderInherit(models.Model):
         if 'pe_attachment_ids' in values:
             for data in self.pe_attachment_ids:
                 data.public = True
+        return res
+
+    @api.model
+    def create(self,vals):
+        res = super(SaleOrderInherit, self).create(vals)
+        if res.pe_attachment_ids:
+            for attachment in res.pe_attachment_ids:
+                attachment.write({'res_model': self._name, 'res_id': res.id})
+        return res
+        
     
     @api.onchange('order_line','tax_totals_json')
     def _compute_total_custo_adm(self):
