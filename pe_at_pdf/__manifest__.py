@@ -19,5 +19,7 @@
         "report/at_report_invoice_document.xml",
         "report/report_invoice_with_payments.xml",
         "report/report_saleorder.xml",
+        "report/sale_order_portal_template.xml",
+        "report/sale_order_portal.xml",
     ],
 }
