@@ -2,26 +2,41 @@
     <data>
     <!-- Form -->
     <record id="pe_acces_right_account_move_form" model="ir.ui.view">
-        <field name="name">pe_acces_right_account_move_form</field>
+        <field name="name">Pacific-ERP pe_acces_right (remettre au brouillon) : account.move(form)</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <!-- Rendre invisible le bouton remettre en brouillon -->
             <xpath expr="//button[@name='button_draft']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="groups">pe_acces_right.pe_button_draft_access</attribute>
             </xpath>
         </field>
     </record>
         
-    <!-- Form : groupe Facturation retrait bouton avoir -->
     <record id="pe_acces_right_account_move_form_remove_credit_note" model="ir.ui.view">
-        <field name="name">pe_acces_right_account_move_form_remove_credit_note</field>
+        <field name="name">Pacific-ERP pe_acces_right (créer un avoir) : account.move(form)</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="groups_id" eval="[(6, 0, [ref('pe_acces_right.pe_create_credit_note') ])]"/>
         <field name="arch" type="xml">
-            <!-- Rendre invisible le bouton avoir pour un groupe donnée-->
+            <!-- Créer un avoir -->
             <xpath expr="//button[@name='action_reverse']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="pe_access_right_account_move_no_validation" model="ir.ui.view">
+        <field name="name">Pacific-ERP pe_acces_right (confirmer la facture) : account.move(form)</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="groups_id" eval="[(6, 0, [ref('pe_acces_right.pe_facturation_no_validation') ])]"/>
+        <field name="arch" type="xml">
+            <!-- Confirmer la facture -->
+            <xpath expr="//button[@name='action_post'][1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_post'][2]" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
         </field>

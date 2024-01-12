@@ -16,5 +16,9 @@
         <record id="pe_create_credit_note" model="res.groups">
             <field name="name">Facturation / Retrait du bouton d'avoir</field>
         </record>
+        
+        <record id="pe_button_draft_access" model="res.groups">
+            <field name="name">Facturation / Remettre en brouillons</field>
+        </record>
     </data>
 </odoo>

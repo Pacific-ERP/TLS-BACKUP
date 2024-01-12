@@ -2,7 +2,7 @@
     <data>
         <!-- attribution des groups au button -->
         <record id="purchase_order_form_restricted" model="ir.ui.view">
-            <field name="name">purchase.order.form.restricted</field>
+            <field name="name">Pacific-ERP pe_acces_right : purchase.order(form)</field>
             <field name="model">purchase.order</field>
             <field name="inherit_id" ref="purchase.purchase_order_form" />
             <field name="arch" type="xml">
@@ -14,13 +14,14 @@
                 </xpath>
             </field>
         </record>
-        <!-- rend invisible champs pour groups donner -->
+        
         <record id="purchase_order_form_mods_restrict" model="ir.ui.view">
-            <field name="name">purchase.order.form.mods.restrict</field>
+            <field name="name">Pacific-ERP pe_acces_right : purchase.order(form)</field>
             <field name="model">purchase.order</field>
             <field name="inherit_id" ref="purchase.purchase_order_form" />
             <field name="groups_id" eval="[(6, 0, [ref('pe_acces_right.purchase_create_facture_restricted') ])]"/>
             <field name="arch" type="xml">
+                <!-- Créer la facture -->
                 <xpath expr="//button[@name='action_create_invoice'][1]" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
@@ -29,23 +30,7 @@
                 </xpath>
             </field>
         </record>
-        
-        <!-- rend invisible champs pour groups donner -->
-        <record id="pe_access_right_account_move_no_validation" model="ir.ui.view">
-            <field name="name">pe.access.right.account.move.no.validation</field>
-            <field name="model">account.move</field>
-            <field name="inherit_id" ref="account.view_move_form" />
-            <field name="groups_id" eval="[(6, 0, [ref('pe_acces_right.pe_facturation_no_validation') ])]"/>
-            <field name="arch" type="xml">
-                <xpath expr="//button[@name='action_post'][1]" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//button[@name='action_post'][2]" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-            </field>
-        </record>
-        
+                
     </data>
 </odoo>
         
