@@ -5,7 +5,7 @@ class ResCompany(models.Model):
     _inherit = "res.company"
 
     revatua_ck = fields.Boolean(string="Activer fonctionnalité Revatua",
-        help="Débloque les modes de calculs dans le modules ventes pour les connaissements",
+        help="Débloque les fonctionalités de calculs dans le modules ventes/factures pour les connaissements",
         default=False,
     )
 

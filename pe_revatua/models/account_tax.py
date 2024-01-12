@@ -13,22 +13,29 @@ class AccountTaxInherit(models.Model):
     # Ajout du paramètre terrestre pour le calcul de la taxe
     def _compute_amount(self, base_amount, price_unit, quantity=1.0, product=None, partner=None, invoice=None, terrestre=0, discount=0, rpa=0, line=None):
         # OVERRIDE
-        _logger.warning("[2] account_tax : _compute_amount")
-        _logger.warning(f"T:{terrestre} | Disc:{discount} | rpa:{rpa} | line:{line}")
+        _logger.error(f"[Taxe] : {self.name}")
+        
+        maritime = terrestre = rpa = 0.0
+        adm = False
+        
+        if line:
+            terrestre = line.tarif_terrestre
+            maritime = line.tarif_maritime
+            rpa = line.tarif_rpa
+            adm = line.check_adm
+            
+        _logger.warning(f"Terrestre : {terrestre} | maritime : {maritime} | RPA : {rpa} | Line : {line} | adm : {adm}")
+        
         self.ensure_one()
-        if self.amount_type == 'fixed':
+        if self.amount_type == 'fixed': # Taxes type fixed (RPA)
             if base_amount:
                 # OVERRIDE >>>
                 # --- Check if revatua is activate ---#
                 if product.tarif_terrestre and self.name == 'RPA' and product.tarif_rpa:
-                    # remise = 1-(discount/100)
-                    # rpa = product.tarif_rpa*remise
                     # Si un coût minimum RPA est configuré et que le total RPA(qty*rpa) et inférieur au minimum RPA
                     if product.tarif_minimum_rpa and (math.copysign(quantity, base_amount) * rpa) < product.tarif_minimum_rpa:
-                        # _logger.error('RPA mini %s '% product.tarif_minimum_rpa)
                         return product.tarif_minimum_rpa
                     else:
-                        # _logger.error('RPA %s '% rpa)
                         return rpa
                 else:
                     return math.copysign(quantity, base_amount) * self.amount
@@ -38,23 +45,19 @@ class AccountTaxInherit(models.Model):
 
         price_include = self._context.get('force_price_include', self.price_include)
         # base * (1 + tax_amount) = new_base
-        if self.amount_type == 'percent' and not price_include:
+        if self.amount_type == 'percent' and not price_include: # Taxes type ratio (13% & CPS)
             # OVERRIDE >>>
             # --- Check if revatua is activate ---#
-            # La taxe s'applique que à la part Terrestre base_amount = montant HT multilier par 0.6 pour obtenir la part terrestre
-            # Soucis sur la récupe de la coche société car calcul fait sur les deux société
-            if terrestre or rpa: # and self.env.company.revatua_ck
-                #('if rpa or terrestre')
-                # remise = 1-(discount/100)
+            # La taxe s'applique que à la part Terrestre
+            if terrestre or rpa:
                 base_amount = round(terrestre, 0)
                 # Arrondis down pour la CPS uniquement
                 if 'CPS' in self.name:
                     #('if cps') arrondi haut cps
                     cps_terrestre = math.ceil(base_amount * self.amount / 100)
-                    # _logger.error('CPS terrestre %s '% cps_terrestre)
+                    # # _logger.error('CPS terrestre %s '% cps_terrestre)
                     return cps_terrestre
                 else:
-                    # _logger.error('Taxes %s terrestre %s '% (self.name, base_amount * self.amount / 100))
                     return base_amount * self.amount / 100
             else:
                 return base_amount * self.amount / 100
@@ -73,9 +76,8 @@ class AccountTaxInherit(models.Model):
         return 0.0
 
 # --------------------------------- Modification des méthode de calculs des taxes et sous totaux  --------------------------------- #
-
-    # Ajout du paramètre discount pour le calcul de la taxe uniquement sur terrestre
-    def compute_all(self, price_unit, currency=None, quantity=1.0, product=None, partner=None, is_refund=False, handle_price_include=True, include_caba_tags=False, discount=0.0, terrestre=0, maritime=0, adm=False, rpa=0, line=None):
+    
+    def compute_all(self, price_unit, currency=None, quantity=1.0, product=None, partner=None, is_refund=False, handle_price_include=True, include_caba_tags=False, discount=0.0, terrestre=0, maritime=0, adm=False, rpa=0, account_line=None, order_line=None):
         """ Returns all information required to apply taxes (in self + their children in case of a tax group).
             We consider the sequence of the parent for group of taxes.
                 Eg. considering letters as taxes and alphabetic order as sequence :
@@ -98,40 +100,40 @@ class AccountTaxInherit(models.Model):
                 'analytic': boolean,
             }],
         } """
-        if line:
-            _logger.warning(f"### Article : {line.product_id.name} ###")
-            if hasattr(line, 'order_id'):
-                _logger.warning(f"### Devis : {line.order_id.name} | Company : {line.order_id.company_id.name} ###")
-            if hasattr(line, 'move_id'):
-                _logger.warning(f"### Facture : {line.move_id.name} | Company : {line.move_id.company_id.name} ###")
-        _logger.warning("[1] account_tax : compute_all")
-        _logger.warning(f"Lines : {line} | T : {terrestre} | M : {maritime} | ADM : {adm} | RPA : {rpa} | Disc : {discount}")
+
+        
+        # OVERRIDE >>>
+
+        
+        taxes_name = ", ".join(tax.name for tax in self) if self else ""
+        # Permet de récupéré la ligne de vente ou de facturation pour recalcul des taxes plus facilements
+        line = adm = False
+        terrestre = maritime = rpa = 0.0
+        
+        if order_line: # Ventes
+            # _logger.warning(f"Tax Ventes : order_line = {order_line}")
+            line = order_line
+        if account_line: # Factures
+            # _logger.warning(f"Tax Factures : account_line = {account_line}")
+            line = account_line
+        
+        _logger.error(f"##### [Totaux Taxes] : {taxes_name} | {line} | context : {self.env.context}#####")
+        
         if not self:
             company = self.env.company
         else:
             company = self[0].company_id
 
-        # 1) Flatten the taxes.
-        taxes, groups_map = self.flatten_taxes_hierarchy(create_map=True)
+        _logger.warning(f"Default company : {company} | Revatua : {company.revatua_ck} ")
 
-        # 2) Deal with the rounding methods
+        
+        # <<< OVERRIDE
+
+        
+        taxes, groups_map = self.flatten_taxes_hierarchy(create_map=True)
         if not currency:
             currency = company.currency_id
-        # By default, for each tax, tax amount will first be computed
-        # and rounded at the 'Account' decimal precision for each
-        # PO/SO/invoice line and then these rounded amounts will be
-        # summed, leading to the total amount for that tax. But, if the
-        # company has tax_calculation_rounding_method = round_globally,
-        # we still follow the same method, but we use a much larger
-        # precision when we round the tax amount for each line (we use
-        # the 'Account' decimal precision + 5), and that way it's like
-        # rounding after the sum of the tax amounts of each line
         prec = currency.rounding
-
-        # In some cases, it is necessary to force/prevent the rounding of the tax and the total
-        # amounts. For example, in SO/PO line, we don't want to round the price unit at the
-        # precision of the currency.
-        # The context key 'round' allows to force the standard behavior.
         round_tax = False if company.tax_calculation_rounding_method == 'round_globally' else True
         if 'round' in self.env.context:
             round_tax = bool(self.env.context['round'])
@@ -139,60 +141,10 @@ class AccountTaxInherit(models.Model):
         if not round_tax:
             prec *= 1e-5
 
-        # 3) Iterate the taxes in the reversed sequence order to retrieve the initial base of the computation.
-        #     tax  |  base  |  amount  |
-        # /\ ----------------------------
-        # || tax_1 |  XXXX  |          | <- we are looking for that, it's the total_excluded
-        # || tax_2 |   ..   |          |
-        # || tax_3 |   ..   |          |
-        # ||  ...  |   ..   |    ..    |
-        #    ----------------------------
         def recompute_base(base_amount, fixed_amount, percent_amount, division_amount):
-            # Recompute the new base amount based on included fixed/percent amounts and the current base amount.
-            # Example:
-            #  tax  |  amount  |   type   |  price_include  |
-            # -----------------------------------------------
-            # tax_1 |   10%    | percent  |  t
-            # tax_2 |   15     |   fix    |  t
-            # tax_3 |   20%    | percent  |  t
-            # tax_4 |   10%    | division |  t
-            # -----------------------------------------------
-
-            # if base_amount = 145, the new base is computed as:
-            # (145 - 15) / (1.0 + 30%) * 90% = 130 / 1.3 * 90% = 90
             return (base_amount - fixed_amount) / (1.0 + percent_amount / 100.0) * (100 - division_amount) / 100
 
-        # The first/last base must absolutely be rounded to work in round globally.
-        # Indeed, the sum of all taxes ('taxes' key in the result dictionary) must be strictly equals to
-        # 'price_included' - 'price_excluded' whatever the rounding method.
-        #
-        # Example using the global rounding without any decimals:
-        # Suppose two invoice lines: 27000 and 10920, both having a 19% price included tax.
-        #
-        #                   Line 1                      Line 2
-        # -----------------------------------------------------------------------
-        # total_included:   27000                       10920
-        # tax:              27000 / 1.19 = 4310.924     10920 / 1.19 = 1743.529
-        # total_excluded:   22689.076                   9176.471
-        #
-        # If the rounding of the total_excluded isn't made at the end, it could lead to some rounding issues
-        # when summing the tax amounts, e.g. on invoices.
-        # In that case:
-        #  - amount_untaxed will be 22689 + 9176 = 31865
-        #  - amount_tax will be 4310.924 + 1743.529 = 6054.453 ~ 6054
-        #  - amount_total will be 31865 + 6054 = 37919 != 37920 = 27000 + 10920
-        #
-        # By performing a rounding at the end to compute the price_excluded amount, the amount_tax will be strictly
-        # equals to 'price_included' - 'price_excluded' after rounding and then:
-        #   Line 1: sum(taxes) = 27000 - 22689 = 4311
-        #   Line 2: sum(taxes) = 10920 - 2176 = 8744
-        #   amount_tax = 4311 + 8744 = 13055
-        #   amount_total = 31865 + 13055 = 37920
-        
         base = currency.round(price_unit * quantity)
-        #('base 1st compute : %s' % base)
-        # For the computation of move lines, we could have a negative base value.
-        # In this case, compute all with positive values and negate them at the end.
         sign = 1
         if currency.is_zero(base):
             sign = self._context.get('force_sign', 1)
@@ -200,9 +152,7 @@ class AccountTaxInherit(models.Model):
             sign = -1
         if base < 0:
             base = -base
-        #('sign : %s' % sign)
-        #('base 2nd compute : %s' % base)
-        # Store the totals to reach when using price_include taxes (only the last price included in row)
+            
         total_included_checkpoints = {}
         i = len(taxes) - 1
         store_included_tax_total = True
@@ -233,17 +183,22 @@ class AccountTaxInherit(models.Model):
                         incl_fixed_amount += abs(quantity) * tax.amount * sum_repartition_factor
                     else:
                         # tax.amount_type == other (python)
-########################################################################
-### 1 - Ajout de la remise pour le calcul de taxe + champs terrestre ###
-########################################################################
+                        ########################################################################
+                        ### 1 - Ajout de la remise pour le calcul de taxe + champs terrestre ###
+                        ########################################################################
                         # soucis lors de l'éxé qui est pas bon et ce fait sur plusieurs société donc rentre pas dans le if pas d'idée (donc self.env.company.revatua_ck fonctionne pas)
-                        if terrestre or rpa:
-                            tax_amount = tax._compute_amount(base, sign * price_unit, quantity, product, partner, terrestre=terrestre, discount=discount, rpa=rpa) * sum_repartition_factor
+                        if company.revatua_ck:
+                            tax_amount = tax._compute_amount(base, sign * price_unit,
+                                                             quantity,
+                                                             product,
+                                                             partner,
+                                                             line= line,
+                                                            ) * sum_repartition_factor
                         else:
                             tax_amount = tax._compute_amount(base, sign * price_unit, quantity, product, partner) * sum_repartition_factor
-########################################################################
-### 1 - Ajout de la remise pour le calcul de taxe + champs terrestre ###
-########################################################################
+                        ########################################################################
+                        ### 1 - Ajout de la remise pour le calcul de taxe + champs terrestre ###
+                        ########################################################################
                         incl_fixed_amount += tax_amount
                         # Avoid unecessary re-computation
                         cached_tax_amounts[i] = tax_amount
@@ -257,54 +212,34 @@ class AccountTaxInherit(models.Model):
                         store_included_tax_total = False
                 i -= 1
         total_excluded = currency.round(recompute_base(base, incl_fixed_amount, incl_percent_amount, incl_division_amount))
-#############################################################################################################################
-#==================================#
-#=============OVERRIDE=============#
-#========================================================================#
-        # Si l'option revatua est vrais
-        # if self.env.company.revatua_ck:
-        # Si Uniquement part terrestre alors 100% du prix de ventes
-        remise = 1-(discount/100)
-        # _logger.error('calcul du HT')
-        # _logger.error('ter %s | mar %s | adm %s | rpa %s' % (terrestre, maritime, adm, rpa))
-        if product and product.tarif_terrestre and not product.tarif_maritime:
-            # _logger.error('if 1')
-            # Si un tarif terrestre minimum existe et que le terrestre actuelle est plus petit que le minmum alors pv = minimum terrestre
-            # _logger.error('Tarif minimum terrestre %s | %s' % (product.tarif_minimum_terrestre, (product.tarif_terrestre * quantity)))
-            if product.tarif_minimum_terrestre and (remise * (product.tarif_terrestre * quantity)) < product.tarif_minimum_terrestre:
-                # _logger.error('if 1.1')
-                total_excluded = currency.round(product.tarif_minimum_terrestre)
-            else:
-                # _logger.error('else 1.1')
-                total_excluded = currency.round((remise * product.tarif_terrestre) * quantity)
-        # Si deux part bien repartager
-        elif product and product.tarif_terrestre and product.tarif_maritime:
-            # _logger.error('elif 2')
-            # Facture ADM client et administration
-            if adm:
-                # _logger.error('if 2.1')
-                total_excluded = currency.round(maritime)
-            elif terrestre and not maritime:
-                # _logger.error('elif 2.2')
-                total_excluded = currency.round(terrestre)
-            # Vente/Facture aremiti normal
-            else:
-                # _logger.error('else 2.2')
-                pv_terrestre = currency.round((remise * product.tarif_terrestre) * quantity)
-                pv_maritime = currency.round((remise * product.tarif_maritime) * quantity)
-                # Vérif du minimum maritime
-                if product.tarif_minimum_maritime and pv_maritime < product.tarif_minimum_maritime:
-                    # _logger.error('if 2.2.1')
-                    pv_maritime = product.tarif_minimum_maritime
-                # Vérif du minimum terrestre
-                if product.tarif_minimum_terrestre and pv_terrestre < product.tarif_minimum_terrestre:
-                    # _logger.error('if 2.2.1')
-                    pv_terrestre = product.tarif_minimum_terrestre
+
+        # OVERRIDE >>>
+
+        if line and company.revatua_ck:
+            pv_terrestre = pv_maritime = 0.0
+            
+            # Part Terrestre
+            if line.tarif_terrestre:
+                pv_terrestre = line.tarif_terrestre
+                
+                # Minimum Terrestre
+                if line.tarif_minimum_terrestre and line.tarif_terrestre < line.tarif_minimum_terrestre:
+                    pv_terrestre = line.tarif_minimum_terrestre
+
+            # Part Maritime
+            if line.tarif_maritime:
+                pv_maritime = line.tarif_maritime
+
+                # Minimum Maritime
+                if line.tarif_minimum_maritime and line.tarif_maritime < line.tarif_minimum_maritime:
+                    pv_maritime = line.tarif_minimum_maritime
+
+            if pv_terrestre and pv_maritime:
+                # Total HT = Terrestre + Maritime
                 total_excluded = pv_terrestre + pv_maritime
-        #========================================================================#
-        #=============OVERRIDE=============#
-        #==================================#
-#############################################################################################################################
+        
+        # <<< OVERRIDE
+
         # 4) Iterate the taxes in the sequence order to compute missing tax amounts.
         # Start the computation of accumulated amounts at the total_excluded value.
         base = total_included = total_void = total_excluded
@@ -338,18 +273,26 @@ class AccountTaxInherit(models.Model):
                 tax_amount = total_included_checkpoints[i] - (base + cumulated_tax_included_amount)
                 cumulated_tax_included_amount = 0
             else:
-#########################################################################
-### 2 -  Ajout de la remise pour le calcul de taxe + champs terrestre ###
-#########################################################################
-                #('2nd compute : %s ' % terrestre)
-                # soucis lors de l'éxé qui est pas bon et ce fait sur plusieurs société donc rentre pas dans le if pas d'idée (donc self.env.company.revatua_ck fonctionne pas)
-                if terrestre or rpa:
-                    tax_amount = tax.with_context(force_price_include=False)._compute_amount(tax_base_amount, sign * price_unit, quantity, product, partner, terrestre=terrestre, discount=discount, rpa=rpa)
+
+                
+            # OVERRIDE >>>
+                
+                if company.revatua_ck:
+                    tax_amount = tax.with_context(force_price_include=False)._compute_amount(
+                        tax_base_amount,
+                        sign * price_unit,
+                        quantity,
+                        product,
+                        partner,
+                        line=line,
+                    )
+                    
                 else:
                     tax_amount = tax.with_context(force_price_include=False)._compute_amount(tax_base_amount, sign * price_unit, quantity, product, partner)
-#########################################################################
-### 2 -  Ajout de la remise pour le calcul de taxe + champs terrestre ###
-#########################################################################
+            
+            # <<< OVERRIDE
+
+            
             # Round the tax_amount multiplied by the computed repartition lines factor.
             tax_amount = round(tax_amount, precision_rounding=prec)
             factorized_tax_amount = round(tax_amount * sum_repartition_factor, precision_rounding=prec)
@@ -420,9 +363,7 @@ class AccountTaxInherit(models.Model):
                 base += factorized_tax_amount
                 if not price_include:
                     skip_checkpoint = True
-            #('ici 3')
             total_included += factorized_tax_amount
-            # _logger.error('total_included %s : %s' % (i, total_included))
             i += 1
         
         base_taxes_for_tags = taxes
@@ -430,11 +371,7 @@ class AccountTaxInherit(models.Model):
             base_taxes_for_tags = base_taxes_for_tags.filtered(lambda x: x.tax_exigibility != 'on_payment')
 
         base_rep_lines = base_taxes_for_tags.mapped(is_refund and 'refund_repartition_line_ids' or 'invoice_repartition_line_ids').filtered(lambda x: x.repartition_type == 'base')
-#########################################################################
-###      3 -  Modification du calcul du Total TTC et HT               ###
-#########################################################################
-        _logger.error(' HT : %s ' % (sign * total_excluded))
-        # _logger.error(' TTC : %s ' % (sign * currency.round(total_included)))
+
         # Override
         vals = {
             'base_tags': base_rep_lines.tag_ids.ids + product_tag_ids,
@@ -443,8 +380,5 @@ class AccountTaxInherit(models.Model):
             'total_included': sign * currency.round(total_included),
             'total_void': sign * currency.round(total_void),
         }
+        _logger.warning(f" Total HT : {(sign * total_excluded)} | Total TTC : {sign * currency.round(total_included)} ")
         return vals
-#########################################################################
-###      3 -  Modification du calcul du Total TTC et HT               ###
-#########################################################################
-    

@@ -9,6 +9,8 @@ class ResPartnerInherit(models.Model):
     
     @api.model
     def create(self, values):
+        # OVERRIDE
+        # Société par défaut pour les contacts aremiti pour filtres
         if self.env.company and self.env.company.revatua_ck:
             values['company_id'] = self.env.company.id
         return super().create(values)

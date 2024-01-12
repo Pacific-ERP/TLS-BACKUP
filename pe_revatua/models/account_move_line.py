@@ -60,9 +60,6 @@ class AccountMoveLine(models.Model):
                     'product_uom_id': self.product_id.uom_id if quantity == 1 else self.product_uom_id,
                 })
 
-        else:
-            _logger.error('Revatua not activated: account_move_line.py -> _onchange_update_qty')
-
     @api.onchange('product_id')
     def _pe_onchange_product_id(self):
         # --- Check if revatua is activated ---#
@@ -78,22 +75,6 @@ class AccountMoveLine(models.Model):
                     'base_rpa': self.product_id.tarif_rpa,
                     'tarif_rpa': self.product_id.tarif_rpa,
                     'tarif_minimum_rpa': self.product_id.tarif_minimum_rpa}
-
-            # Facture ADM ligne adm
-            if self.move_id.journal_id.id == 27 and self.product_id.check_adm:
-                vals.update({'price_unit': self.product_id.tarif_maritime,
-                            'base_terrestre': 0.0,
-                            'tarif_terrestre': 0.0,
-                            'tarif_minimum_terrestre': 0.0})
-                self.move_id.is_adm_invoice = True
-            
-            # Facture Client ligne adm
-            elif self.product_id.check_adm:
-                vals.update({'price_unit': self.product_id.tarif_terrestre,
-                            'base_maritime': 0.0,
-                            'tarif_maritime': 0.0,
-                            'tarif_minimum_maritime': 0.0})
-                self.move_id.is_adm_invoice = False
             
             self.with_context(check_move_validity=False).write(vals)
    
@@ -107,8 +88,9 @@ class AccountMoveLine(models.Model):
             param mini_amount : Minimum que la part peut prendre
         """
         # Effectue une condition ternaire plutôt qu'une instruction if / else 
-        res = mini_amount if (mini_amount and ((base * discount) * qty) < mini_amount) else (base * discount) * qty
-        return round(res, 0)
+        res = round(mini_amount if (mini_amount and ((base * discount) * qty) < mini_amount) else (base * discount) * qty, 0)
+        # _logger.error(f"[Facture : Calcul Tarif] _compute_amount_base_revatua : {res}")
+        return res
         
     # Recalcul des part terrestre et maritime selon la quantité et la remise
     @api.onchange('quantity','discount')
@@ -118,61 +100,12 @@ class AccountMoveLine(models.Model):
             # Remise si existant : remise < 1 sinon = 1
             discount = 1-(self.discount/100)
             quantity = self.quantity
-            rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=',self.env.company.id),('type_tax_use','=','sale')])
-            # Ligne ADM
-            if self.check_adm:
-                # Facture Clients
-                if not self.move_id.is_adm_invoice:
-                    taxe_ids = self.product_id.taxes_id - rpa
-                    self.tarif_terrestre = self._compute_amount_base_revatua(self.base_terrestre, quantity, self.tarif_minimum_terrestre, discount)
-                    self.tarif_maritime = 0.0
-                    self.tarif_rpa_ttc = 0.0
-                    self.tarif_rpa = 0.0
-                    self.tax_ids = [(6,0,[taxe_ids.ids])]
-                # Facture ADM
-                else:
-                    self.tarif_maritime = self._compute_amount_base_revatua(self.base_maritime, quantity, self.tarif_minimum_maritime, discount)
-                    self.tarif_rpa_ttc = self._compute_amount_base_revatua(self.base_rpa, quantity, self.tarif_minimum_rpa, discount)
-                    self.tarif_rpa = self._compute_amount_base_revatua(self.base_rpa, quantity, self.tarif_minimum_rpa, discount)
-                    self.tarif_terrestre = 0.0
-                    self.tax_ids = [(6,0,[rpa.id])]
-            # Ligne normal
-            else:
-                self.tarif_terrestre = self._compute_amount_base_revatua(self.base_terrestre, quantity, self.tarif_minimum_terrestre, discount)
-                self.tarif_maritime = self._compute_amount_base_revatua(self.base_maritime, quantity, self.tarif_minimum_maritime, discount)
-                self.tarif_rpa_ttc = self._compute_amount_base_revatua(self.base_rpa, quantity, self.tarif_minimum_rpa, discount)
-                self.tarif_rpa = self._compute_amount_base_revatua(self.base_rpa, quantity, self.tarif_minimum_rpa, discount)
-        else:
-            _logger.error('Revatua not activate : sale_order_line.py -> _compute_revatua_part')
+            self.tarif_terrestre = self._compute_amount_base_revatua(self.base_terrestre, quantity, self.tarif_minimum_terrestre, discount)
+            self.tarif_maritime = self._compute_amount_base_revatua(self.base_maritime, quantity, self.tarif_minimum_maritime, discount)
+            self.tarif_rpa_ttc = self._compute_amount_base_revatua(self.base_rpa, quantity, self.tarif_minimum_rpa, discount)
+            self.tarif_rpa = self._compute_amount_base_revatua(self.base_rpa, quantity, self.tarif_minimum_rpa, discount)
     
-    # Recalcul des Totaux pour les lignes ADM (Client et Administration)
-    def _get_revatua_totals(self, type, terrestre, maritime, adm, rpa, product):
-        _logger.error('----------------------- _get_revatua_totals -----------------------')
-        terrestre = round(terrestre, 0) if terrestre else None
-        maritime = round(maritime, 0) if maritime else None
-        total_excluded = sum(filter(None, [terrestre, maritime]))
-        totals_tax = 0.0
-        # Calcul des taxes
-        if product.taxes_id:
-            for tax in product.taxes_id:
-                if 'CPS' in tax.name:
-                    totals_tax += math.ceil(terrestre * (tax.amount/100)) if terrestre else 0
-                elif 'RPA' in tax.name:
-                    totals_tax += rpa
-                else:
-                    totals_tax += round(terrestre * (tax.amount/100), 0) if terrestre else 0
-                        
-        if adm and maritime:
-            total_included = maritime + rpa if rpa else 0.0
-        elif product.check_adm and terrestre:
-            total_included = total_excluded + totals_tax
-        else:
-            total_included = total_excluded + totals_tax
-        
-        _logger.error('HT : %s' % total_excluded if type == 'excluded' else 'TTC : %s' % total_included)
-        return round(total_excluded, 0) if type == 'excluded' else round(total_included, 0)
-        
-    def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None, terrestre=None, maritime=None, adm=None, rpa=None, type=None):
+    def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None, line=None):
         # OVERRIDE
         self.ensure_one()
         return self._get_price_total_and_subtotal_model(
@@ -184,15 +117,12 @@ class AccountMoveLine(models.Model):
             partner=self.partner_id if partner is None else partner,
             taxes=self.tax_ids if taxes is None else taxes,
             move_type=self.move_id.move_type if move_type is None else move_type,
-            # Ajout des champs Revatua
-            terrestre=self.tarif_terrestre if terrestre is None else terrestre,
-            maritime=self.tarif_maritime if maritime is None else maritime,
-            adm=self.move_id.is_adm_invoice if adm is None else adm,
-            rpa=self.tarif_rpa if rpa is None else rpa,
+            # Récupération de ligne pour simplifier les calculs des taxes
+            line= self if line is None else line,
         )
     
     @api.model
-    def _get_price_total_and_subtotal_model(self, price_unit, quantity, discount, currency, product, partner, taxes, move_type, terrestre=None, maritime=None, adm=None, rpa=None):
+    def _get_price_total_and_subtotal_model(self, price_unit, quantity, discount, currency, product, partner, taxes, move_type, line=None):
         # OVERRIDE
         ''' This method is used to compute 'price_total' & 'price_subtotal'.
 
@@ -207,68 +137,48 @@ class AccountMoveLine(models.Model):
         :return:            A dictionary containing 'price_subtotal' & 'price_total'.
         '''
         res = {}
-        # OVERRIDE >>>
-        # ----- Modification du prix unitaire pour chaque état possible d'une facture Aremiti ----- #
-        if self.env.company.revatua_ck:
-            # Facture ADM administration
-            if self.move_id.is_adm_invoice:
-                price_unit = self.base_maritime
-            # Facture ADM client
-            elif not self.tarif_maritime and self.tarif_terrestre:
-                price_unit = self.base_terrestre
-            # Facture Aremiti normal
-            elif self.tarif_maritime and self.tarif_terrestre:
-                price_unit = self.base_maritime + self.base_terrestre
-            # Facture normal
-            else:
-                price_unit = price_unit
-        # <<< OVERRIDE 
-                
         # Compute 'price_subtotal'.
         line_discount_price_unit = price_unit * (1 - (discount / 100.0))
         subtotal = quantity * line_discount_price_unit
 
         # Compute 'price_total'.
         if taxes:
+            
         # OVERRIDE >>>
-        # ----- Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre) ----- #
-            if self.env.company.revatua_ck and self.move_id.move_type in ('out_invoice','out_refund'):
-                taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
-                quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'), terrestre=terrestre, maritime=maritime, adm=adm, discount=discount, rpa=rpa, line=self)
-                if terrestre or maritime:
-                    taxes_res['total_excluded'] = self._get_revatua_totals('excluded', terrestre, maritime, adm, rpa, product)
-                    taxes_res['total_included'] = self._get_revatua_totals('included', terrestre, maritime, adm, rpa, product)
-            else:
-                taxes_res = taxes._origin.with_context(force_sign=1).compute_all(line_discount_price_unit,
-                quantity=quantity, currency=currency, product=product, partner=partner, is_refund=move_type in ('out_refund', 'in_refund'))
+            taxes_res = taxes._origin.with_context(force_sign=1).compute_all(
+                line_discount_price_unit,                                                             
+                quantity= quantity,
+                currency= currency,
+                product= product,
+                partner= partner,
+                is_refund= move_type in ('out_refund', 'in_refund'),
+                account_line = line
+            )
+            
             res['price_subtotal'] = taxes_res['total_excluded']
             res['price_total'] = taxes_res['total_included']
         else:
             res['price_total'] = res['price_subtotal'] = subtotal
+            
         # <<< OVERRIDE
         
         #In case of multi currency, round before it's use for computing debit credit
         if currency:
             res = {k: currency.round(v) for k, v in res.items()}
         return res
-        
-    # Méthode de récupération des champs du model : account.admg
-    def _prepare_line_admg(self, sequence=1):
-        self.ensure_one()
-        rpa = self.env['account.tax'].sudo().search([('name','=','RPA'),('company_id','=', self.env.company.id),('type_tax_use','=','sale')])
-        vals = {
-            'sequence': sequence,
-            'display_type': self.display_type,
-            'product_id': self.product_id,
-            'r_volume': self.r_volume,
-            'r_weight': self.r_weight,
-            'quantity': self.quantity,
-            'price_subtotal': self.price_subtotal,
-            'tax_id': [(6,0,[rpa.id])],
-            'price_unit': self.price_unit,
-            'tarif_terrestre': self.tarif_terrestre,
-            'tarif_maritime': self.tarif_maritime,
-            'tarif_rpa': self.tarif_rpa,
-            'price_total': self.price_total,
-        }
-        return vals
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        # OVERRIDE
+        # _logger.error(f"[CREATE LINES] ({self.env.company.revatua_ck})")
+        # _logger.error(f"[Vals] ({vals_list})")
+        # Permet de reprendre le bon PU car dans le cas d'un minimum terrestre ou maritime
+        # Odoo recalcul le PU selon la quantités et le total HT
+        res = super(AccountMoveLine, self).create(vals_list)
+        if self.env.company.revatua_ck:
+            for line in res:
+                # _logger.warning(f"PU : {line.price_unit} | base {line.base_unit_price}")
+                line.write(line._get_price_total_and_subtotal())
+                if line.base_unit_price and line.price_unit != line.base_unit_price:
+                    line.price_unit = line.base_unit_price
+        return res

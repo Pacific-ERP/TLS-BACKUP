@@ -11,7 +11,6 @@ class AccountMoveInherit(models.Model):
     revatua_ck = fields.Boolean(string="Mode Revatua", related="company_id.revatua_ck")
 
     is_adm_invoice = fields.Boolean(string='Est pour ADM', store=True, default=False)
-    adm_group_id = fields.Many2one(string='Facture globale ADM', store=True, comodel_name='account.move.adm')
 
     # Lieu Livraison
     commune_recup = fields.Many2one(string='Commune de récupération',comodel_name='res.commune')
@@ -34,62 +33,39 @@ class AccountMoveInherit(models.Model):
     sum_adm = fields.Monetary(string="Montant ADM", store=True, help="La part qui sera payé par l'administration")
     sum_customer = fields.Monetary(string="Montant Client", store=True, help="La part qui sera payé par le client")
 
-    # Récupération d'une ligne pour la facture global ADM
-    def _add_move_line(self, sequence=1):
-        self.ensure_one()
-        title = str(self.name)
-        if self.invoice_origin:
-            order = self.env['sale.order'].search([('name','=',self.invoice_origin)])
-            if order and len(order) == 1:
-                title += ' - '+str(order.name)+' - '+str(order.date_order.date())
-        vals = {
-            'sequence': sequence,
-            'name': title,
-            'display_type': 'line_section',
-            'product_id': False,
-            'r_volume': 0,
-            'r_weight': 0,
-            'quantity': 0,
-            'price_subtotal': 0,
-            'tax_id': [], #RPA id
-            'tarif_terrestre': 0,
-            'tarif_maritime': 0,
-            'tarif_rpa': 0,
-            'price_total': 0,
-        }
-        return vals
-
-    # Calcul des parts client et ADM
     @api.onchange('invoice_line_ids')
     def _total_tarif(self):
+        """
+            Calcul les totaux ADM et clients
+        """
+        # _logger.error('[Facture : Part Client & ADM]')
         # --- Check if revatua is activate ---#
         if self.revatua_ck:
             sum_customer = 0
             sum_adm = 0
-            for move in self:
-                # Sum tarif_terrestre and maritime
-                for line in move.invoice_line_ids:
-                    taxe = 0.0
-                    for tax in line.tax_ids.filtered(lambda tax_line: tax_line.amount in (1,13)):
-                        taxe += tax.amount
-                    # _logger.error(taxe)
-                    if line.check_adm:
-                        sum_adm += round(line.tarif_maritime, 0) + round(line.tarif_rpa_ttc, 0)
-                        sum_customer += line.tarif_terrestre * (1+(taxe/100))
-                    else:
-                        sum_customer += line.price_total
+            
+            for line in self.invoice_line_ids:
+                # _logger.warning(f"[Ligne] Adm = {sum_adm} | Custo = {sum_customer}")
+                if line.check_adm:
+                    # Administration = Maritime + RPA
+                    sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
+                    # Clients = Total TTC - Administration (Différents des ventes car pas de total taxes par ligne ici)
+                    sum_customer += line.price_total - (line.tarif_maritime + line.tarif_rpa_ttc)
+                    # _logger.warning(f"Custom : {line.price_total - (line.tarif_maritime + line.tarif_rpa_ttc)}")
+                
+                # Sinon Full Clients
+                else:
+                    sum_customer += line.price_total
+                
                 # Write fields values car les champs sont en readonly
-                move.write({'sum_adm' : sum_adm, 'sum_customer' : sum_customer})
-                if any(line.check_adm for line in move.invoice_line_ids):
-                    move.is_adm_invoice = True
-        else:
-            _logger.error('Revatua not activate : sale_order.py -> _total_tarif')
+            # _logger.warning(f"[Fin] Adm = {sum_adm} | Custo = {sum_customer}")
+            self.write({'sum_adm' : sum_adm, 'sum_customer' : sum_customer})
 
     # Calculs de taxes au chargement du documents
     def _recompute_tax_lines(self, recompute_tax_base_amount=False, tax_rep_lines_to_recompute=None):
         """ Compute the dynamic tax lines of the journal entry.
 
-        :param recompute_tax_base_amount: Flag forcing only the recomputation of the `tax_base_amount` field.
+            :param recompute_tax_base_amount: Flag forcing only the recomputation of the `tax_base_amount` field.
         """
         self.ensure_one()
         in_draft_mode = self != self._origin
@@ -123,7 +99,8 @@ class AccountMoveInherit(models.Model):
                 is_refund = (tax_type == 'sale' and base_line.debit) or (tax_type == 'purchase' and base_line.credit)
                 price_unit_wo_discount = base_line.amount_currency
             
-# -----Ajout du discount et du terrestre pour simplifier le calculs des taxes (car taxes s'applique uniquement à la part terrestre)
+            # OVERRIDE >>>
+            
             if self.revatua_ck:
                 return base_line.tax_ids._origin.with_context(force_sign=move._get_tax_force_sign()).compute_all(
                     price_unit_wo_discount,
@@ -135,10 +112,7 @@ class AccountMoveInherit(models.Model):
                     handle_price_include=handle_price_include,
                     include_caba_tags=move.always_tax_exigible,
                     discount = base_line.discount,
-                    terrestre = base_line.tarif_terrestre,
-                    maritime = base_line.tarif_maritime,
-                    rpa = base_line.tarif_rpa,
-                    adm = move.is_adm_invoice,
+                    account_line = base_line,
                 )
             else:
                 return base_line.tax_ids._origin.with_context(force_sign=move._get_tax_force_sign()).compute_all(
@@ -152,6 +126,8 @@ class AccountMoveInherit(models.Model):
                     include_caba_tags=move.always_tax_exigible,
                     discount = base_line.discount,
                 )
+
+            # <<< OVERRIDE
 
         taxes_map = {}
 

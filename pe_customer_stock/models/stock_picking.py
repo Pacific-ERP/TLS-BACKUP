@@ -23,7 +23,7 @@ class SaleOrder(models.Model):
             Emplacement Interne Client -> Client
         """
         _logger.warning(f" Avant : {self.picking_ids}")
-        super(SaleOrder, self).action_confirm()
+        res = super(SaleOrder, self).action_confirm()
         
         if self.partner_id.customer_location_id: # Si emplacement interne client configurer
             partner_loc = self.partner_id.customer_location_id
@@ -45,3 +45,4 @@ class SaleOrder(models.Model):
                         move.location_id = partner_loc.id
                         
         _logger.warning(f" Après : {self.picking_ids}")
+        return res
