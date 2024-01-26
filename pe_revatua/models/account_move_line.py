@@ -43,22 +43,23 @@ class AccountMoveLine(models.Model):
     def _onchange_update_qty(self):
         # --- Check if revatua is activated ---#
         if self.env.company.revatua_ck:
-            quantity = 1
-            if self.product_id:
-                # Volume weight
-                if self.product_uom_id.name == 'T/m³' and self.r_volume and self.r_weight:
-                    quantity = round((self.r_volume + self.r_weight) / 2, 3)
-                # Tonne
-                elif self.product_uom_id.name == 'T' and self.r_weight:
-                    quantity = self.r_weight
-                # Cubic meter
-                elif self.product_uom_id.name == 'm3' and self.r_volume:
-                    quantity = self.r_volume
-    
-                self.with_context(check_move_validity=False).write({
-                    'quantity': quantity,
-                    'product_uom_id': self.product_id.uom_id if quantity == 1 else self.product_uom_id,
-                })
+            vals = {'quantity': 1}
+            
+            m3 = self.env.ref('pe_revatua.revatua_udm_mcube')
+            t = self.env.ref('pe_revatua.revatua_udm_tons')
+            t_m3 = self.env.ref('pe_revatua.revatua_udm_mcube_tons')
+            
+            # T/M3
+            if self.product_uom_id.id == t_m3.id and self.r_volume and self.r_weight:
+                vals['quantity'] = round((self.r_volume + self.r_weight) / 2, 3)
+            # T
+            elif self.product_uom_id.id == t.id and self.r_weight:
+                vals['quantity'] = self.r_weight
+            # M3
+            elif self.product_uom_id.id == m3.id and self.r_volume:
+                vals['quantity'] = self.r_volume
+
+            self.write(vals)
 
     @api.onchange('product_id')
     def _pe_onchange_product_id(self):

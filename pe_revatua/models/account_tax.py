@@ -21,7 +21,7 @@ class AccountTaxInherit(models.Model):
         if line:
             terrestre = line.tarif_terrestre
             maritime = line.tarif_maritime
-            rpa = line.tarif_rpa
+            rpa = line.tarif_rpa if not line.check_adm else 0.0 # Part ADM non payé par le client
             adm = line.check_adm
             
         _logger.warning(f"Terrestre : {terrestre} | maritime : {maritime} | RPA : {rpa} | Line : {line} | adm : {adm}")
@@ -31,9 +31,9 @@ class AccountTaxInherit(models.Model):
             if base_amount:
                 # OVERRIDE >>>
                 # --- Check if revatua is activate ---#
-                if product.tarif_terrestre and self.name == 'RPA' and product.tarif_rpa:
+                if terrestre and self.name == 'RPA' and rpa:
                     # Si un coût minimum RPA est configuré et que le total RPA(qty*rpa) et inférieur au minimum RPA
-                    if product.tarif_minimum_rpa and (math.copysign(quantity, base_amount) * rpa) < product.tarif_minimum_rpa:
+                    if product.tarif_minimum_rpa and math.copysign(quantity, rpa) < product.tarif_minimum_rpa:
                         return product.tarif_minimum_rpa
                     else:
                         return rpa
@@ -234,9 +234,12 @@ class AccountTaxInherit(models.Model):
                 if line.tarif_minimum_maritime and line.tarif_maritime < line.tarif_minimum_maritime:
                     pv_maritime = line.tarif_minimum_maritime
 
-            if pv_terrestre and pv_maritime:
+            # Part ADM non payé par client
+            if not line.check_adm:
                 # Total HT = Terrestre + Maritime
                 total_excluded = pv_terrestre + pv_maritime
+            else:
+                total_excluded = pv_terrestre
         
         # <<< OVERRIDE
 

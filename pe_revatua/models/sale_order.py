@@ -73,15 +73,11 @@ class SaleOrderInherit(models.Model):
             sum_adm = 0
             
             for line in self.order_line:
+                # Clients = Total car taxe déduit et maritime aussi
+                sum_customer += line.price_total
                 if line.check_adm: # Si ligne ADM (Séparation des montants Administration & Clients)
                     # Administration = Maritime + RPA
-                    sum_adm += round(line.tarif_maritime, 0) + round(line.tarif_rpa_ttc, 0)
-                    # Clients = Terrestre + (Taxes - RPA) -> car RPA compter comme une taxe
-                    sum_customer += line.tarif_terrestre + (line.price_tax - line.tarif_rpa_ttc)
-                
-                # Sinon Full Clients
-                else:
-                    sum_customer += line.price_total
+                    sum_adm += round(line.tarif_maritime, 0) + round(line.tarif_rpa, 0)
 
             self.write({'sum_adm': sum_adm, 'sum_customer' : sum_customer})
             _logger.warning(f"Adm = {sum_adm} | Custo = {sum_customer}")
