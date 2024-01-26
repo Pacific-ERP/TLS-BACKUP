@@ -2,7 +2,7 @@
 {
     "name": "Workflow Aremiti Transport",
     "summary": "Workflow Aremiti transport : Vente de service de transport avec calcul automatique des parts terrestre/maritime et prise en compte de la taxe RPA",
-    "version": "15.4.0.0.1",
+    "version": "15.4.0.0.2",
     "category": "Pacific-ERP",
     "author": "Mehdi Tepava",
     'website': "https://www.pacific-erp.com/",

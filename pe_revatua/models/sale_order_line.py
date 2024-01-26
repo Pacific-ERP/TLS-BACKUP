@@ -154,22 +154,23 @@ class SaleOrderLineInherit(models.Model):
     def _onchange_update_qty(self):
         # --- Check if revatua is activated ---#
         if self.env.company.revatua_ck:
-            quantity = 1
+            vals = {'product_uom_qty': 1}
             
-            # Volume weight
-            if self.product_uom.name == 'T/m³' and self.r_volume and self.r_weight:
-                quantity = round((self.r_volume + self.r_weight) / 2, 3)
-            # Tonne
-            elif self.product_uom.name == 'T' and self.r_weight:
-                quantity = self.r_weight
-            # Cubic meter
-            elif self.product_uom.name == 'm3' and self.r_volume:
-                quantity = self.r_volume
+            m3 = self.env.ref('pe_revatua.revatua_udm_mcube')
+            t = self.env.ref('pe_revatua.revatua_udm_tons')
+            t_m3 = self.env.ref('pe_revatua.revatua_udm_mcube_tons')
+            
+            # T/M3
+            if self.product_uom.id == t_m3.id and self.r_volume and self.r_weight:
+                vals['product_uom_qty'] = round((self.r_volume + self.r_weight) / 2, 3)
+            # T
+            elif self.product_uom.id == t.id and self.r_weight:
+                vals['product_uom_qty'] = self.r_weight
+            # M3
+            elif self.product_uom.id == m3.id and self.r_volume:
+                vals['product_uom_qty'] = self.r_volume
 
-            self.write({
-                'product_uom_qty': quantity,
-                'product_uom': self.product_id.uom_id if quantity == 1 else self.product_uom,
-            })
+            self.write(vals)
 
     # Méthode de calcule pour les tarifs par lignes
     def _compute_amount_base_revatua(self, base=0.0, qty=0.0, mini_amount=0.0, discount=1):
