@@ -38,28 +38,21 @@ class AccountMoveInherit(models.Model):
         """
             Calcul les totaux ADM et clients
         """
-        # _logger.error('[Facture : Part Client & ADM]')
+        _logger.error('[Facture : Part Client & ADM]')
         # --- Check if revatua is activate ---#
         if self.revatua_ck:
             sum_customer = 0
             sum_adm = 0
             
             for line in self.invoice_line_ids:
-                # _logger.warning(f"[Ligne] Adm = {sum_adm} | Custo = {sum_customer}")
+                # Clients = Total car taxe déduit et maritime aussi
+                sum_customer += line.price_total
                 if line.check_adm:
                     # Administration = Maritime + RPA
                     sum_adm += line.tarif_maritime + line.tarif_rpa_ttc
-                    # Clients = Total TTC - Administration (Différents des ventes car pas de total taxes par ligne ici)
-                    sum_customer += line.price_total - (line.tarif_maritime + line.tarif_rpa_ttc)
-                    # _logger.warning(f"Custom : {line.price_total - (line.tarif_maritime + line.tarif_rpa_ttc)}")
                 
-                # Sinon Full Clients
-                else:
-                    sum_customer += line.price_total
-                
-                # Write fields values car les champs sont en readonly
-            # _logger.warning(f"[Fin] Adm = {sum_adm} | Custo = {sum_customer}")
             self.write({'sum_adm' : sum_adm, 'sum_customer' : sum_customer})
+            _logger.warning(f"Adm = {sum_adm} | Custo = {sum_customer}")
 
     # Calculs de taxes au chargement du documents
     def _recompute_tax_lines(self, recompute_tax_base_amount=False, tax_rep_lines_to_recompute=None):
