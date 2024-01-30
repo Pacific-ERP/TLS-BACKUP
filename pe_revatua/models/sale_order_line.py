@@ -194,10 +194,15 @@ class SaleOrderLineInherit(models.Model):
                 # Remise si existant : remise < 1 sinon = 1
                 discount = 1-(line.discount/100)
                 quantity = line.product_uom_qty
-                line.tarif_terrestre = line._compute_amount_base_revatua(line.base_terrestre, quantity, line.tarif_minimum_terrestre, discount)
-                line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, line.tarif_minimum_maritime, discount)
-                line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa)
-                line.tarif_rpa = line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa)        
+                # Prise en compte des lignes 100% maritime et PPN
+                if not self.base_terrestre and self.check_adm and self.base_maritime:
+                    line.discount = 100
+                    line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, line.tarif_minimum_maritime, 1)
+                else:
+                    line.tarif_terrestre = line._compute_amount_base_revatua(line.base_terrestre, quantity, line.tarif_minimum_terrestre, discount)
+                    line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, line.tarif_minimum_maritime, discount)
+                    line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa)
+                    line.tarif_rpa = line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa)        
     
     def _prepare_invoice_line(self,**optional_values):
         # OVERRIDE
@@ -229,9 +234,4 @@ class SaleOrderLineInherit(models.Model):
                 'tarif_minimum_rpa' : self.tarif_minimum_rpa,
                 'tarif_minimum_terrestre': self.tarif_minimum_terrestre,
             })
-            
-        # Prise en compte des lignes 100% maritime et PPN
-        if not self.base_terrestre and self.check_adm and self.base_maritime:
-            values['discount'] = 100
-            
         return values
