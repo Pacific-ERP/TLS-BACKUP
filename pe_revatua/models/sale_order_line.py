@@ -194,15 +194,21 @@ class SaleOrderLineInherit(models.Model):
                 # Remise si existant : remise < 1 sinon = 1
                 discount = 1-(line.discount/100)
                 quantity = line.product_uom_qty
+
                 # Prise en compte des lignes 100% maritime et PPN
-                if not self.base_terrestre and self.check_adm and self.base_maritime:
-                    line.discount = 100
-                    line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, line.tarif_minimum_maritime, 1)
-                else:
-                    line.tarif_terrestre = line._compute_amount_base_revatua(line.base_terrestre, quantity, line.tarif_minimum_terrestre, discount)
-                    line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, line.tarif_minimum_maritime, discount)
-                    line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa)
-                    line.tarif_rpa = line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa)        
+                vals = {
+                    'tarif_terrestre': line._compute_amount_base_revatua(line.base_terrestre, quantity, line.tarif_minimum_terrestre, discount),
+                    'tarif_maritime': line._compute_amount_base_revatua(line.base_maritime, quantity, line.tarif_minimum_maritime, discount),
+                    'tarif_rpa_ttc': line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa),
+                    'tarif_rpa': line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa),
+                }
+
+                # Article ADM 100% Maritime = Discount 100%
+                if not line.base_terrestre and line.check_adm and line.base_maritime:
+                    vals['discount'] = 100
+                    vals['tarif_maritime'] = line._compute_amount_base_revatua(line.base_maritime, quantity, line.tarif_minimum_maritime, 1)
+
+                line.write(vals)
     
     def _prepare_invoice_line(self,**optional_values):
         # OVERRIDE

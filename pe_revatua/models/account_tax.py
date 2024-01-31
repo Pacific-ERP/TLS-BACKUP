@@ -117,7 +117,7 @@ class AccountTaxInherit(models.Model):
             # _logger.warning(f"Tax Factures : account_line = {account_line}")
             line = account_line
         
-        _logger.error(f"##### [Totaux Taxes] : {taxes_name} | {line} | context : {self.env.context}#####")
+        _logger.error(f"##### [Totaux Taxes] {line.product_id.name if line else 'None'} : {taxes_name} | {line} | context : {self.env.context}#####")
         
         if not self:
             company = self.env.company
@@ -221,7 +221,6 @@ class AccountTaxInherit(models.Model):
             # Part Terrestre
             if line.tarif_terrestre:
                 pv_terrestre = line.tarif_terrestre
-                
                 # Minimum Terrestre
                 if line.tarif_minimum_terrestre and line.tarif_terrestre < line.tarif_minimum_terrestre:
                     pv_terrestre = line.tarif_minimum_terrestre
@@ -229,17 +228,24 @@ class AccountTaxInherit(models.Model):
             # Part Maritime
             if line.tarif_maritime:
                 pv_maritime = line.tarif_maritime
-
                 # Minimum Maritime
                 if line.tarif_minimum_maritime and line.tarif_maritime < line.tarif_minimum_maritime:
                     pv_maritime = line.tarif_minimum_maritime
 
-            # Part ADM non payé par client
-            if not line.check_adm:
-                # Total HT = Terrestre + Maritime
-                total_excluded = pv_terrestre + pv_maritime
-            else:
-                total_excluded = pv_terrestre
+            if pv_terrestre or pv_maritime: # Produit avec part Maritime ou Terrestre
+                
+                # HT Produit non ADM = Terrestre + Maritime
+                if not line.check_adm: 
+                    _logger.warning(f"IF")
+                    total_excluded = pv_terrestre + pv_maritime
+                # HT Produit ADM 100% Maritime
+                # elif line.check_adm and pv_maritime and not pv_terrestre:
+                #     _logger.warning(f"ELIF")
+                #     total_excluded = pv_maritime
+                # HT Produit ADM = Terrestre
+                else:
+                    _logger.warning(f"ELSE")
+                    total_excluded = pv_terrestre
         
         # <<< OVERRIDE
 
