@@ -42,24 +42,25 @@ class AccountMoveLine(models.Model):
     @api.onchange('product_uom_id', 'r_volume', 'r_weight')
     def _onchange_update_qty(self):
         # --- Check if revatua is activated ---#
-        if self.env.company.revatua_ck:
-            vals = {'quantity': 1}
+        if self.env.company.revatua_ck and self.product_id:
+            quantity = 0
             
             m3 = self.env.ref('pe_revatua.revatua_udm_mcube')
             t = self.env.ref('pe_revatua.revatua_udm_tons')
             t_m3 = self.env.ref('pe_revatua.revatua_udm_mcube_tons')
+
             
             # T/M3
             if self.product_uom_id.id == t_m3.id and self.r_volume and self.r_weight:
-                vals['quantity'] = round((self.r_volume + self.r_weight) / 2, 3)
+                quantity = round((self.r_volume + self.r_weight) / 2, 3)
             # T
             elif self.product_uom_id.id == t.id and self.r_weight:
-                vals['quantity'] = self.r_weight
+                quantity = self.r_weight
             # M3
             elif self.product_uom_id.id == m3.id and self.r_volume:
-                vals['quantity'] = self.r_volume
+                quantity = self.r_volume
 
-            self.write(vals)
+            self.quantity = quantity
 
     @api.onchange('product_id')
     def _pe_onchange_product_id(self):
@@ -90,7 +91,7 @@ class AccountMoveLine(models.Model):
         """
         # Effectue une condition ternaire plutôt qu'une instruction if / else 
         res = round(mini_amount if (mini_amount and ((base * discount) * qty) < mini_amount) else (base * discount) * qty, 0)
-        # _logger.error(f"[Facture : Calcul Tarif] _compute_amount_base_revatua : {res}")
+        _logger.error(f"[Facture : Calcul Tarif] _compute_amount_base_revatua : {res}")
         return res
         
     # Recalcul des part terrestre et maritime selon la quantité et la remise
@@ -98,13 +99,21 @@ class AccountMoveLine(models.Model):
     def _compute_revatua_part(self):
         # --- Check if revatua is activated ---#
         if self.env.company.revatua_ck and self.product_id:
-            # Remise si existant : remise < 1 sinon = 1
-            discount = 1-(self.discount/100)
-            quantity = self.quantity
-            self.tarif_terrestre = self._compute_amount_base_revatua(self.base_terrestre, quantity, self.tarif_minimum_terrestre, discount)
-            self.tarif_maritime = self._compute_amount_base_revatua(self.base_maritime, quantity, self.tarif_minimum_maritime, discount)
-            self.tarif_rpa_ttc = self._compute_amount_base_revatua(self.base_rpa, quantity, self.tarif_minimum_rpa, discount)
-            self.tarif_rpa = self._compute_amount_base_revatua(self.base_rpa, quantity, self.tarif_minimum_rpa, discount)
+            for line in self:
+                # Remise si existant : remise < 1 sinon = 1
+                discount = 1-(line.discount/100)
+                quantity = line.quantity
+
+                # Prise en compte des lignes 100% maritime et PPN
+                line.tarif_terrestre = line._compute_amount_base_revatua(line.base_terrestre, quantity, line.tarif_minimum_terrestre, discount)
+                line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, line.tarif_minimum_maritime, discount)
+                line.tarif_rpa_ttc = line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa)
+                line.tarif_rpa = line._compute_amount_base_revatua(line.base_rpa, quantity, line.tarif_minimum_rpa)
+
+                # Article ADM 100% Maritime = Discount 100%
+                if not line.base_terrestre and line.check_adm and line.base_maritime:
+                    line.discount = 100
+                    line.tarif_maritime = line._compute_amount_base_revatua(line.base_maritime, quantity, line.tarif_minimum_maritime, 1)
     
     def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None, line=None):
         # OVERRIDE
