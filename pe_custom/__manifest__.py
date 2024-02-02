@@ -8,12 +8,13 @@
         - Rajout de champs Vente/Achat/Compta (Poids, Volume, Pays de provenance, Mode acheminement, Incoterms à déplacer)
         - Rajout de champs Articles (Code douanier, Référence constructeur)
         - Champs téléphone et email obligatoire sur contacts
+        - Ajout de documents à envoyer pour le follow-ups (rapport de suivi)
     """,
     'author': "Mehdi Tepava",
     'website': "http://www.yourcompany.com",
     'category': 'Uncategorized',
     'version': '15.0.0.0.1',
-    'depends': ['purchase','account','pe_revatua'],
+    'depends': ['purchase','account','pe_revatua','account_followup'],
     'data': [
         'views/account_move.xml',
         'views/res_partner.xml',
