@@ -17,6 +17,12 @@ class ProductTemplate(models.Model):
         if any(val not in editable_field for val in vals) and self.env.user.has_group('pe_custom_stock.group_product_emplacement'):
             raise AccessError('Vous pouvez modifiez uniquement les champs(Emplacement,Images,Référence interne,Dénomination client) veuillez annuler la modification et recommencer.')
         return super(ProductTemplate, self).write(vals)
+
+    @api.onchange('pe_customer_denomination')
+    def _onchange_restrict_customer_deno(self):
+        for record in self:
+            if not self.env.user.has_group('pe_custom_stock.group_customer_denomination'):
+                raise AccessError('Vous ne pouvez pas modifier le champ "Dénomination client". Veuillez vous rapprocher de Terai ou Hokini pour toute modification concernant ce champ.')
     
 class ProductEmplacement(models.Model):
     _name = "product.emplacement"
