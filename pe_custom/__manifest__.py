@@ -9,6 +9,8 @@
         - Rajout de champs Articles (Code douanier, Référence constructeur)
         - Champs téléphone et email obligatoire sur contacts
         - Ajout de documents à envoyer pour le follow-ups (rapport de suivi)
+        - Ajout de la remise dans les lignes comptables pour filtre
+        - Restriction sur remise avec un champs limite
     """,
     'author': "Mehdi Tepava",
     'website': "http://www.yourcompany.com",
@@ -20,6 +22,7 @@
         'views/res_partner.xml',
         'views/purchase_order.xml',
         'views/product_template.xml',
+        'security/security_groups.xml',
     ],
     "license": "LGPL-3",
 }
