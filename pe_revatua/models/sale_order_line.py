@@ -128,7 +128,7 @@ class SaleOrderLineInherit(models.Model):
         # OVERRIDE
         res = super(SaleOrderLineInherit, self).product_id_change()
         # --- Check if revatua is activate ---#
-        if self.env.company.revatua_ck:
+        if self.env.company.revatua_ck and self.product_id:
             vals = {
                 'tarif_minimum' : self.product_id.tarif_minimum,
                 'check_adm' : self.product_id.check_adm,
@@ -144,7 +144,7 @@ class SaleOrderLineInherit(models.Model):
                 'tarif_minimum_rpa' : self.product_id.tarif_minimum_rpa,
             }
             # Article ADM 100% Maritime = Discount 100%
-            if not self.product_id.base_terrestre and self.product_id.check_adm and self.product_id.base_maritime:
+            if not self.product_id.tarif_terrestre and self.product_id.check_adm and self.product_id.tarif_maritime:
                 vals['discount'] = 100
 
             self.write(vals)
