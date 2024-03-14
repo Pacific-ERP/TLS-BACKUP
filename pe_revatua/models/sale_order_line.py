@@ -143,6 +143,10 @@ class SaleOrderLineInherit(models.Model):
                 'tarif_rpa' : self.product_id.tarif_rpa,
                 'tarif_minimum_rpa' : self.product_id.tarif_minimum_rpa,
             }
+            # Article ADM 100% Maritime = Discount 100%
+            if not self.product_id.base_terrestre and self.product_id.check_adm and self.product_id.base_maritime:
+                vals['discount'] = 100
+
             self.write(vals)
         # else:
         #     _logger.error('Revatua not activate : sale_order_line.py -> product_id_change')

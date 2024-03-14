@@ -34,4 +34,6 @@ class PurchaseOrderLine(models.Model):
         res['r_volume'] = self.pe_poid
         res['r_weight'] = self.pe_volume
         return res
+
+    
     

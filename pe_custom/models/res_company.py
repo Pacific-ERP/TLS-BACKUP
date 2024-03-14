@@ -12,3 +12,5 @@ class ResCompany(models.Model):
     technical_data = fields.Many2many(string='Fiche technique',
                                       comodel_name='ir.attachment',
                                       context={'default_public': True})
+
+    
